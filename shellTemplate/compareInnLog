@@ -1,0 +1,7 @@
+#!/bin/sh
+date=`date -d "yesterday" +%Y-%m-%d`
+num=`cat /home/twenliang/server/log/inn2_$date.log |wc -l`
+cannedNum=`cat /home/twenliang/server/log/inn2_$date.log | grep "LogOnPre" | wc -l`
+num=$((num=$num-$cannedNum))
+exec 3>/dev/tcp/172.30.0.102/4047
+echo -e "game1:$date:$num" >&3

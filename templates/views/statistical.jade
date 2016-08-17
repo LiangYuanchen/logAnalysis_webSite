@@ -1,0 +1,122 @@
+extends ../layouts/default
+
+block head
+
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		//- img(src='/images/logo.svg', width='160')
+		form(method='post')
+			input(type='hidden', name='action', value='statistical')
+			label 开始时间 
+			input.easyui-datetimebox(name="op",value=formatData["op"])
+			label 结束时间
+			input.easyui-datetimebox(name="ed",value=formatData["ed"])
+			label 显示数量
+			input.easyui-numberbox(name="num",vlaue=formatData["num"])
+			input(type="submit",value="检索")
+		//- p This is your new <a href='http://keystonejs.com', target='_blank'>KeystoneJS</a> website.
+		//- p It includes the latest versions of
+		//- 	| <a href='http://getbootstrap.com/' target='_blank'>Bootstrap</a>
+		//- 	| and <a href='http://www.jquery.com/' target='_blank'>jQuery</a>.
+		//- p Visit the <a href='http://keystonejs.com/guide' target='_blank'>Getting Started</a> guide to learn how to customise it.
+		//- hr
+		//- if user && user.canAccessKeystone
+		//- 	p
+		//- 		a(href='/keystone/signin').btn.btn-lg.btn-primary Open the Admin UI
+		//- else
+		//- 	p We have created a default Admin user for you with the email <strong>user@keystonejs.com</strong> and the password <strong>admin</strong>.
+		//- 	p
+		//- 		a(href='/keystone/signin', style='margin-right: 10px').btn.btn-lg.btn-primary Sign in
+		//- 		|  to use the Admin UI.
+		//- hr
+		//- p Remember to <a href='https://github.com/JedWatson/keystone' target='_blank'>Star KeystoneJS on GitHub</a> and
+		//- 	| <a href='https://twitter.com/keystonejs' target='_blank'>follow @keystonejs</a> on twitter for updates.
+
+		#container(style="min-width:700px;height:400px")
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type='text/javascript').
+			$("[name=op]").datetimebox();
+
+			var xAxis = "#{xAxis}".split(",").reverse();
+			//长度过长则只显示收尾
+				//- if(xAxis.length>=20)
+				//- {
+				//- 	for(var i=0;i<xAxis.length;i++){
+				//- 		if(i==0||i==(xAxis.length-1)){
+				//- 			continue;
+				//- 		}else{
+				//- 			xAxis[i] = "";
+				//- 		}
+				//- 	}
+				//- }
+			var online = eval("([#{online}])").reverse();
+			var totalUser = eval("([#{totalUser}])").reverse();
+			var sessionCount = eval("([#{sessionCount}])").reverse();
+			var regeisterCount = eval("([#{registerCount}])").reverse();
+			var onlineUidCount = eval("([#{onlineUidCount}])").reverse();
+			var gemOnsumedCount =eval("([#{GemConsumed}])").reverse();
+			$(function () {
+			    $('#container').highcharts({
+			        title: {
+			            text:'#{ttitle}',
+			            x: -20 //center
+			        },
+			        subtitle: {
+			            text: '#{subtitle}',
+			            x: -20
+			        },
+			        xAxis: {
+			            categories: xAxis
+			        },
+			        yAxis: {
+			            title: {
+			                text: '#{yAxisTitle}'
+			            },
+			            plotLines: [{
+			                value: 0,
+			                width: 1,
+			                color: '#808080'
+			            }]
+			        },
+			        tooltip: {
+			            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+			            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+			                '<td style="padding:0"><b>{point.y} 个</b></td></tr>',
+			            footerFormat: '</table>',
+			            shared: true,
+			            useHTML: true
+			        },		
+			        legend: {
+			            layout: 'vertical',
+			            align: 'right',
+			            verticalAlign: 'middle',
+			            borderWidth: 0
+			        },
+			        series: [{
+			            name: '在线人数',
+			            data:online },{
+			            name: '总人数',
+			            data:totalUser
+			            },{
+			            name:'Session数量',
+			            data:sessionCount
+			            },{
+			            name:'新注册人数',
+			            data:regeisterCount
+			            },{
+			            name:'ActiveUser',
+			            data:onlineUidCount
+			            },{
+			            name:'宝石消费量',
+			            data:gemOnsumedCount
+			            }
+			            ]
+			    });
+			});
+
+				

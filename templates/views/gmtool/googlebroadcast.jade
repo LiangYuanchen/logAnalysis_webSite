@@ -1,0 +1,293 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - GoogleBroadcast
+
+block content
+	.container: .jumbotron(style="min-height:400px;")
+		if hasPermission
+			div(style="float:left;width:300")
+				div(class="easyui-panel",title="添加")
+					form(method="post",action="/googlebroadcast_send",onsubmit="return subNow()",style="")
+						input(type="hidden",name="actions",value="send")
+						label 发送类型:
+						select(id="gtype",name="gtype",style="width:150px")
+							option(value="0") 全部
+							option(value="1") 指定
+						input(type="hidden",name="cmd",id="cmd",value="cmd")
+						br
+						label 设备号*:
+						input(class="easyui-textbox",style="",id="gid",name="gid")
+						br
+						label 内容类型:
+						select(id="type",name="type",style="width:150px")
+							option(value=2000) 文本
+						br
+						label 推送标题:
+						input(class="easyui-textbox",style="100px,float:left",name="title",id="title")
+						br
+						label(style="vertical-align: top;") 推送内容:
+						textarea(style="height:100px;margin-left:55px",id="message",name="message")
+						br
+						input(type="button",onclick="add()",name="sub",value="提交",style="width:100%;height:32px")
+			div(style="margin-left:20px;float:left;width:700px")
+				table(id="dg",class="easyui-datagrid",title="计划任务",style="width:auto;height:auto",data-options="singleSelect:true,collapsible:true,method:'post',toolbar:toolDg,onClickRow:onClickRow	,fitColumns:true,view:detailview")
+					thead
+						tr
+							th(data-options="field:'begindate',width:150,formatter:formatDate,editor:{type:'datetimebox',options:{editable:false,showSeconds:true,okText:'确定'}}") 开始时间
+							th(data-options="field:'cron',width:50,editor:'text' ") Cron
+							th(data-options="field:'onServer',width:50") 运行状态
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	script(type="text/javascript").
+		var prefix="googlebroadcast";
+		var toolDg=[
+			{
+			text:"刷新",
+			iconCls:"icon-reload",
+			handler:load
+			}
+			,{
+			text:'添加计划',
+			iconCls:'icon-add',
+			handler:append			
+			},
+			{
+			text:'删除计划',
+			iconCls:'icon-remove',
+			handler:remove
+			},
+			{
+			text:"保存",
+			iconCls:"icon-add",
+			handler:save
+			}
+		];
+		function onClickRow(index){
+				if (endEdit()){
+				    $('#dg').datagrid('selectRow', index)
+				            .datagrid('beginEdit', index);
+				                        editIndex = index;
+				    
+				} else {
+				    $('#dg').datagrid('selectRow', editIndex);
+				}		
+				var cmd = $("#dg").datagrid("getRows")[editIndex].cmd;
+				if(cmd){
+					var objCmd = getCmdObj(cmd);
+					valuation(objCmd);
+				}
+		}
+		function valuation(obj){
+			if(obj.title)
+				$("#title").val(obj.title);
+			if(obj.message)
+				$("#message").val(obj.message);
+			if(obj.gtype)
+				$("#gtype").val(obj.gtype);
+			if(obj.type)
+				$("#type").val(obj.type);
+			if(obj.gid)
+				$("#gid").val(obj.gid);
+		}
+		function clearVal()
+		{
+			$("#title").val("");
+			$("#message").val("");
+			$("#gtype").val("0");
+			$("#type").val("2000");
+			$("#gid").val("");
+		}
+		function getCmdObj(str)
+		{
+			var obj = {};
+			try{
+				obj = JSON.parse(str);
+			}
+			catch(err){
+				return {};
+			}
+			return obj;
+		}
+		function formatForm(){
+			var gtype=$("#gtype").val();
+			var type =parseInt($("#type").val());
+			var message=$("#message").val();
+			var title=$("#title").val();
+			var result={};
+			switch(gtype){
+				case "0":
+					result.to="/topics/global";
+					break;
+				case "1":
+					var gid=$("#gid").val();
+					result.registration_ids=gid.split(",");
+					break;
+				default:
+					break;
+			}
+			result.data={message:message,title:title,type:type};
+			return JSON.stringify(result);
+		}
+
+		function add(){
+			if(subNow())
+				{
+					$.post("/googlebroadcast_send",{cmd:$("#cmd").val()},function(data){
+							alert(data);
+						});				
+				}
+		};
+		function subNow(){
+			if(confirm("确认推送当前内容?"))
+				{
+					$("#cmd").val(formatForm());
+					return true;
+				}
+			else
+				return false;
+		}
+		function formatDate(val,row)
+		{
+			if(isNaN(val))
+				{
+					val = row.begindate = Date.parse(val);
+
+				}
+				return (new Date(parseInt(val))).format("yyyy-MM-dd hh:mm:ss");
+		}
+		function remove(){
+			if (editIndex == undefined){return}
+			var id=$("#dg").datagrid("getRows")[editIndex]._id;
+			$.post("/googlebroadcast_remove",{actions:"remove",_id:id},function(data){
+				$('#dg').datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+				editIndex = undefined;
+				$('#dg').datagrid('acceptChanges');
+				load();
+			});
+		}
+		function append(){
+			if(endEdit()){
+				$("#dg").datagrid("appendRow",{_id:"",begindate:Date.now(),cmd:"",cron:"* * * * * *"});
+				editIndex =$("#dg").datagrid("getRows").length-1;
+				$("#dg").datagrid("selectRow",editIndex).datagrid("beginEdit",editIndex);
+
+			}
+		}
+		function load(){
+			$.post("/googlebroadcast_cronlist",{actions:"cronlist"},function(data){
+					if(!data||!data.rows)
+						data={total:0,rows:[]};
+					$("#dg").datagrid("loadData",data);
+				});
+		}
+		function save(){
+			if(endEdit())
+				{
+					var rows = $("#dg").datagrid('getChanges');
+					$.post("/googlebroadcast_cronedit",{actions:"cronedit",data:rows},function(data){
+							$('#dg').datagrid('acceptChanges');
+							load();
+						});				
+				}
+
+		}
+		var editIndex=undefined;
+		function endEdit(){
+			if(editIndex==undefined)return true;
+			if($("#dg").datagrid("validateRow",editIndex)){
+				$("#dg").datagrid("endEdit",editIndex);
+			var row = $("#dg").datagrid("getRows")[editIndex];
+			row.cmd=formatForm();
+			editIndex=undefined;
+			return true;
+			}
+			else
+				return false;
+		}
+		$(function(){
+		  $("#dg").datagrid({
+				 detailFormatter:function(rowIndex,rowData){
+					  return '<table><tr>' +
+									  '<td style="border:0;padding-right:10px">' +
+									  '<p>cmd: ' + JSON.stringify(rowData.cmd) + '</p>' +
+									  '</td>' +
+									  '</tr></table>';
+				 }
+			});			
+			load();
+			});
+		$.fn.datebox.defaults.formatter = function(date){
+		var y = date.getFullYear();
+		var m = date.getMonth()+1;
+		var d = date.getDate();
+		var h = date.getHours() > 9 ? date.getHours() : '0'+date.getHours();
+		var mm = date.getMinutes() > 9 ? date.getMinutes() : '0'+date.getMinutes();
+		var s = date.getSeconds() > 9 ? date.getSeconds() : '0'+date.getSeconds();
+		return y+'-'+m+'-'+d+' '+h+":"+mm+":"+s;
+		}
+
+
+
+		/***扩展editors的datetimebox方法*****/
+		$.extend($.fn.datagrid.defaults.editors, {
+		numberspinner: {
+		        init: function(container, options){
+		            var input = $('<input type="text">').appendTo(container);
+		            return input.numberspinner(options);
+		        },
+		        destroy: function(target){
+		            $(target).numberspinner('destroy');
+		        },
+		        getValue: function(target){
+		            return $(target).numberspinner('getValue');
+		        },
+		        setValue: function(target, value){
+		            $(target).numberspinner('setValue',value);
+		        },
+		        resize: function(target, width){
+		            $(target).numberspinner('resize',width);
+		        }
+		    },
+		datetimebox: {//datetimebox就是你要自定义editor的名称
+		        init: function(container, options){
+		            var editor = $('<input />').appendTo(container);
+		            editor.enableEdit = false;
+		            editor.datetimebox(options);
+		            return editor;
+		        },
+		        getValue: function(target){
+		        var new_str = $(target).datetimebox('getValue').replace(/:/g,'-');
+		        new_str = new_str.replace(/ /g,'-');
+		        var arr = new_str.split("-");
+		        var datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
+		        var timeStamp = datum.getTime();
+		        
+		        return new Date(timeStamp).format("yyyy-MM-dd hh:mm:ss");
+		            //return timeStamp;
+		       },
+		        setValue: function(target, value){
+		        if(value)
+		        $(target).datetimebox('setValue',new Date(value).format("yyyy-MM-dd hh:mm:ss"));
+		        else
+		        $(target).datetimebox('setValue',new Date().format("yyyy-MM-dd hh:mm:ss"));
+		        },
+		        resize: function(target, width){
+		           $(target).datetimebox('resize',width);        
+		        },
+		        destroy: function(target){
+		        $(target).datetimebox('destroy');
+		        }
+		    }
+		});
+
+
+
+
+
+

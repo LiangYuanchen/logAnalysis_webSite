@@ -1,0 +1,285 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		form(id="userData",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="userData")
+			span userData(Init)
+			input(type="submit", placeholder="placeholder",value="提交")
+		br
+		form(id="updateUser", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="updateUser")
+			span UpdateUser(Edit)
+			input(type="submit",placeholder="placeholder",value="提交")
+		br 
+		form(id="removeRepeatedUser", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="removeRepeatedUser")
+			span removeRepeatedUser
+			input(type="submit",placeholder="placeholder",value="提交")
+		br 		
+		form(id="updateUser_Country", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="updateUser_Country")
+			span updateUser_Country(Edit)
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="getMySqlCount", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="getMySqlCount")
+			span days:
+			input(type="textbox",name="days")
+			span getMySqlCount
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="RegisterLog",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="RegisterLog")
+			span RegisterLog
+			input(type="submit", placeholder="placeholder",value="提交")
+		form(id="baseLog",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="baseLog")
+			span baseLog 
+			input(type="checkbox",name="onlygembuy")
+			span (onlygembuy)
+			input(type="submit", placeholder="placeholder",value="提交")
+		br
+		form(id="phaseStatistical", method="post")
+			span logDate: 
+			input(type="textbox",name="logdate")
+			input(type="hidden", placeholder="placeholder",name="actions",value="phaseStatistical")
+			span phaseStatistical
+			input(type="submit", placeholder="placeholder",value="提交")
+		br 
+		form(id="sendEmail",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="sendEmail")
+			span sendEmail
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="updateErrorID", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="updateErrorID")
+			span updateErrorID
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="getSummary", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="getSummary")
+			span getSummary
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="getSummaryByDate", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="getSummaryByDate")
+			span getSummaryByDate
+			input(type="textbox",name="date")
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="moveAllData", method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="moveAllData")
+			span moveAllDatas
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="addSignCountry",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="addSignCountry")
+			span op: 
+			input(type="textbox",name="op")
+			span ed:
+			input(type="textbox",name="ed")
+			span addSignCountry
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="summaryAll",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="summaryAll")
+			span days:
+			input(type="textbox",name="days")
+			span summaryAll
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="Dayleft",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="Dayleft")
+			span days: 
+			input(type="textbox",name="days")
+			span Dayleft
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="SYNCDailyStatistical_onlyTutorial",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="SYNCDailyStatistical_onlyTutorial")
+			span days:
+			input(type="text",name="days")
+			span end:
+			input(type="text",name="end")
+			span timezone:
+			input(type="text",name="timezone")
+			span SYNCDailyStatistical_onlyTutorial
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="SYNCDailyStatistical_onlySummary",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="SYNCDailyStatistical_onlySummary")
+			span days:
+			input(type="text",name="days")
+			span end:
+			input(type="text",name="end")
+			span timezone:
+			input(type="text",name="timezone")
+			span SYNCDailyStatistical_onlySummary
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="SYNCDailyStatistical_onlyRetention",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="SYNCDailyStatistical_onlyRetention")
+			span days:
+			input(type="text",name="days")
+			span end:
+			input(type="text",name="end")
+			span timezone:
+			input(type="text",name="timezone")
+			span SYNCDailyStatistical_onlyRetention
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="SYNCDailyStatistical",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="SYNCDailyStatistical")
+			span days:
+			input(type="text",name="days")
+			span end:
+			input(type="text",name="end")
+			span timezone:
+			input(type="text",name="timezone")
+			span SYNCDailyStatistical
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="SYNCDailyStatisticalLinshi",method="post")
+			input(type="hidden", placeholder="placeholder",name="actions",value="SYNCDailyStatisticalLinshi")
+			span days: 
+			input(type="textbox",name="days")
+			span SYNCDailyStatisticalLinshi
+			input(type="submit",placeholder="placeholder",value="提交")
+		br
+		form(id="monitoring",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="monitoring")
+			span monitoring:
+			if onMonitoring
+				input(type="submit",name="off")
+			if !onMonitoring
+				input(type="submit",name="on")
+		br
+		form(id="getStorageNow",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getStorageNow")
+			span getStorageNow:
+				input(type="submit",name="getStorageNow")
+		br
+		form(id="payinginfo",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="payinginfo")
+			span payinginfo:
+				input(type="submit",name="payinginfo")
+		br
+		form(id="getCluster",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getCluster")
+			span getCluster:
+				input(type="submit",name="getCluster")
+		br
+		form(id="getdiffofinnlogs",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getdiffofinnlogs")
+			span logDate: 
+			input(type="textbox",name="logdate")
+			span getdiffofinnlogs:
+				input(type="submit",name="getdiffofinnlogs")
+		form(id="getRT",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getRT")
+			span getRT:
+				input(type="submit",name="getRT")
+		br
+		form(id="testStatisticalHandle",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="testStatisticalHandle")
+			span date:
+			input(type="textbox",name="date")
+			span timezone:
+			input(type="textbox",name="timezone")
+			span testStatisticalHandle:
+				input(type="submit",name="getRT")
+		br
+		form(id="getIPO",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getIPO")
+			span days:
+			input(type="textbox",name="days")
+			span getIPO:
+				input(type="submit",name="getIPO")
+		br
+		form(id="getIPO_Date",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getIPO_Date")
+			span date:
+			input(type="textbox",name="date")
+			span getIPO_Date:
+				input(type="submit",name="getIPO_Date")
+		br
+		form(id="getMysql_days",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getMysql_days")
+			span days:
+			input(type="textbox",name="days")
+			span end:
+			input(type="text",name="end")
+			span getMysql_days:
+				input(type="submit",name="getMysql_days")
+		br
+		form(id="getMysql_Date",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getMysql_Date")
+			span date:
+			input(type="textbox",name="date")
+			span end:
+			input(type="text",name="end")
+			span getMysql_Date:
+				input(type="submit",name="getMysql_Date")
+		br
+		form(id="getMysql_order",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getMysql_order")
+			span date:
+			input(type="textbox",name="date")
+			span end:
+			input(type="text",name="end")
+			span getMysql_order:
+				input(type="submit",name="getMysql_order")
+		br
+		form(id="getMysql_register",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="getMysql_register")
+			span date:
+			input(type="textbox",name="date")
+			span end:
+			input(type="text",name="end")
+			span getMysql_register:
+				input(type="submit",name="getMysql_register")
+		br
+		form(id="summary",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="summary")
+			span firstdate:
+			input(type="textbox",name="firstdate")
+			span lastdate:
+			input(type="textbox",name="lastdate")
+			span summary:
+				input(type="submit",name="getIPO_Date")
+		br
+		form(id="LTV",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="LTV")
+			span date:
+			input(type="textbox",name="date")
+			span LTV:
+				input(type="submit",name="LTV")
+		br
+		form(id="testRetentions",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="testRetentions")
+			span newuserDay:
+			input(type="textbox",name="date")
+			span retentionDay:
+			input(type="textbox",name="date2")
+			span testRetentions:
+				input(type="submit",name="testRetentions")
+		br
+		form(id="newUser",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="newUser")
+			span email:
+			input(type="textbox",name="email")
+			span code:
+			input(type="textbox",name="code")
+			span newUser:
+				input(type="submit",name="newUser")
+		br
+		form(id="devicd_id",method="post")
+			input(type="hidden",placeholder="placeholder",name="actions",value="devicd_id")
+			span devicd_id:
+				input(type="submit",name="newUser")
+		br
+		

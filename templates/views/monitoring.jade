@@ -1,0 +1,114 @@
+extends ../layouts/default
+
+block head
+
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		#container(style="height:400px;margin-rigth:10px;")
+		br(style="clear:both:margin:10px;")
+
+block js
+		script(type="text/javascript", src="/js/highstock.js")
+		script(type="text/javascript", src="/js/modules/exporting.js")
+		script(type="text/javascript", src="/easyui/jquery.easyui.min.js")
+		script(type='text/javascript').
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+			}
+			function showDailyBegin(logDate){
+				var Nowdate=new Date(logDate);
+				var day = Nowdate.getHours()*60*60*1000+Nowdate.getMinutes()*60*1000+Nowdate.getSeconds()*1000+Nowdate.getMilliseconds();
+				var dailyBegin = new Date(Nowdate-day);
+				dailyBegin = dailyBegin;
+				return dailyBegin;
+			}
+			var currentDate = Date.now();
+
+			function addPointHandler(data,serie){
+				for(var i=0;i<data.length;i++){
+					serie.addPoint(data[i],false,false);
+				}
+			}
+			$(function () {
+			    Highcharts.setOptions({
+			        global : {
+			            useUTC : false
+			        }
+			    });
+				var mongodb = eval("(#{JSON.stringify(mongodb)})") ;
+				var nodejs = eval("(#{JSON.stringify(nodejs)})") ;
+				
+			    $('#container').highcharts('StockChart',{
+			    	chart:{
+			    		events:{
+			    			load:function(){
+			    				var self = this;
+			    				var mongodbData = self.series[0];
+			    				var nodejsData = self.series[1];
+			    				setInterval(function(){
+			    					$.post("/monitoring",{actions:"getresult",op:currentDate,name:"mongodb"},function(data){
+			    							addPointHandler(data,mongodbData);
+			    							self.redraw();
+			    						});
+			    					$.post("/monitoring",{actions:"getresult",op:currentDate,name:"nodejs"},function(data){
+			    							addPointHandler(data,nodejsData);
+			    							self.redraw();
+			    						});			    					
+			    					currentDate = Date.now();
+			    						
+			    					},5000);
+
+			    			}
+			    		}
+			    	},
+			        title: {
+			            text:'#{ttitle}',
+			            x: -20 //center
+			        },
+			        subtitle: {
+			            text: '#{subtitle}',
+			            x: -20
+			        },
+			        rangeSelector: {
+			            buttons: [{
+			                count: 30,
+			                type: 'minute',
+			                text: '30M'
+			            }, {
+			                count: 5,
+			                type: 'hour',
+			                text: '5h'
+			            }, {
+			                type: 'all',
+			                text: 'All'
+			            }],
+			            inputEnabled: false,
+			            selected: 0
+			        },
+			        exporting: {
+			            enabled: false
+			        },	
+			        legend:{
+			            enabled:true
+			        },
+			        series: [{
+			            name: 'mongodb占用',
+			            data:mongodb },{
+			            name:'nodejs占用',
+			            data:nodejs
+			            }
+			            ]
+			    });
+
+
+			});
+
+				

@@ -1,0 +1,68 @@
+extends ../../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - SummonLegend
+block content
+	span(id="show_message")
+	if hasPermission
+		.container: .jumbotron(style="height:1000px")
+			//- <span>regionId("," 分隔多个):</span>
+			//- <input type='text' id="regions" value=""> 
+			//- <span>regionId排除(","分隔多个):</span>
+			//- <input type="text" id="excluderegionid" value="">
+			<a href="javascript:void(0)" title="保存" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="save()">更改</a>
+			span(style="color:red") 1.操作完成后请点击更改，否则不生效 2.添加新分区数据请点击更改，否则列表不显示
+			h2 SummonLegend
+				span(id="currentregionid_show",style="color:red;margin-left:10px;font-size:20px")
+			div(id="region",style="padding:5px")
+			div(style="float:left;width:250px")
+				div(class="easyui-panel",title="操作",style="width:250px;padding:30px 60px")
+					div(style="margin:20px 0")
+						div advId
+						input(class="easyui-numberbox",id="advid",data-options="",style="width:100%,height:32px")
+						span(style="color:red") *
+					div(style="margin:20px 0")
+						div start
+						input(class="easyui-datetimebox",id="start",data-options="",style="width:100%,height:32px")
+						span(style="color:red") *
+					div(style="margin:20px 0")
+						div end
+						input(class="easyui-datetimebox",id="end",data-options="",style="width:100%,height:32px")
+						span(style="color:red") *
+					div(style="margin:20px 0")
+						div regionId
+						input(class="easyui-textbox",id="regionid",data-options="",style="width:100%,height:32px")
+						span(style="color:red") *
+					div(style="margin:20px 0")
+						div excludeRegionId
+						input(class="easyui-textbox",id="excluderegionid",data-options="",style="width:100%,height:32px")
+					div(style="margin:20px 0")
+						a(href="#",onclick="edit()",class="easyui-linkbutton",iconCls="icon-ok",style="width:100%;height:32px") 添加
+					div(style="margin:20px 0")
+						a(href="#",onclick="deleteSummonlegend()",class="easyui-linkbutton",iconCls="icon-remove",style="width:100%;height:32px") 删除						
+			div(style="float:left;width:700px;margin-left:20px;")
+				table(id="tt",class="easyui-datagrid",title="summonlegend",style="width:auto;height:auto;",data-options="singleSelect:true,collapsible:true,method:'post',toolbar:tooldg,rownumbers:true,fitColumns:true")
+					thead
+						tr
+							th(data-options="field:'advid',width:50") advid
+							th(data-options="field:'start',width:70,formatter:formatDate") startDate
+							th(data-options="field:'end',width:70,formatter:formatDate ") endDate
+							th(data-options="field:'isedit',width:20 ") isedit
+							th(data-options="field:'atRegion',width:100 ") atRegion
+
+	else 
+		.container: .jumbotron
+			form
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/js/underscore-min.js")
+	script(type="text/javascript", src="/js/async.min.js")
+	link(rel="stylesheet", type="text/css", href="/css/summonlegend.css")
+	script(type="text/javascript", src="/js/summonlegend.js")
+
+

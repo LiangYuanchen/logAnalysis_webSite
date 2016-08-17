@@ -1,0 +1,70 @@
+extends ../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 FeedBack
+block content
+	.container: .jumbotron
+		div 双击行查看明细
+		div
+			label uid
+			input.textbox(name="uid",id="uid")
+			label 酒馆名称
+			input.textbox(name="tavername",id="tavername")
+			input(type="button",id="sub",onclick="changeSub()",value="检索")
+		table(style="min-width:700px",id="dg")
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type="text/javascript", src="/js/formatterDg.js")
+		script(type='text/javascript').
+			function formaaterUid(val,row){
+				return "<a href='/feedbackinfo?_id="+row._id+"' target='_blank' >"+row.uid+"</a>"
+			}
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+			}
+			function changeSub()
+			{
+				var queryParams = $('#dg').datagrid('options').queryParams;
+				queryParams.uid = $("#uid").val();
+				queryParams.tavername = $("#tavername").val();
+				$('#dg').datagrid('reload');
+			}
+			
+			$('#dg').datagrid({
+				singleSelect:true,
+				pagination:true,
+				sortName:'timeStamp',
+				sortOrder:'desc',
+				url:'/handle',
+				rownumbers:true,
+				queryParams:{actions:"feedbacklist"},
+				pageSize:50,
+				columns:[
+				[
+					{field:"uid",title:'uid',width:150,sortable:true,order:'desc',formatter:formaaterUid},
+					{field:'timeStamp',title:'日期',width:170,formatter:formatterDate,sortable:true,order:'desc'},
+					{field:'regionid',title:'regionid',width:70,sortable:true,order:'desc'},
+					{field:'username',title:'username',width:70,sortable:true,order:'desc'},
+					{field:'tavername',title:'tavername',width:70,sortable:true,order:'desc'},
+					{field:'message',title:'message',width:400,sortable:true,order:'desc'}
+				]			],
+				onDblClickRow:function(index,row){
+					//alert(JSON.stringify(row));
+					window.open("/feedbackinfo?_id="+row._id);
+				}
+			});
+			$(function(){
+				//var pager = $('#dg').datagrid().datagrid('getPager');
+			});	

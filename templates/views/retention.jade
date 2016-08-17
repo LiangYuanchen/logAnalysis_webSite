@@ -1,0 +1,207 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="styles/easyui.css")
+block content
+	.container: .jumbotron
+		if onSummaryRetention
+			span(style="color:red") #{new Date(onSummaryRetention*1000).toDateString()} 数据整理中……
+		form(method='get')
+			input(type='hidden', name='action', value='statistical')
+			label 查询时间 
+			input.easyui-datebox(name="date",value=filters["date"])
+			select(id="registertype",name="registertype",style="width:150px")
+				option(value="0",selected=filters["registertype"] == "0") 全部
+				option(value="1",selected=filters["registertype"] == "1") 筛选出未登录用户
+			select(id="formatstatus",name="formatstatus",style="width:150px")
+				option(value="0",selected=filters["formatstatus"] == "0") 日留存
+				option(value="1",selected=filters["formatstatus"] == "1") 首次付费				
+				option(value="2",selected=filters["formatstatus"] == "2") 日留存（人数）	
+			include ../layouts/country
+			include ../layouts/onlypaid
+			include ../layouts/region
+			include ../layouts/timezone
+			input(type="submit",id="sub",value="检索",onsubmit="checktimezone()")
+			label(id="lastlogdate")
+		#container(style="min-width:700px;height:400px")
+		table(style="min-width:700px",id="dg")
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type="text/javascript", src="/js/formatterDg.js")
+		script(type="text/javascript", src="/js/underscore-min.js")
+
+		script(type='text/javascript').
+			var daysLefts = !{JSON.stringify(DataDaysLeft)};
+			var selectedUserCount = !{DataTop10[0]?DataTop10[0].newuserCount:0} ||0;
+			formatStatus = parseInt( $("#formatstatus").val());
+			var xAxis =[];
+			var yAxis =[];
+			var DataTop10 = !{JSON.stringify(DataTop10)};
+			function checktimezone(){
+				$("#timezone").val("1,2,3");
+				return true;
+			}
+			function onClickRow(index){
+				var parm = $("#dg").datagrid("getRows");
+				daysLefts = parm[index].daysLeft;
+				
+				selectedUserCount = parm[index].newuserCount;
+				bindData(parm[index]);
+			}
+			function bindData(parm){
+				xAxis = [];
+				yAxis = [];
+				var userCounts = [];
+				var paidCounts = [];
+				var logDate =  "Nebula,";
+				var title="日留存";
+				var yAxisName="日留存";
+				if(!parm)
+				{
+					parm = DataTop10[0];
+				}
+				if(!parm)
+				{
+					return ;
+				}
+				if(!parm.firstpaids)
+					parm.firstpaids=[];
+				var retentions = parm.retentions;
+
+				for(var i=0;i<daysLefts.length;i++){
+					var date = new Date(daysLefts[i].date*1000);
+					var dayleft = daysLefts[i].dayleft || 0;
+					dayleft = dayleft;
+					xAxis.push((date.getMonth()+1)+"/"+date.getDate());
+					yAxis.push(retentions[i]);
+					userCounts.push(Math.ceil( selectedUserCount*parseFloat(dayleft)/100));
+					var paidcount = 0;
+					var firstpaid = _.find(parm.firstpaids,function(firstpaid){return firstpaid.date == daysLefts[i].date});
+					if(firstpaid)
+						paidcount = firstpaid.count;
+					paidCounts.push(paidcount);
+
+				}		
+				
+				if(parm){
+					logDate = new Date(parm.logDate*1000);
+					//alert(logDate);
+					logDate = (logDate.getMonth()+1)+"/"+logDate.getDate();
+				}					
+
+			    $('#container').highcharts({
+			        title: {
+			            text:title,
+			            x: -20 //center
+			        },
+			        subtitle: {
+			            text: logDate,
+			            x: -20
+			        },		        
+			        xAxis: {
+			            categories: xAxis
+			        },		        
+			        yAxis: {
+			            title: {
+			                text: '#{yAxisTitle}'
+			            },
+			            plotLines: [{
+			                value: 0,
+			                width: 1,
+			                color: '#808080'
+			            }]
+			        },
+			        tooltip: {
+			            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+			            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+			                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+			            footerFormat: '</table>',
+			            shared: true,
+			            useHTML: true
+			        },		
+			        legend: {
+			            layout: 'vertical',
+			            align: 'right',
+			            verticalAlign: 'middle',
+			            borderWidth: 0
+			        },
+			        series: [{
+			            name: yAxisName,
+			            data:yAxis}
+			            	,{
+			            name:'首次付费',
+			            data:paidCounts
+			            }]
+			    });
+			}
+	
+			var getStrByDate = function(date){
+				var timezone = $("#")
+			  return new Date(date*1000).format("MM/dd/yyyy");
+			}			
+			function formatterDate(val,row){
+				return getStrByDate(val);
+			}
+			
+			$(function () {				
+				for(var i=0;i<DataTop10.length;i++){
+					DataTop10[i].daysLeft = eval("("+DataTop10[i].daysLeft+")");
+					if(DataTop10[i].firstpaids)
+						DataTop10[i].firstpaids = eval("("+DataTop10[i].firstpaids+")");
+				}
+				bindData();
+
+				$('#dg').datagrid({
+					data:DataTop10,
+					singleSelect:true,
+					fitColumns: true,  
+					nowrap:false,
+					width:1018,
+					columns:[
+					[
+					{field:'logDate',title:'UTC日期',width:70,formatter:formatterDate},
+					{field:'newuserCount',title:'新用户',width:50},
+					{field:'daysLeft0',title:'当天',formatter:formatterDaysLeft0},
+					{field:'daysLeft1',title:'1天后',formatter:formatterDaysLeft1},
+					{field:'daysLeft2',title:'2天后',formatter:formatterDaysLeft2},
+					{field:'daysLeft3',title:'3天后',formatter:formatterDaysLeft3},
+					{field:'daysLeft4',title:'4天后',formatter:formatterDaysLeft4},
+					{field:'daysLeft5',title:'5天后',formatter:formatterDaysLeft5},
+					{field:'daysLeft6',title:'6天后',formatter:formatterDaysLeft6},
+					{field:'daysLeft7',title:'7天后',formatter:formatterDaysLeft7},
+					{field:'daysLeft8',title:'8天后',formatter:formatterDaysLeft8},
+					{field:'daysLeft9',title:'9天后',formatter:formatterDaysLeft9},
+					{field:'daysLeft10',title:'10天后',formatter:formatterDaysLeft10},
+					{field:'daysLeft11',title:'11天后',formatter:formatterDaysLeft11},
+					{field:'daysLeft12',title:'12天后',formatter:formatterDaysLeft12},
+					{field:'daysLeft13',title:'13天后',formatter:formatterDaysLeft13},
+					{field:'daysLeft14',title:'14天后',formatter:formatterDaysLeft14},
+					{field:'daysLeft15',title:'15天后',formatter:formatterDaysLeft15},
+					{field:'daysLeft16',title:'16天后',formatter:formatterDaysLeft16},
+					{field:'daysLeft17',title:'17天后',formatter:formatterDaysLeft17},
+					{field:'daysLeft18',title:'18天后',formatter:formatterDaysLeft18},
+					{field:'daysLeft19',title:'19天后',formatter:formatterDaysLeft19},
+					{field:'daysLeft20',title:'20天后',formatter:formatterDaysLeft20},
+					{field:'daysLeft21',title:'21天后',formatter:formatterDaysLeft21},
+					{field:'daysLeft22',title:'22天后',formatter:formatterDaysLeft22},
+					{field:'daysLeft23',title:'23天后',formatter:formatterDaysLeft23},
+					{field:'daysLeft24',title:'24天后',formatter:formatterDaysLeft24},
+					{field:'daysLeft25',title:'25天后',formatter:formatterDaysLeft25},
+					{field:'daysLeft26',title:'26天后',formatter:formatterDaysLeft26},
+					{field:'daysLeft27',title:'27天后',formatter:formatterDaysLeft27},
+					{field:'daysLeft28',title:'28天后',formatter:formatterDaysLeft28},
+					{field:'daysLeft29',title:'29天后',formatter:formatterDaysLeft29},
+					{field:'daysLeft30',title:'30天后',formatter:formatterDaysLeft30}
+					]
+					],
+					onClickRow:onClickRow
+					});
+				//$(".datagrid-htable tbody").hide();
+				$.post("/handle",{actions:"lastlogdateStatistical"},function(data){
+					$("#lastlogdate").text(data);
+				});
+			});
+
+				

@@ -1,0 +1,35 @@
+#!/usr/bin/expect
+set timeout 100
+set vnum [lindex $argv 0]
+spawn ssh -i /home/lyuanchen/.ssh/liangyuanchen lyuanchen@52.4.101.225
+expect "server"
+send "sudo su \r"
+expect "server"
+send "cd /home/twenliang/server/log\r"
+expect "server"
+send "rm -f /home/lyuanchen/count\r"
+expect "server"
+send "cat inn1_$vnum.log | wc -l  > /home/lyuanchen/count\r"
+expect "server"
+send "exit \r"
+expect "server"
+send "exit \r"
+expect "server"
+expect "lyuanchen"
+spawn ssh -i /home/lyuanchen/.ssh/liangyuanchen lyuanchen@52.1.106.90
+expect "server"
+send "sudo su \r"
+expect "server"
+send "cd /home/twenliang/server/log\r"
+expect "server"
+send "rm -f /home/lyuanchen/count\r"
+expect "server"
+send "cat inn2_$vnum.log | wc -l  > /home/lyuanchen/count\r"
+expect "server"
+send "exit \r"
+expect "server"
+send "exit \r"
+expect "server"
+expect "lyuanchen"
+expect eof 
+exit

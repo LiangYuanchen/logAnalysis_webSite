@@ -1,0 +1,57 @@
+extends ../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block intro
+	.container
+		h1 FeedBack
+	
+block content
+	.container: .jumbotron
+		div
+			a(href="#info") look info
+		table(id="pg",class="easyui-propertygrid",style="width:auto",data-options="showGroup:true,showHeader:false,scrollbarSize:0")
+		br
+		div(id="message",style="width:auto")
+		br
+		pre(id="log",style="width:auto")
+		br
+		pre(id="info",style="width:auto")
+		br
+		div
+			a(href="#pg") Back To The Top
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript").
+		var data = !{JSON.stringify(data)} || "";
+		
+		$(function(){
+
+			var result={};
+			result.rows = [
+				{"name":"uid","value":data.uid,"group":"反馈信息"},
+				{"name":"username","value":data.username,"group":"反馈信息"},
+				{"name":"tavername","value":data.tavername,"group":"反馈信息"},
+				{"name":"regionid","value":data.regionid,"group":"反馈信息"},
+				{"name":"createdAt","value":(new Date(data.timeStamp*1000)).format(),"group":"反馈信息"}
+			];
+			result.total = result.rows.length;
+			$("#pg").propertygrid("loadData",result);
+			$("#log").text(data.logs);
+			$("#message").text(data.message);
+			$("#info").text(data.info);
+		});
+	style(type="text/css").
+		#message{
+			display: block;
+			padding: 9.5px;
+			margin: 0 0 10px;
+			font-size: 13px;
+			line-height: 1.42857143;
+			word-break: break-all;
+			word-wrap: break-word;
+			color: #333;
+			background-color: #f5f5f5;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}

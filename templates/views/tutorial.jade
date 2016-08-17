@@ -1,0 +1,99 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		//- img(src='/images/logo.svg', width='160')
+		form(method='get')
+			include ../layouts/country
+			label 查询时间 
+			input.easyui-datebox(name="firstDate",value=filters["firstDate"])
+			input.easyui-datebox(name="lastDate",value=filters["lastDate"])
+			select.easyui-combobox(name="stype",value=filters["stype"],style="")
+				option(value="daily") 日
+				//- option(value="weekly") 周
+				//- option(value="monthly") 月
+			input(type="submit",id="sub",value="检索")
+
+		#container(style="min-width:700px;height:400px")
+		#containerTrend(style="min-width:700px;height:400px")
+		h4 新用户数量:#{userCount}
+		table(style="min-width:700px",id="dg")
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type="text/javascript", src="/js/formatterDg.js")
+		script(type='text/javascript').
+			var datas = !{JSON.stringify(datas)};
+			var list = !{JSON.stringify(list)};
+			var tutorialnames = !{JSON.stringify(tutorialnames)};
+
+			function onClickRow(index){
+				var parm = $("#dg").datagrid("getRows");
+				list = parm[index];
+				var country=$("[name=country]").val();
+				$.post("/tutorial",{list:list,firstDate:new Date($("[name=firstDate]").val())/1000,lastDate:new Date($("[name=lastDate]").val())/1000,stype:$("[name=stype]").val(),country:country},function(data){
+					$("#containerTrend").show();
+					$("#containerTrend").highcharts({
+						                      title: {
+						                          text:data.title
+						                      },
+						                      xAxis: {
+						                          categories: data.key					                      },
+						                      series: [{
+						                          name: "Tutorial",
+						                          data: data.value
+						                      }]
+						                });
+					});
+			}
+
+			$(function(){
+				$("#containerTrend").hide();
+				$("#container").highcharts({
+						                      title: {
+						                          text:"Tutorial"
+						                      },
+						                      xAxis: {
+						                          categories: datas.key,
+				                                  labels:{
+				                                  	step:3,
+				                                  	staggerLines:1
+				                                  }						                          
+						                      },
+						                      series: [{
+						                          type: 'column',
+						                          name: "Tutorial",
+						                          data: datas.value
+						                      }]
+						                });
+				$("#dg").datagrid({
+					data:list,
+					singleSelect:true,
+					fitColumns: true,  
+					nowrap:false,
+					width:1018,
+					columns:[
+						[
+							{field:"tutorialID",title:"tutorialID",width:100},
+							{field:"tutorialName",title:"tutorialName",width:100},
+							{field:"finishCount",title:"进入用户数量",width:50},
+							{field:"conversionPer",title:"上步转化率",width:50},
+							{field:"conversion",title:"总体转换率(%)",width:50}
+						]
+					],
+					onClickRow:onClickRow
+					});
+			});
+				function getFormat(){
+			      if(this.isFirst)
+			        return this.value;
+			      if(this.isLast)
+			        return this.value;
+			      return "";
+			    }
+
+				

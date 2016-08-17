@@ -1,0 +1,176 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - LeaveMessge
+
+block content
+	if hasPermission
+		.container: .jumbotron(style="")
+			h2 LeaveMessge
+				span(id="typeid")
+			div(style="float:left;width:250px;")
+				div(class="easyui-panel",title="添加",style="width:250px;padding:30px 60px;")
+					form(method="post",action="/leavemsgadd")
+						div(style="margin:20px 0;")
+							div UID:
+							input(class="easyui-textbox",id="uid",data-options="",style="width:100%,height:32px")
+							div(style="margin:20px 0;", class="qunfa")
+							div TypeID:
+							input(class="easyui-numberbox",id="tid",data-options="",style="width:100%,height:32px")
+							div(style="margin:20px 0;", class="qunfa")
+							div MsgContent:
+							textarea(style="width:127px;heigth:157px",id="msgcontent")
+							div(style="margin:20px 0;", class="qunfa")
+							div(style="margin:20px 0;")
+								a(href="#",onclick="addleavemsg()",class="easyui-linkbutton",iconCls="icon-ok",style="width:100%,height:32px") 提交
+			div(style="float:left;width:700px;margin:20px")
+				form(method="get",action="leavemsg")
+					span TypeID
+					input(class="easyui-numberbox",name="typeid",id="typeid")
+					span (输入typeid，填充列表)
+					input(type="submit")
+			div(style="float:left;width:700px; margin:20px")
+				table(id="tt",class="easyui-datagrid",title="点赞列表",style="width:auto;height:auto;",data-options="singleSelect:true,collapsible:true,method:'post',toolbar:tooldg,rownumbers:true,fitColumns:true,view:detailview,onClickRow:onClickRow")
+					thead
+						tr
+							th(data-options="field:'msgid',width:60") MsgId
+							th(data-options="field:'time',width:80,formatter:formatDate,editor:'datebox' ") time
+							th(data-options="field:'okcount',width:80,editor:'numberbox' ") OkCount
+							th(data-options="field:'nocount',width:80,editor:'numberbox'") NoCount
+							th(data-options="field:'isshow',width:80,editor:{type:'combobox',options:{data:isShowData,valueField:'value',textField:'text'}}") IsShow
+							th(data-options="field:'msgcontent',width:80,editor:'text'") MsgContent	
+			hr
+			div(style="float:left;width:700px; margin-left:20px")
+				table(id="tt2",class="easyui-datagrid",title="最新列表",style="width:auto;height:auto;",data-options="singleSelect:true,collapsible:true,method:'post',toolbar:tooldg,rownumbers:true,fitColumns:true,view:detailview,onClickRow:onClickRow2")
+					thead
+						tr
+							th(data-options="field:'msgid',width:60") MsgId
+							th(data-options="field:'time',width:80,formatter:formatDate,editor:'datebox' ") time
+							th(data-options="field:'okcount',width:80,editor:'numberbox' ") OkCount
+							th(data-options="field:'nocount',width:80,editor:'numberbox'") NoCount
+							th(data-options="field:'isshow',width:80,editor:{type:'combobox',options:{data:isShowData,valueField:'value',textField:'text'}}") IsShow
+							th(data-options="field:'msgcontent',width:80,editor:'text'") MsgContent	
+			div(style="clear:both")
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	if hasPermission
+		script(type="text/javascript").
+			var tooldg =[
+				{
+				text:'更新',
+				iconCls:'icon-reload',
+				handler:edit
+				}
+			];
+			var isShowData=[{value:"true",text:"true"},{value:"false",text:"false"}];
+			function formatDate(val,row){
+					var date = new Date(val*1000);
+					return date.format("yyyy-MM-dd hh:mm:ss");
+			}
+			var editIndex = undefined;
+			var editIndex2 = undefined;
+			function onClickRow(index){
+				$('#tt').datagrid('selectRow', index)
+				.datagrid('beginEdit', index);
+				editIndex = index;
+			}
+			function endEditing()
+			{
+				$('#tt').datagrid('endEdit', editIndex);
+				$("#tt2").datagrid('endEdit', editIndex2);
+			}
+			function onClickRow2(index){
+				$('#tt2').datagrid('selectRow', index)
+				.datagrid('beginEdit', index);
+				editIndex2 = index;
+			}
+			function request(paras)
+			{
+				var url = location.href; 
+				var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+				var paraObj = {}; 
+				for (i=0; j=paraString[i]; i++){ 
+				paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+				} 
+				var returnValue = paraObj[paras.toLowerCase()]; 
+				if(typeof(returnValue)=="undefined"){ 
+				return "";
+				}else{ 
+				if(returnValue.indexOf('#')>-1)
+				    returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+				return returnValue;
+				}
+			}
+			var typeid=request("typeid");
+			function addleavemsg(){
+				var data={};
+				data.typeid = $("#tid").val();
+				data.uid = $("#uid").val();
+				data.msgcontent = $("#msgcontent").val();
+				$.post("/leavemsgadd",{data:data},function(data){
+					load();
+				});
+			}
+			function load(){
+				$.post("/leavemsglist",{data:typeid},function(data){
+					if(typeof data == "string")
+						data =eval("("+data+")");
+					$("#typeid").val(data.typeid);
+					var msgbypraise = data.msgbypraise;
+					if(!msgbypraise&&!msgbypraise.length)
+						msgbypraise = [];
+					var msgbytime = data.msgbytime;
+					if(!msgbytime&&!msgbytime.length)
+						msgbytime = [];
+					msgbypraise = {rows:msgbypraise,total:msgbypraise.length};
+					msgbytime = {rows:msgbytime,total:msgbytime.length};
+					$("#tt").datagrid("loadData",data.msgbypraise);
+					$("#tt2").datagrid("loadData",data.msgbytime);					
+				});
+			}
+			function add(){
+
+			}
+			function edit(){
+				endEditing();
+				var rows = $("#tt").datagrid('getChanges');
+				var rows2 = $("#tt2").datagrid("getChanges");
+				rows = rows.concat(rows2);
+
+				$.post("/leavemsgedit",{data:rows},function(data){
+					load();
+				});
+			}
+			$(function(){
+			  $("#tt").datagrid({
+					 detailFormatter:function(rowIndex,rowData){
+						return '<table><tr>' +
+								'<td style="border:0;padding-right:10px">' +
+								'<p>Uid: ' + JSON.stringify(rowData.uid) + '</p>' +
+								'<p>Name: ' + JSON.stringify(rowData.name) + '</p>' +
+								'<p>Header: ' + JSON.stringify(rowData.header) + '</p>' +
+								'<p>Text: ' + JSON.stringify(rowData.msgcontent) + '</p>' +
+								'</td>' +
+								'</tr></table>';
+					 }
+				});	
+			  $("#tt2").datagrid({
+					 detailFormatter:function(rowIndex,rowData){
+						return '<table><tr>' +
+								'<td style="border:0;padding-right:10px">' +
+								'<p>Uid: ' + JSON.stringify(rowData.uid) + '</p>' +
+								'<p>Name: ' + JSON.stringify(rowData.name) + '</p>' +
+								'<p>Header: ' + JSON.stringify(rowData.header) + '</p>' +
+								'<p>Text: ' + JSON.stringify(rowData.msgcontent) + '</p>' +
+								'</td>' +
+								'</tr></table>';
+					 }
+				});					
+				load();
+			});
+	

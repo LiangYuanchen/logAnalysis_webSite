@@ -1,0 +1,119 @@
+#!/bin/sh
+
+cd /home/twenliang/server/bin_debug
+
+sid=`cat gid`
+
+no=0
+
+if [[ -e "lognumber.txt" ]]; then
+	no=`cat lognumber.txt`		
+fi
+
+if [[ -z $no ]]; then
+	no=0
+fi
+
+no=$(($no+1))
+
+echo $no > lognumber.txt
+
+#echo $sid
+
+total=`/home/lyuanchen/tcrmgr inform -port 6001 -st 172.30.0.103 | awk '{if($1=="rnum")print $2}'` 
+#total2=`/home/lyuanchen/tcrmgr inform -port 6001 -st 172.30.0.100 | awk '{if($1=="rnum")print $2}'`
+#total=$total1+total2
+
+online=`netstat -anop|grep 5001|grep -v proxy|grep ESTAB|wc -l`
+
+
+IP=`ifconfig eth0 | grep "inet addr" | cut -f 2 -d ":" | cut -f 1 -d ""`
+
+cpu_num=`grep -c 'model name' /proc/cpuinfo`
+
+count_uptime=`uptime |wc -w`
+
+load_15=`uptime | awk '{print $'$count_uptime'}'`
+
+average_load=`echo "scale=2;a=$load_15/$cpu_num;if(length(a)==scale(a)) print 0;print a" | bc `
+
+average_int=`echo $average_load | cut -f 1 -d "."`
+
+cpu_idle=`top -b -n 1 | grep Cpu | awk -F ',' '{print $4}' | awk -F '.' '{print $1}'` 
+
+
+
+exec 3>/dev/tcp/172.30.0.102/4046
+
+echo -e "ip:$IP" >&3
+
+echo -e "total:$total" >&3
+#内存剩余量
+mem_use=`free -m | sed -n '3p' | awk '{print $3}'`
+mem_free=`free -m | sed -n '3p' | awk '{print $4}'`
+mem_total=`free -m | sed -n '2p' | awk '{print $2}'`
+echo -e  "mem:$mem_use:$mem_free" >&3
+#监控交换分区
+#swap_total=`free -m | grep Swap | awk '{print  $2}'`
+#swap_free=`free -m | grep Swap | awk '{print  $4}'`
+#swap_used=`free -m | grep Swap | awk '{print  $3}'`
+#if [ $swap_used -ne 0 ]
+#then
+#swap_per=0`echo "scale=2;$swap_free/$swap_total" | bc`
+#swap_warn=0.20
+#swap_now=`expr $swap_per \> $swap_warn`
+#if [ $swap_now -eq 0 ]
+#then
+#    echo -e  "swap:$swap_free M 未使用，剩余不足20%，使用率已经超过80%，请及时处理。" >&3
+#echo "$IP服务器swap交换分区只剩下 $swap_free M 未使用，剩余不足20%, 使用率已经超过80%, 请及时处理。" | mail -s "$IP服务器内存告警" XXXX@qq.com
+#else
+#    echo -e  "swap:$swap_free M未使用，使用率正常" >&3
+#fi
+#else
+#     echo -e "swap:未使用" >&3
+#fi
+
+#监控磁盘空间
+disk_sda1=`df -h | grep /dev/xvda1 | awk '{print $5}' | cut -f 1 -d "%"`
+echo -e "disk:$((100-$disk_sda1))" >&3
+# if [ $disk_sda1 -gt 80 ]
+# then
+#    echo -e "$IP服务器 /根分区 使用率已经超过80%,请及时处理。">>/usr/monitor/performance/
+# #echo "$IP服务器 /根分区 使用率已经超过80%,请及时处理。 " | mail -s "$IP服务器硬盘告警" XXXX@qq.com
+# else
+#      echo -e "$IP服务器 /根分区 使用率为$disk_sda1%,使用率正常">>/usr/monitor/performance/performance_$(date +%Y%m%d).log
+# fi
+
+
+# #监控登录用户数
+# users=`uptime |awk '{print $6}'`
+# if [ $users -gt 2 ]
+# then
+# echo "$IP服务器用户数已经达到$users个，请及时处理。">>/usr/monitor/performance/performance_$(date +%Y%m%d).log
+# echo "$IP服务器用户数已经达到$users个，请及时处理。" | mail -s "$IP服务器用户登录数告警" XXXX@qq.com
+# else
+#    echo "$IP服务器当前登录用户为$users个，情况正常">>/usr/monitor/performance/performance_$(date +%Y%m%d).log
+# fi
+
+#流量监控
+R1=`cat /sys/class/net/eth0/statistics/rx_bytes`
+T1=`cat /sys/class/net/eth0/statistics/tx_bytes`
+sleep 1
+R2=`cat /sys/class/net/eth0/statistics/rx_bytes`
+T2=`cat /sys/class/net/eth0/statistics/tx_bytes`
+TBPS=`expr $T2 - $T1`
+RBPS=`expr $R2 - $R1`
+TKBPS=`expr $TBPS / 1024`
+RKBPS=`expr $RBPS / 1024`
+
+echo -e "upspeed:$TKBPS" >&3
+
+echo -e "downspeed:$RKBPS" >&3
+
+#cpu负载，值  >1 表示超过警戒值1.0，需要处理
+echo -e "average_int:$average_int" >&3
+#cpu使用率 80%警戒值
+echo -e "cpu_idle:$cpu_idle" >&3
+
+echo -e "online:$sid:$online:$no" >&3
+exec 3>&-

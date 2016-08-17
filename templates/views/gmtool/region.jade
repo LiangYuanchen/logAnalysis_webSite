@@ -1,0 +1,331 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Region
+
+block content
+	if hasPermission
+		.container: .jumbotron
+			div(style="display:none")
+				div
+					a(href="javascript:void(0)",title="保存",class="easyui-linkbutton",data-options="iconCls:'icon-reload', plan:true" onclick="edit()") 更改 
+				br
+				div(style="width:250px;padding:30px 60px;margion:10px,float:left;",class="easyui-panel",title="LastRegion")
+					input(id="lastregion",name="lastregion",style="width:100%,height:32px",class="easyui-numberbox")
+				br
+				div(style="width:250px;padding:30px 60px;margion:10px,float:left;",class="easyui-panel",title="Newregions")
+					input(id="newregions",name="newregions",style="width:100%,height:32px",class="easyui-textbox")
+				br
+				div(style="width:250px;padding:30px 60px;margion:10px,float:left;",class="easyui-panel",title="HotRegions")
+					input(id="hotregions",name="hotregions",style="width:100%,height:32px",class="easyui-textbox")
+				br
+				div(style="width:250px;padding:30px 60px;margion:10px,float:left;",class="easyui-panel",title="CloseRegions")
+					input(id="closeregions",name="closeregions",style="width:100%,height:32px",class="easyui-textbox")
+				br
+				div(style="width:250px;padding:30px 60px;margion:10px,float:left;",class="easyui-panel",title="Newuserregions")
+					input(id="newuserregions",name="newuserregions",style="width:100%,height:32px",class="easyui-textbox")
+				div(style="clear:both")
+			div(style="color:red")
+				span 最大允许分区数量是：
+				span(id="warp_region_num")
+			div
+				span(id="warp_merge_region")
+			div
+				input(type="text",value="",id="mergeRegion") 
+				span 两个数字，“，”分隔，无逗号为拆服
+				a(href="javascript:void(0)",title="合服，拆服",class="easyui-linkbutton",data-options="iconCls:'icon-reload',plain:true",onclick="regionmerge()")	合服，拆服	
+			table(id="tt",class="easyui-datagrid",title="Region",style="width:auto",data-options="singleSelect:true,collapsible:true,method:'post',toolbar:tooldg,rownumbers:true,fitColumns:true,onClickRow:onClickRow") 
+				thead
+					tr
+						th(data-options="field:'name',width:50") 分区名称
+						th(data-options="field:'type',width:50,editor:{type:'combobox',options:{data:map_type,valueField:'value',textField:'text'}}") 分区状态
+						th(data-options="field:'hidden',width:50,editor:{type:'combobox',options:{data:map_hidden,valueField:'value',textField:'text'}}") 隐藏状态		
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	script(type="text/javascript", src="/js/underscore-min.js")
+	if hasPermission
+		script(type="text/javascript").
+			var lastregion = 0;
+			var newregions = [];
+			var hotregions =[];
+			var closeregions = [];
+			var newuserregions = [];
+			var region_nums = !{region_nums};
+			var tooldg =[
+				{
+				text:'保存',
+				iconCls:'icon-reload',
+				handler:saveTable
+			},
+			{
+				text:"开新分区",
+				iconCls:"icon-add",
+				handler:addTable
+			},
+			{
+				text:"隐藏所有分区",
+				iconCls:"icon-reload",
+				handler:hiddenAll
+			},
+			{
+				text:"显示所有分区",
+				iconCls:"icon-reload",
+				handler:showAll
+			},
+			{
+				text:"only Show",
+				iconCls:"icon-reload",
+				handler:onlyShow
+			}			
+			];			
+			var map_type =[
+				{value:"new",text:"New"},
+				{value:"hot",text:"Hot"},
+				{value:"close",text:"Close"},
+				{value:"normal",text:"Normal"}
+			];
+			var map_hidden = [
+				{value:"show",text:"显示"},
+				{value:"hidden",text:"隐藏"}
+			];
+			function regionmerge(){
+				var rm = $("#mergeRegion").val().replace("，",",");
+				if(confirm("合服拆服确认:"+rm))
+				{
+					$.post("/regionmerge",{data:rm},function(){
+						alert("操作完成");
+					});
+				}
+			}
+			function digui(first,obj_data,parms){
+				for(var i = 0;i<obj_data.length;i++)
+				{
+					if(obj_data[i].des==first)
+					{
+						parms.push(obj_data[i].src);
+						digui(obj_data[i].src,obj_data,parms);
+					}
+				}
+			}
+			function regionmergelist(){
+				$.post("/regionmergelist",{},function(data){
+					var obj_data = eval("("+data+")");
+					if(!obj_data||!obj_data.length)
+					{
+						return;
+					}
+					var link =  {};
+					var left_data = [];
+					var right_data = [];
+					_.each(obj_data,function(parm){
+						left_data.push(parm.src);
+						right_data.push(parm.des);
+					});
+					_.each(right_data,function(rdata){
+						if(left_data.indexOf(rdata)>-1)
+							return;
+						else
+							link[rdata] = [];
+					});
+					_.each(link,function(value,key){
+						var parm = [];
+						digui(key,obj_data,parm);
+						link[key] = parm;
+					});
+					
+					//$("#warp_merge_region").text(data);
+					$("#warp_merge_region").text(JSON.stringify(link));
+				});
+			}
+			$(function(){
+				regionmergelist();
+			});
+			function pad(num, n) {  
+			    var len = num.toString().length;  
+			    while(len < n) {  
+			        num = "0" + num;  
+			        len++;  
+			    }  
+			    return num;  
+			}  			
+			function clear()
+			{
+				lastregion = 1;
+				newregions = [];
+				hotregions = [];
+				closeregions = [];
+				newuserregions = [];
+			}
+			var editIndex = undefined;
+			function onClickRow(index){
+				endEditing();
+				$('#tt').datagrid('selectRow', index)
+				.datagrid('beginEdit', index);
+				editIndex = index;
+			}
+			function endEditing()
+			{
+				$('#tt').datagrid('endEdit', editIndex);
+			}			
+			function hiddenAll(){
+				endEditing();
+				var result = $("#tt").datagrid("getRows");
+				_.each(result,function(row){
+					row.hidden = "hidden";
+				});
+				$("#tt").datagrid("loadData",result);
+				saveTable();
+			}
+			function showAll(){
+				endEditing();
+				var result = $("#tt").datagrid("getRows");
+				_.each(result,function(row){
+					row.hidden = "show";
+				});
+				$("#tt").datagrid("loadData",result);
+				saveTable();
+			}
+			function addTable(){
+				endEditing();
+				var result = $("#tt").datagrid("getRows");
+				if(!result||result.length==0)
+					result = [];
+				else
+					result[result.length-1].type = "normal";
+				var newone = {};
+				newone.name = "world" + pad(result.length + 1 ,3);
+				newone.type = "new";
+				newone.hidden = "show";
+				result.push(newone);
+				result = {rows:result,totoal:result.length};
+				$("#tt").datagrid("loadData",result);
+				saveTable();
+			}
+			function saveTable(){
+				if(!confirm("即将执行，确认继续?"))
+				{
+					return;
+				}
+				endEditing();
+				var result = $("#tt").datagrid("getRows");
+				clear();
+				lastregion = result.length;
+				_.each(result,function(row,index){
+					var regionNum = index+1;
+					if(row.type=="new")
+						newregions.push(regionNum);
+					else if(row.type=="hot")
+						hotregions.push(regionNum);
+					else if(row.type=="close")
+						closeregions.push(regionNum);
+					if(row.hidden=="show")
+						newuserregions.push(regionNum);
+				});
+				$("#lastregion").val(lastregion);
+				$("#newregions").val(newregions.join(","));
+				$("#hotregions").val(hotregions.join(","));
+				$("#closeregions").val(closeregions.join(","));
+				$("#newuserregions").val(newuserregions.join(","));				
+				edit();
+			}
+			function loadTable(){
+				lastregion = $("#lastregion").val() || 1;
+				newregions = $("#newregions").val().split(",") || [];
+				hotregions = $("#hotregions").val().split(",") || [];
+				closeregions = $("#closeregions").val().split(",") || [];
+				newuserregions = $("#newuserregions").val().split(",") || [];
+				var result = {rows:[],totoal:0};
+				
+				for(var i=0;i<lastregion;i++)
+				{
+					var row = {};
+					var regionNum = i+1;
+					regionNum = regionNum+"";
+					row.name = "world" + pad(regionNum,3);
+					
+					if(_.contains(newregions, regionNum ))
+						row.type = "new";
+					else if(_.contains(hotregions, regionNum ))
+						row.type = "hot";
+					else if(_.contains(closeregions, regionNum))
+						row.type = "close";
+					else 
+						row.type = "normal";
+					if(_.contains(newuserregions, regionNum))
+						row.hidden = "show";
+					else
+						row.hidden = "hidden";
+					result.rows.push(row);
+				}
+				result.total = result.rows.length;
+				$("#tt").datagrid("loadData",result);
+			}
+			function load(cb){
+			$.post("/regionsettinglist",{},function(data){
+			if(!data)
+			return;
+			if(typeof data == "string"&&data)
+			data = eval("(" + data + ")");
+			$("#lastregion").val(data.lastregion);
+			$("#newregions").val(data.newregions);
+			$("#hotregions").val(data.hotregions);
+			$("#closeregions").val(data.closeregions);
+			$("#newuserregions").val(data.newuserregions);
+			cb();
+			});
+			}
+			function onlyShow(){
+				var result = $("#tt").datagrid("getRows");
+				clear();
+				lastregion = result.length;
+				_.each(result,function(row,index){
+					var regionNum = index+1;
+					if(row.type=="new")
+						newregions.push(regionNum);
+					else if(row.type=="hot")
+						hotregions.push(regionNum);
+					else if(row.type=="close")
+						closeregions.push(regionNum);
+					if(row.hidden=="show")
+						newuserregions.push(regionNum);
+				});
+				$("#lastregion").val(lastregion);
+				$("#newregions").val(newregions.join(","));
+				$("#hotregions").val(hotregions.join(","));
+				$("#closeregions").val(closeregions.join(","));
+				$("#newuserregions").val(newuserregions.join(","));		
+				edit(true);				
+			}
+			function edit(onlyshow)
+			{
+			var data = {};
+			data.lastregion = $("#lastregion").val();
+			data.newregions = $("#newregions").val();
+			data.hotregions = $("#hotregions").val();
+			data.closeregions = $("#closeregions").val();
+			data.newuserregions = $("#newuserregions").val();
+			if(onlyshow)
+			{
+				alert("opglobal,regionsettingedit," +JSON.stringify(data));
+			}
+			else
+			{			
+				$.post("/regionsettingedit",{data:data},function(data){
+				load(function(){
+					loadTable();
+					alert("操作完成");
+				});
+				});
+			}
+			}
+			$(function(){
+			$("#warp_region_num").text(region_nums);
+			load(function(){
+				loadTable();
+			});
+			});

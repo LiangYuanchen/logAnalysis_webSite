@@ -1,0 +1,120 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - PvPRank
+
+block content
+	.container: .jumbotron.
+			<h2></h2>
+			<a href="javascript:void(0)" title="PVPRESET" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="pvpreset()">PvPReset</a>
+			<a href="javascript:void(0)" title="PVPSAVE" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="pvpsave()">PvPSave</a>			
+			<div id="tb" style="height:auto"></div>
+			<div id="groups" style="height:auto" ></div>
+			<table id="tt" class="easyui-datagrid" title="pvpUserData" style="width:auto;height:auto;" data-options="" >
+					<thead>
+						<tr> 
+							<th data-options="field:'uid',width:80" >Uid</th>
+							<th data-options="field:'relateuid',width:80" >relateuid</th>
+							<th data-options="field:'tavernlevel',width:80" >tavernlevel</th>
+							<th data-options="field:'name',width:80" >name</th>
+							<th data-options="field:'pvpScore',width:80" >pvpScore</th>
+			 				<th data-options="field:'pvpleague',width:80" >pvpleague</th>
+							<th data-options="field:'pvpuptime',width:90,formatter:formatterDateStr" >pvpuptime</th>
+							<th data-options="field:'pvpwincount',width:80" >pvpwincount</th>
+			 				<th data-options="field:'pvptotalcount',width:80" >pvptotalcount</th>
+							<th data-options="field:'pvprank',width:80" >pvprank</th>
+							<th data-options="field:'header',width:80" >header</th>
+							<th data-options="field:'pvpgroup',width:80" >pvpgroup</th>
+					</thead>
+			</table>
+
+			<pre style='float:left;width:400px;'  id='user' ></pre>
+			<pre style='float:right;width:400px;'  id='globaluser' ></pre>
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-groupview.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	script(type="text/javascript").
+		//<script type="text/javascript">
+			var ranktypes = [14000000,14000001,14000002,14000003,14000004];
+			var rankname = ["寒铁","赤钢","秘银","精金","星云"];
+			var tooldg =[];
+			function pvpreset(){
+				$.post("/pvpreset",{},function(data){
+					location.reload();
+					});
+			}
+			function pvpsave(){
+				$.post("/pvpsave",{},function(data){
+					location.reload();
+					})
+			}
+			function showGroup(ranktype){
+					$("#groups").html("");
+				$.post("/rankgroup",{data:ranktype},function(data){
+					var parm = [];
+					if (typeof data =="string") {
+						parm = eval("("+data+")");
+					}else{
+						parm = data;
+					}
+					parm = parm.groupid;
+					
+					if (parm) {
+						for (var i = parm.length - 1; i >= 0; i--) {
+							var id = parm[i];
+							var $a = $("<a href='javascript:showIt("+ranktype+","+id+")' >"+id+"</a>&nbsp;&nbsp;");
+							$("#groups").append($a);
+						};
+					}else{
+						alert("没有数据>_<");
+					}
+				});
+			}
+			function showIt(ranktype,groupid){
+				getPvps(ranktype,groupid,function(data){
+				   $("#tt").datagrid("loadData",data);
+				});
+			}
+			function getPvps(i,groupid,next){
+				var parm=i+":"+groupid;
+				$.post("/ranklist",{data:parm},function(data){
+					next(data);
+				});		
+			}
+			$(function(){
+				for(var i=0;i<ranktypes.length;i++){
+					var ranktype=ranktypes[i];
+					var name = rankname[i];
+					var $a = $("<a style='margin:auto 5'  href='javascript:void(0)' value='"+name+"'  onclick='showGroup("+ranktype+")' >"+name+"</a>&nbsp;&nbsp;");
+					$("#tb").append($a);
+				}
+				$("#tt").datagrid({
+					detailFormatter:function(rowIndex,rowData){
+						return '<table><tr>' +
+									'<td style="border:0;padding-right:10px">' +
+									'<p>pvpAdvs: ' + JSON.stringify(rowData.pvpadvs) + '</p>' +
+									'<p>pvpfamiliar: ' + rowData.pvpfamiliar + '</p>' +
+									'</td>' +
+									'</tr></table>';
+					}
+				});
+			});
+			function formatterDateStr(val,row){
+					var parm;
+
+
+					if (isNaN(val)) {
+						parm = new Date(val);
+					}
+					else{
+						parm = new Date(val*1000)
+					}
+					return parm.toLocaleString();
+			 }
+		//</script>
+

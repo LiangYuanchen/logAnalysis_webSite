@@ -1,0 +1,158 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		form(method='get')
+			label uid
+			input.textbox(name="uid",id="uid",value=filters["uid"])
+			include ../layouts/region
+			input(type="submit",id="sub",value="检索")
+			input(type="button",id="export",style="float:right",value="export")
+		table(style="min-width:700px",id="dg",title="用户",data-options="rownumbers:true,singleSelect:true,pagination:true,url:'/payinginfo',pageSize:50")
+			thead
+				tr
+					th(data-options="field:'orderId',width:120,sortable:true,order:'desc'") orderId
+					th(data-options="field:'gem',width:120,sortable:true,order:'desc'") gem
+					th(data-options="field:'money',width:120,sortable:true,order:'desc'") money
+					th(data-options="field:'timeStamp',width:120,sortable:true,order:'desc',formatter:formatterDate") timeStamp
+					th(data-options="field:'uid',width:120,sortable:true,order:'desc'") uid
+					th(data-options="field:'gamer',width:120,formatter:formatterRegisterdate") registerdate
+					th(data-options="field:'region',width:120,sortable:true,order:'desc'") region
+					th(data-options="field:'country',width:30,sortable:true,order:'desc',formatter:formatterCountry") country
+					th(data-options="field:'deviceid',width:120,sortable:true,order:'desc',formatter:formatterAID") deviceID
+					//- th(data-options="field:'uid',width:120,sortable:true,order:'desc'") uid
+					//- th(data-options="field:'username',width:100,sortable:true,order:'desc'") 用户名
+					//- th(data-options="field:'tavernName',width:80,sortable:true,order:'desc' ") 酒馆名称
+					//- //- th(data-options="field:'userRegTime',width:100") 注册时间
+					//- th(data-options="field:'innExp',width:80,sortable:true,order:'desc'") 经验
+					//- th(data-options="field:'gembuy',width:80,sortable:true,order:'desc'") 宝石-真
+					//- th(data-options="field:'gemother',width:80,sortable:true,order:'desc'") 宝石-假
+					//- th(data-options="field:'gold',width:60,sortable:true,order:'desc'") 金币
+					//- th(data-options="field:'power',width:60,sortable:true,order:'desc'") 能量
+					//- th(data-options="field:'lastlogtime',width:120,formatter:formatterDate,sortable:true,order:'desc'") 最后登录时间
+					//- th(data-options="field:'registerdate',width:120,formatter:formatterDate,sortable:true,order:'desc'") 注册时间
+					//- th(data-options="field:'activetime',width:30,sortable:true,order:'desc'") 活跃时间
+					//- th(data-options="field:'advCount',width:30,sortable:true,order:'desc' ") 冒险者数量
+					//- th(data-options="field:'lastQuest',width:120,sortable:true,order:'desc' ") 最后关卡
+					//- th(data-options="field:'country',width:50,sortable:true,order:'desc'") 国别
+					//- th(data-options="field:'bindAccout',width:150,formatter:formatterAccount") 绑定
+		
+block js
+		script(type="text/javascript", src="/map/highmaps.js")
+		script(type="text/javascript", src="/mapdata/mapdata.js")
+		script(type="text/javascript", src="/mapdata/custom/world.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type='text/javascript').
+			$("#export").click(function(){
+				var uid = $("#uid").val();
+				var region = $('#region').combo('getValue');
+				$.ajax({
+					type: "POST",
+					url: "/getallpayinginfos",
+					dataType:"text",
+					data: {uid:uid,region:region},
+					success: function(response, status, xhr) {
+					// check for a filename
+					var filename = "payinginfos"+(new Date()).toLocaleString()+".csv";
+					var disposition = xhr.getResponseHeader('Content-Disposition');
+					if (disposition && disposition.indexOf('attachment') !== -1) {
+					var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+					var matches = filenameRegex.exec(disposition);
+					if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+					}
+
+					var type = xhr.getResponseHeader('Content-Type');
+					var blob = new Blob([response], { type: "application/CSV" });
+
+					if (typeof window.navigator.msSaveBlob !== 'undefined') {
+					// IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
+					window.navigator.msSaveBlob(blob, filename);
+					} else {
+					var URL = window.URL || window.webkitURL;
+					var downloadUrl = URL.createObjectURL(blob);
+
+					if (filename) {
+					// use HTML5 a[download] attribute to specify filename
+					var a = document.createElement("a");
+					// safari doesn't support this yet
+					if (typeof a.download === 'undefined') {
+					window.location = downloadUrl;
+					} else {
+					a.href = downloadUrl;
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					}
+					} else {
+					window.location = downloadUrl;
+					}
+
+					setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100); // cleanup
+					}
+					}
+				});
+			});			
+			function formatterCountry(val,row)
+			{
+				if(row&&row.gamer)
+					return row.gamer.country;
+				else 
+					return "";
+			}
+			function formatterAID(val,row)
+			{
+				if(row&&row.gamer)
+					return row.gamer.device_id;
+				else 
+					return "";			
+			}
+			function formatterRegisterdate(val,row)
+			{
+				var gamer = row.gamer;
+				var registerdate="";
+				if(gamer&&gamer.registerdate)
+					{
+					registerdate = gamer.registerdate;
+					return new Date(registerdate*1000).format("yyyy-MM-dd hh:mm:ss");
+					}
+				else
+					return "";
+				
+			}
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+
+			}
+			function formatterAccount(val,row){
+			return val.join(",");
+			}
+			var data=!{JSON.stringify(mapDatas)};
+			//var data = [{key:"cn",value:5}];
+			$(function(){
+				var mapKey = "custom/world";
+				var mapGeoJSON=Highcharts.maps[mapKey];
+				//- $.each(mapGeoJSON.features, function (index, feature) {
+				//- 	data.push({
+				//- 			key: feature.properties['hc-key'],
+				//- 		value: index
+				//- 	});
+				//- });				
+				var region = $('#region').combo('getValue');
+				$("#dg").datagrid({
+						queryParams:{uid:$("#uid").val(),region:region}
+					});
+				//var pager = $('#dg').datagrid().datagrid('getPager');
+
+			});
+
+

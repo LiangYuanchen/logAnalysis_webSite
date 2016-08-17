@@ -1,0 +1,258 @@
+extends ../layouts/default
+
+block head
+
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		form(method='get')
+			include ../layouts/region
+			input(type="submit",value="检索",name="sub")
+		#container(style="width:700px;height:400px;float:left;margin-rigth:10px;")
+		#containerError(style="width:320px;height:400px;float:left;")
+		br(style="clear:both:margin:10px;")
+		table(style="min-width:700px",id="dg")
+
+block js
+		script(type="text/javascript", src="/js/highstock.js")
+		script(type="text/javascript", src="/js/modules/exporting.js")
+		script(type="text/javascript", src="/easyui/jquery.easyui.min.js")
+		script(type='text/javascript').
+
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+
+			}
+			function request(paras)
+			{ 
+			var url = location.href; 
+			var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+			var paraObj = {} 
+			for (i=0; j=paraString[i]; i++){ 
+			paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+			} 
+			var returnValue = paraObj[paras.toLowerCase()]; 
+			if(typeof(returnValue)=="undefined"){ 
+			return "";
+			}else{ 
+			if(returnValue.indexOf('#')>-1)
+			    returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+			return returnValue;
+			} 
+			}			
+			function showDailyBegin(logDate){
+				var Nowdate=new Date(logDate);
+				var day = Nowdate.getHours()*60*60*1000+Nowdate.getMinutes()*60*1000+Nowdate.getSeconds()*1000+Nowdate.getMilliseconds();
+				var dailyBegin = new Date(Nowdate-day);
+				dailyBegin = dailyBegin;
+				return dailyBegin;
+			}
+			var online = eval("(#{JSON.stringify(online)})") ;
+			var sessionCount = eval("(#{JSON.stringify(sessionCount)})") ;
+			var regeisterCount = eval("(#{JSON.stringify(registerCount)})") ;
+			var onlineUidCount = eval("(#{JSON.stringify(onlineUidCount)})") ;
+			var payingPlayerCount =eval("(#{JSON.stringify(payingPlayer)})") ;
+			var currentDate = Date.now();
+			var currentDateError = null;
+			var currentDateStatus = null;
+			function addPointHandler(data,serie){
+				for(var i=0;i<data.length;i++){
+					serie.addPoint(data[i],false,false);
+				}
+			}
+			$(function () {
+			    Highcharts.setOptions({
+			        global : {
+			            useUTC : false
+			        }
+			    });
+				$('#dg').datagrid({
+				singleSelect:true,
+				title:"服务器状态",
+				columns:[
+				[
+					{field:"gameid",title:'gameid',width:70},
+					{field:'disk_idle',title:'硬盘空闲率',width:70},
+					{field:'cpu_idle',title:'cpu空闲率',width:70},
+					{field:'mem_idle',title:'内存空闲率'},
+					{field:'datetime',title:'记录日期',width:170}
+				]			]
+				});			
+				setInterval(function(){
+					$.post("/",{actions:"getserverstatus",op:currentDateStatus},function(data){
+						$("#dg").datagrid("loadData",data);
+						var currentDateStatus = Date.now();
+						});
+					},60*1000*7);
+				$.post("/",{actions:"getserverstatus",op:currentDateStatus},function(data){
+					$("#dg").datagrid("loadData",data);
+					var currentDateStatus = Date.now();
+				});				
+			    $('#container').highcharts('StockChart',{
+			    	chart:{
+			    		events:{
+			    			load:function(){
+			    				var self = this;
+			    				var onlineData = self.series[0];
+			    				var sessionCountData = self.series[1];
+			    				var registerCountData = self.series[2];
+			    				var onlineUidCountData = self.series[3];
+			    				var payingPlayerCountData = self.series[4];
+			    				setInterval(function(){
+			    					$.post("/",{actions:"getresult",op:currentDate,name:"online",region:request("region")},function(data){
+			    							addPointHandler(data,onlineData);
+			    							self.redraw();
+			    						});
+			    					$.post("/",{actions:"getresult",op:currentDate,name:"sessionCount",region:request("region")},function(data){
+			    							addPointHandler(data,sessionCountData);
+			    							self.redraw();
+			    						});
+			    					$.post("/",{actions:"getresult",op:currentDate,name:"registerCount",region:request("region")},function(data){
+			    							addPointHandler(data,registerCountData);
+			    							self.redraw();
+			    						});
+			    					$.post("/",{actions:"getresult",op:currentDate,name:"onlineUidCount",region:request("region")},function(data){
+			    							addPointHandler(data,onlineUidCountData);
+			    							self.redraw();
+			    						});
+			    					$.post("/",{actions:"getresult",op:currentDate,name:"payingPlayerCount",region:request("region")},function(data){
+			    							addPointHandler(data,payingPlayerCountData);
+			    							self.redraw();
+			    						});
+			    					currentDate = Date.now();
+			    						
+			    					},1000*60*3);
+
+			    			}
+			    		}
+			    	},
+			        title: {
+			            text:'#{ttitle}',
+			            x: -20 //center
+			        },
+			        subtitle: {
+			            text: '#{subtitle}',
+			            x: -20
+			        },
+			        rangeSelector: {
+			            buttons: [{
+			                count: 30,
+			                type: 'minute',
+			                text: '30M'
+			            }, {
+			                count: 5,
+			                type: 'hour',
+			                text: '5h'
+			            }, {
+			                type: 'all',
+			                text: 'All'
+			            }],
+			            inputEnabled: false,
+			            selected: 0
+			        },
+			        exporting: {
+			            enabled: false
+			        },	
+			        legend:{
+			            enabled:true
+			        },
+			        series: [{
+			            name: '在线人数',
+			            data:online },{
+			            name:'Session数量',
+			            data:sessionCount
+			            },{
+			            name:'新注册人数',
+			            data:regeisterCount
+			            },{
+			            name:'ActiveUser',
+			            data:onlineUidCount
+			            },{
+			            name:"付费玩家数",
+			            data:payingPlayerCount
+			            }
+			            ]
+			    });
+
+				
+				$("#containerError").highcharts('StockChart',{
+			    	chart:{
+			    		events:{
+			    			load:function(){
+			    				var self = this;
+			    				var msgErrs = self.series[0];
+			    				var handlerErrs = self.series[1];
+								setInterval(function(){
+									$.post("/",{actions:"geterror",op:currentDateError,region:request("region")},function(data){
+										var msgErr = data.msgErr;
+										var handlerErr = data.handlerErr;
+										addPointHandler(msgErr,msgErrs);
+										addPointHandler(handlerErr,handlerErrs);
+										self.redraw();
+										currentDateError = Date.now();
+									});
+
+								},1000*60*6);
+			    			}
+			    		}
+			    	},
+			        title: {
+			            text:'ErrorLog',
+			            x: -20 //center
+			        },
+			        subtitle: {
+			            text: 'nebuliumgames',
+			            x: -20
+			        },
+			        rangeSelector: {
+			            buttons: [{
+			                count: 30,
+			                type: 'minute',
+			                text: '30M'
+			            }, {
+			                count: 5,
+			                type: 'hour',
+			                text: '5h'
+			            }, {
+			                type: 'all',
+			                text: 'All'
+			            }],
+			            inputEnabled: false,
+			            selected: 0
+			        },
+			        exporting: {
+			            enabled: false
+			        },	
+			        legend:{
+			            enabled:true
+			        },
+			        series: [{
+			            name: 'msgError',
+			            data:[] },{
+			            name:'handlerError',
+			            data:[]
+			            }
+			            ]
+			    });
+				$.post("/",{actions:"geterror",op:currentDateError,region:request("region")},function(data){
+					var chart = $("#containerError").highcharts();
+					var msgErrs = chart.series[0];
+					var handlerErrs = chart.series[1];
+					var msgErr = data.msgErr;
+					var handlerErr = data.handlerErr;
+					addPointHandler(msgErr,msgErrs);
+					addPointHandler(handlerErr,handlerErrs);
+					chart.redraw();
+					currentDateError = Date.now();
+				});
+
+			});
+
+				

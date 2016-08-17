@@ -1,0 +1,44 @@
+{
+  "name": "innsite",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "keystone": "0.3.14",
+    "async": "1.4.2",
+    "underscore": "1.8.3",
+    "dotenv": "1.2.0",
+    "node-schedule":"0.2.9",
+    "node-uuid":"1.4.3",
+    "cron":"1.0.9",
+    "time":"0.11.4",
+    "panic":"0.2.1",
+    "protobufjs":"4.1.1",
+    "winston":"1.0.2",
+    "csvtojson":"0.4.3",
+    "memcached":"2.2.0",
+    "node-statsd-client":"1.0.3",
+    "mysql":"2.10.2",
+    "body-parser": "^1.13.3",
+    "mongoose":"4.4.12",
+    "moment":"2.13.0",
+    "nodemailer":"2.4.2",
+    "json2csv":"3.6.2"
+  },
+  "devDependencies": {
+    "hexy":"0.2.7",
+    "sleep":"3.0.0",
+    "should":"7.1.0",
+    "gulp": "3.9.0",
+    "gulp-jshint": "1.11.2",
+    "jshint-stylish": "2.0.1",
+    "gulp-watch": "4.3.5"
+  },
+  "engines": {
+    "node": ">=4.1.2",
+    "npm": ">=2.14.4"
+  },
+  "scripts": {
+    "start": "node keystone.js"
+  },
+  "main": "keystone.js"
+}

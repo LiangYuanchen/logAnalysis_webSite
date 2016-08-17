@@ -1,0 +1,6 @@
+extends /layouts/default
+
+block body-contents
+	h1 Hi *|first_name|*,
+	p.text-larger  New version submitted to #{brand} (#{data.innSite}):
+		p.text-larger #{data.msg}

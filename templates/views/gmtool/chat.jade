@@ -1,0 +1,67 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Chat
+
+block content
+		.container: .jumbotron(style="")
+			h2 Chat
+			if hasPermission
+				div(style="width:250px")
+					form(method="post",action="/sendchat")
+						div(style="margin:20px 0;")
+							div Text:
+							textarea(style="width:701px; height: 157px;",id="content",name="content")
+						div(style="margin:20px 0;")
+							div ChatType:
+								select(id="chattype",name="chattype",style="width:150px")
+									option(value="1") ALL
+									option(value="2") SPECIFY 
+						div(style="margin:20px 0;",id="wrap_uids")
+							div Uids:
+							<input class="easyui-textbox" id="uids" data-options="" style="width:100%,height:32px"/>[uid间“,”相隔]
+						div(style="margin:20px 0;",id="wrap_uids")
+							div adminName:
+							<input class="easyui-textbox" id="adminName" data-options="" style="width:100%,height:32px"/>
+						div(style="margin:20px 0;",id="wrap_uids")
+							div region:
+							<input class="easyui-textbox" id="region" data-options="" style="width:100%,height:32px"/>							
+
+						div(style="margin:20px 0;")
+							<a href="#" onclick="send()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Send</a>
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	if hasPermission
+		script(type="text/javascript").
+			$(function(){
+				$("#wrap_uids").hide();
+				$("#chattype").on("change",function(parm){
+					if($("#chattype").val()=="2")
+						$("#wrap_uids").show();
+					else
+						$("#wrap_uids").hide();
+					});
+				});
+			function send()
+			{
+				var datas={};
+				datas.content=$("#content").val();
+				datas.chattype=$("#chattype").val();
+				datas.uids = $("#uids").val();
+				datas.adminName = $("#adminName").val();
+				datas.region=$("#region").val();
+				if(datas.content.length==0)
+					{
+						alert("不能发送空信息");
+						return;
+					}
+				$.post("/sendchat",{cmd:datas},function(){
+					alert("发送成功");
+					$("#content").val("");
+				});
+			}

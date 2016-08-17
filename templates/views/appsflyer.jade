@@ -1,0 +1,60 @@
+extends ../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block intro
+	.container
+		h1 Appsflyer
+block content
+	.container: .jumbotron
+		div 双击行查看明细
+		table(style="min-width:700px",id="dg")
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type="text/javascript", src="/js/formatterDg.js")
+		script(type="text/javascript", src="/datagrid-scrollview.js")
+		script(type='text/javascript').
+			function formaaterUid(val,row){
+				return "<a href='/feedbackinfo?_id="+row._id+"' target='_blank' >"+row.uid+"</a>"
+			}
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+			}
+
+			$('#dg').datagrid({
+				singleSelect:true,
+				pagination:true,
+				sortName:'timeStamp',
+				sortOrder:'desc',
+				url:'/handle',
+				rownumbers:true,
+				queryParams:{actions:"appsflyerlist"},
+				pageSize:50,
+				view:detailview,
+				columns:[
+				[
+					{field:"timeStamp",title:'记录时间',width:200,sortable:true,order:'desc',formatter:formatterDate},
+					{field:"download_time",title:'download_time',width:150,sortable:true,order:'desc'},
+					{field:"device_type",title:'device_type',width:150,sortable:true,order:'desc'}
+				]		],
+				detailFormatter:function(rowIndex,rowData){
+					var returns ="";
+					var datas = rowData;
+					if(datas)
+					{
+						returns = JSON.stringify(rowData);				  	
+					}
+					return returns;
+				}
+			});
+			$(function(){
+				var pager = $('#dg').datagrid().datagrid('getPager');
+			});	

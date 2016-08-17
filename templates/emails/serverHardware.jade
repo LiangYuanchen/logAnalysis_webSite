@@ -1,0 +1,15 @@
+extends /layouts/default
+
+block body-contents
+	h1 Hi *|first_name|*,
+	p.text-larger An Hardware abnormity was just submitted to #{brand}(GameID:#{innlogG.gameid}):
+		p.text-larger 内存空闲率：
+				| <strong>#{innlogG.mem_idle}%</strong>
+		p.text-larger cpu空闲率：
+				| <strong>#{innlogG.cpu_idle}%</strong>		
+		p.text-larger 硬盘空闲率:
+				| <strong>#{innlogG.disk_idle}%</strong>
+		.text-larger(style="color:red") !{innlogG.msg}
+	p.text-muted Sent #{innlogG.date.format("yyyy-MM-dd hh:mm:ss")}
+	p &nbsp;
+	+button({ url: '#{innlogG.url}' , label: 'Open innSite' })

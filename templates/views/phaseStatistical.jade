@@ -1,0 +1,102 @@
+extends ../layouts/default
+
+block head
+  link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+  link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+       .container: .jumbotron
+               form(method='post')
+                       input(type='hidden', name='action', value='statistical')
+                       label 开始时间 
+                       input.easyui-datebox(name="op",value=filters["op"])
+                       label 结束时间
+                       input.easyui-datebox(name="ed",value=filters["ed"])
+                       include ../layouts/country   
+                       input(type="button",value="检索",name="sub")
+                       //input(type="button",value="demoJSON",name="demo",onclick="demo")
+               each ys in configs
+                       div(style="min-width:700px;height:400px",class="#{ys.name}")
+block js
+               script(type="text/javascript", src="/js/highcharts.js")
+               script(type="text/javascript", src="/js/exporting.js")
+               script(type="text/javascript", src="/js/jeasyui.js")
+               script(type="text/javascript").
+                       var ttype=#{ttype};
+                       var configs=!{JSON.stringify(configs)};
+                       $(function(){
+                               connect();
+                               $("[name=sub]").click(function(){
+                                  connect();
+                                });
+                               });
+                       function connect(){
+                               //alert("configs.count:"+configs.length);
+                               var cb=function(i){
+                                       //alert("now config:"+i);
+                                       if(i!=configs.length-1)
+                                               showAll(++i,cb);
+                                       };              
+                               showAll(0,cb);
+                       }
+                       function showAll(i,next){
+                               var name = configs[i].name;
+                               dataBind(name,function(){
+                                       next(i);
+                                       });
+                       }
+                       function dataBind(name,next){
+                               var op=$("[name=op]").val();
+                               var ed=$("[name=ed]").val();
+                               var num=$("[name=num]").val();
+                               var country=$("#country").val();
+                               $.post('/jsonServer?ttype='+ttype+'&name='+name,{action:"phaseStatistical",op:op,ed:ed,num:num,country:country},function(data){
+                                       init(name,data);
+                                       next();
+                               });     
+                       }
+                       function init(name,data){
+                            var config ={
+                               title: {
+                                   text:data.title,
+                                   x: -20 //center
+                               },
+                               subtitle: {
+                                   text: data.subtitle,
+                                   x: -20
+                               },
+                               xAxis: {
+                                   categories: data.xAxis.reverse(),
+                               },
+                               yAxis: {
+                                   title: {
+                                       text: data.ytitle,
+                                   },
+                                   plotLines: [{
+                                       value: 0,
+                                       width: 1,
+                                       color: '#808080'
+                                   }]
+                               },
+                               tooltip: {
+                                   headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                                   pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                       '<td style="padding:0"><b>{point.y} 个</b></td></tr>',
+                                   footerFormat: '</table>',
+                                   shared: true,
+                                   useHTML: true
+                               },              
+                               legend: {
+                                   layout: 'vertical',
+                                   align: 'right',
+                                   verticalAlign: 'middle',
+                                   borderWidth: 0
+                               },
+                               series: []
+                           }
+                           for (var property in data.yAxis){
+                                   var serie={name:property,data:data.yAxis[property].reverse()};
+                                   config.series.push(serie);      
+                           } 
+                           //console.log(JSON.stringify(config));
+                           $('.'+name).highcharts(config);
+                       }

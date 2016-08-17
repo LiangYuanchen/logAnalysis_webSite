@@ -1,0 +1,1767 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+	script(type="text/javascript", src="/jquery.min.js")
+block intro
+	.container
+		h1 GMTool - Store
+		div(id="region",style="padding:5px")
+block content
+	if hasPermission
+		.container: .jumbotron(style="").
+			<h2>Store</h2>
+			<a href="javascript:void(0)" title="重置数据（清空数据）" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearAll()">ClearAll</a>
+			<a href="javascript:void(0)" title="重置数据（清空数据）" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearAll(8)">ClearAllBoxShop</a>
+			<a href="javascript:void(0)" title="重置数据（清空数据）" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearAll(9)">ClearAllDicountShop</a>
+			<a href="javascript:void(0)" title="重置数据（清空数据）" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearAll(17)">ClearQueenShop</a>			
+			<a href="javascript:void(0)" title="重置数据OpenShop（清空数据）" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearAll(11)">ClearOpenShop</a>		
+			<br style="clear:both;" />
+			<table id="dgboxshop" class="easyui-datagrid" title="BoxShop" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowboxshop,
+						onEndEdit:onEndEditboxshop,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgboxshop">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: boxshoppool,
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgdiscount" class="easyui-datagrid" title="Discount" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowdiscount,
+						onEndEdit:onEndEditdiscount,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgdiscount">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: discountpool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>			
+			<table id="dgadv" class="easyui-datagrid" title="冒险者" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRow,
+						onEndEdit:onEndEdit,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgadv">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: advpool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgnor" class="easyui-datagrid" title="普通" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRownor,
+						onEndEdit:onEndEditnor,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgnor">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: normalpool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgody" class="easyui-datagrid" title="奥德赛" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowody,
+						onEndEdit:onEndEditody,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgody">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: odypool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgPvP" class="easyui-datagrid" title="PVP" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowPvP,
+						onEndEdit:onEndEditPvP,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgPvP">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: pvppool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgCoin" class="easyui-datagrid" title="Coin" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowCoin,
+						onEndEdit:onEndEditCoin,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgCoin">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: coinpool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgBlack" class="easyui-datagrid" title="Black" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowBlack,
+						onEndEdit:onEndEditBlack,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgBlack">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: blackpool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgGuild" class="easyui-datagrid" title="Guild" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:onClickRowGuild,
+						onEndEdit:onEndEditGuild,
+						autoRowHeight:false,pageSize:50,toolbar:tooldgGuild">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right',editor:'numberbox'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right',editor:{
+							type:'combobox',
+							options:{
+								valueField:'value',
+								textField:'text',
+								data: guildpool,			   
+								required:true
+							}
+						}," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right',editor:{type:'numberbox',options:{precision:3}}" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+
+
+			<div style="clear:both" ></div>
+	else
+		.container: .jumbotron(style="").
+			<h2>Store</h2>
+			<br style="clear:both;" /> 
+			<table id="dgadv" class="easyui-datagrid" title="冒险者" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:[],
+						onEndEdit:[],
+						autoRowHeight:false,pageSize:50,toolbar:[]">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right'," rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right'" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgnor" class="easyui-datagrid" title="普通" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:[],
+						onEndEdit:[],
+						autoRowHeight:false,pageSize:50,toolbar:[]">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right'" rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right'" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgody" class="easyui-datagrid" title="奥德赛" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:[],
+						onEndEdit:[],
+						autoRowHeight:false,pageSize:50,toolbar:[]">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right'" rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right'" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgPvP" class="easyui-datagrid" title="PVP" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:[],
+						onEndEdit:[],
+						autoRowHeight:false,pageSize:50,toolbar:[]">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right'" rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right'" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgCoin" class="easyui-datagrid" title="Coin" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:[],
+						onEndEdit:[],
+						autoRowHeight:false,pageSize:50,toolbar:[]">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right'" rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right'" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<table id="dgBlack" class="easyui-datagrid" title="Black" style="width:500px;height:300px;float:left;margin-left:20px" data-options="
+						singleSelect:true,
+						onClickRow:[],
+						onEndEdit:[],
+						autoRowHeight:false,pageSize:50,toolbar:[]">
+				<thead>
+					<tr>
+					   <th data-options="field:'id',width:40,align:'right'" rowspan='2' >序号</th>
+					   <th data-options="field:'poolid',width:300,align:'right'" rowspan='2' >池ID</th>
+					   <th data-options="field:'discount',width:150,align:'right'" rowspan='2' >折扣</th>
+					</tr>
+				</thead>
+			</table>
+			<div style="clear:both" ></div>		
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/js/underscore-min.js")
+	script(type="text/javascript").
+		var firstRegionId=0;
+		var lastRegionId=0;
+		$.post("/getregion",null,function(data){
+			var arrStr = data.split(":");
+			if(!arrStr||arrStr.length<2)
+				return;
+			firstRegionId =parseInt( arrStr[0]);
+			lastRegionId =parseInt( arrStr[1]);
+			var divRegion=$("#region");
+			for(var i=firstRegionId;i<lastRegionId+1;i++)
+				{
+					var aregion =$( "<a class='easyui-linkbutton' data-options=\"iconCls:'icon-reload',plain:true\" href='?region="+i+"' >分区"+i+"</a>");
+					divRegion.append(aregion);
+				}
+			});
+	if hasPermission
+		script(type="text/javascript").
+			var config = {};
+			var advpool = [];
+			var otherpool = [];
+			var pvppool =[];
+			var normalpool =[];
+			var odypool = [];
+			var coinpool = [];
+			var blackpool = [];
+			var guildpool = [];
+			var boxshoppool = [];
+			var discountpool = [];
+
+			var handle_index = 0;
+			function overHandle()
+			{
+				handle_index--;
+				if(handle_index==0)
+				{
+					alert("操作完成");
+				}
+			}
+			function clearAll(num)
+			{
+				if(num&&!isNaN(num))
+				{
+					if(num==8)
+					{
+						handle_index = 1;
+						clearboxshop(0,function(){
+							overHandle();
+						});
+					}
+					else if(num==9)
+					{
+						handle_index = 1;
+						cleardiscount(0,function(){
+							overHandle();
+						});
+					}
+					else if(num>9&&num<17)
+					{
+						handle_index = 7;
+						clearOpenShop(0,function(){
+							overHandle();
+						});
+					}
+				else if(num==17)
+					{
+						handle_index = 1;
+						clearQueenShop(0,function(){
+							overHandle();
+						});
+					}
+				}
+				else
+					{
+						handle_index = 17;
+						clearByRegion(0,function(){
+							overHandle();
+						});
+					}
+			}
+
+			function clearByRegion(region,next)
+			{
+				clearAdv(region,next);
+				clearody(region,next);
+				clearnor(region,next);
+				clearCoin(region,next);
+				clearBlack(region,next);
+				clearPvP(region,next);
+				clearGuild(region,next);
+				clearboxshop(region,next);
+				cleardiscount(region,next);
+				clearOpenShop(region,next);
+			}
+			var initPool = function(poolid,poolname,shoptype)
+			{
+				return {text:poolid,value:poolid,shoptype:shoptype,poolname:poolname};
+			}
+			function getShopTypeByPoolName(store){
+				var parm = {text:"",value:"",shoptype:0};
+				parm.text = parm.value = store.poolid;
+				if (1==1||store.poolname.indexOf("normalshop")!=-1) {
+					normalpool.push(initPool(store.poolid,store.poolname,2));
+				};
+				if (1==1||store.poolname.indexOf("pvpshop")!=-1) {
+					pvppool.push(initPool(store.poolid,store.poolname,4));
+				};
+				if (1==1||store.poolname.indexOf("odsshop")!=-1) {
+					odypool.push(initPool(store.poolid,store.poolname,3));
+				};
+				if (1==1||store.poolname.indexOf("coinshop")!=-1){
+					coinpool.push(initPool(store.poolid,store.poolname,5));
+				}
+				if(1==1||store.poolname.indexOf("blackshop")!=-1){
+					blackpool.push(initPool(store.poolid,store.poolname,6));
+				}
+				if(1==1||store.poolname.indexOf("guildshop")!=-1){
+					guildpool.push(initPool(store.poolid,store.poolname,7));
+				}					
+				if(1==1||store.poolname.indexOf("boxshop")!=-1){
+					boxshoppool.push(initPool(store.poolid,store.poolname,8));
+				}
+				if(1==1||store.poolname.indexOf("discountshop")!=-1){
+					discountpool.push(initPool(store.poolid,store.poolname,9));
+				}
+				return parm;
+			}
+			function request(paras,region)
+			{ 
+			if(!isNaN(region))
+				{
+				return region;
+				}
+			var url = location.href; 
+			var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+			var paraObj = {} 
+			for (i=0; j=paraString[i]; i++){ 
+			paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+			} 
+			var returnValue = paraObj[paras.toLowerCase()]; 
+			if(typeof(returnValue)=="undefined"){ 
+			return "";
+			}else{ 
+			if(returnValue.indexOf('#')>-1)
+			returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+			return returnValue;
+			} 
+			}				
+			function load(next){
+				$.ajax(
+						{
+							url:"/storepool",
+							async:false,
+							type:"post",
+							success:function(data){
+									config =eval("("+data+")");
+									for(var i=0;i<config.advs.length;i++)
+									{
+										var parm = {text:"",value:""};
+										parm.text = parm.value = config.advs[i];
+										advpool.push(parm);
+									}
+									for(var i=0;i<config.stores.length;i++)
+									{   
+										otherpool.push(getShopTypeByPoolName(config.stores[i]));				
+									}
+									next();
+							 }
+						}
+					);
+			}
+			function loadGuild(){
+				$.post("/storelist",{data:7,region:request("region")},function(datas){
+					$("#dgGuild").datagrid("loadData",datas);
+				})
+			}				
+			function loadAdv(){
+				$.post("/storelist",{data:1,region:request("region")},function(datas){
+					$("#dgadv").datagrid("loadData",datas);
+				});
+			}
+			function loadNor(){
+				$.post("/storelist",{data:2,region:request("region")},function(datas){
+					$("#dgnor").datagrid("loadData",datas);
+				});
+			}
+			function loadOdy(){
+				$.post("/storelist",{data:3,region:request("region")},function(datas){
+					$("#dgody").datagrid("loadData",datas);
+				});
+			}
+			function loadPvP(){
+				$.post("/storelist",{data:4,region:request("region")},function(datas){
+					$("#dgPvP").datagrid("loadData",datas);
+				});
+			}
+			function loadCoin(){
+				$.post("/storelist",{data:5,region:request("region")},function(datas){
+					$("#dgCoin").datagrid("loadData",datas);
+				})
+			}
+			function loadBlack(){
+				$.post("/storelist",{data:6,region:request("region")},function(datas){
+					$("#dgBlack").datagrid("loadData",datas);
+				})				
+			}
+			function loadBoxShop(){
+				$.post("/storelist",{data:8,region:request("region")},function(datas){
+					$("#dgboxshop").datagrid("loadData",datas);
+				})
+			}
+			function loadDiscount(){
+				$.post("/storelist",{data:9,region:request("region")},function(datas){
+					$("#dgdiscount").datagrid("loadData",datas);
+				})
+			}				
+			load(function(){
+			   loadAdv();
+			   loadNor();
+			   loadOdy();
+			   loadPvP();
+			   loadCoin();
+			   loadBlack();
+			   loadGuild();
+			   loadBoxShop();
+			   loadDiscount();				
+			});			
+		script(type="text/javascript").
+					   var tooldgadv =[
+							{
+								text:'刷新',
+								iconCls:'icon-reload',
+								handler:loadAdv
+							},
+							{
+								text:'添加',
+								iconCls:'icon-add',
+								handler:append
+							},
+							{
+								text:'保存',
+								iconCls:'icon-save',
+								handler:accept
+							},
+							{
+								text:'Clear',
+								iconCls:'icon-remove',
+								handler:clearAdv
+							},
+							{
+								text:'撤销',
+								iconCls:'icon-undo',
+								handler:reject
+							},
+							{
+								text:'Changes',
+								iconCls:'icon-search',
+								handler:getChanges
+							},
+							{
+								text:'删除',
+								iconCls:'icon-remove',
+								handler:remove
+							}
+						];
+						var editIndex ;
+						function append(){
+							if (endEditing()){
+								$('#dgadv').datagrid('appendRow',{id:99,shoptype:1,discount:1,poolid:0});
+								editIndexDgarmer = $('#dgadv').datagrid('getRows').length-1;
+								$('#dgadv').datagrid('selectRow', editIndexDgarmer)
+										.datagrid('beginEdit', editIndexDgarmer);
+							}
+						}
+						function accept(){
+								if (endEditing()){
+								var rows = $("#dgadv").datagrid('getChanges');
+								var validated = true;
+								var msg = "";
+								//把rows里的skills技能重置一下
+
+								if (rows.length>0&&validated) {
+									$.post("/storeedit",{data:rows,shoptype:1,region:request("region")},function(){
+										loadAdv();
+									});
+									$('#dgadv').datagrid('acceptChanges');
+								}else{
+									//alert(JSON.stringify(rows)+"changes error");
+								}
+							}		
+						}
+						function clearAdv(region,next)
+						{
+							$.post("/storeclear",{data:1,region:request("region",region)},function(data){
+								loadAdv();
+								next();
+							});
+						}
+						function reject()
+						{
+							$('#dgadv').datagrid('rejectChanges');
+							editIndex = undefined;
+						}
+						function getChanges()
+						{
+							var rows = $('#dgadv').datagrid('getChanges');
+							alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+						}
+						function remove()
+						{
+							if (!isNaN(editIndex)) {
+								var curRow = $("#dgadv").datagrid("getSelected");
+								var parm = "1:"+curRow.id;
+								$.post("/storedelete",{data:parm,region:request("region")},function(){
+									loadAdv();
+								})
+							};
+						}
+						function onClickRow(index){
+							if (editIndex != index){
+								if (endEditing()){
+									$('#dgadv').datagrid('selectRow', index)
+											.datagrid('beginEdit', index);
+														editIndex = index;
+									
+								} else {
+									$('#dgadv').datagrid('selectRow', editIndex);
+								}
+							}
+							
+						}
+						function onEndEdit(index,row,changes){
+
+						}
+						function endEditing(){
+							if (editIndex == undefined){return true}
+							if ($('#dgadv').datagrid('validateRow', editIndex)){
+								//var ed = $('#dg').datagrid('getEditor', {index:editIndex,field:'productid'});
+								// var productname = $(ed.target).combobox('getText');
+								// $('#dg').datagrid('getRows')[editIndex]['productname'] = productname;
+								 $('#dgadv').datagrid('endEdit', editIndex);
+								editIndex = undefined;
+								return true;
+							} else {
+								return false;
+							}
+						}
+		script(type="text/javascript").
+				  var tooldgnor =[
+					{
+						text:'刷新',
+						iconCls:'icon-reload',
+						handler:loadNor
+					},
+					{
+						text:'添加',
+						iconCls:'icon-add',
+						handler:appendnor
+					},
+					{
+						text:'保存',
+						iconCls:'icon-save',
+						handler:acceptnor
+					},
+					{
+						text:'Clear',
+						iconCls:'icon-remove',
+						handler:clearnor
+					},
+					{
+						text:'撤销',
+						iconCls:'icon-undo',
+						handler:rejectnor
+					},
+					{
+						text:'Changes',
+						iconCls:'icon-search',
+						handler:getChangesnor
+					},
+					{
+						text:'删除',
+						iconCls:'icon-remove',
+						handler:removenor
+					}
+				];
+				var editIndexDgarmer;
+				function appendnor(){
+					if (endEditingnor()){
+						$('#dgnor').datagrid('appendRow',{id:99,shoptype:2,discount:1,poolid:0});
+						editIndexDgarmerDgarmer = $('#dgnor').datagrid('getRows').length-1;
+						$('#dgnor').datagrid('selectRow', editIndexDgarmerDgarmer)
+								.datagrid('beginEdit', editIndexDgarmerDgarmer);
+					}
+				}
+				function acceptnor(){
+						if (endEditingnor()){
+						var rows = $("#dgnor").datagrid('getChanges');
+						var validated = true;
+						var msg = "";
+						//把rows里的skills技能重置一下
+
+						if (rows.length>0&&validated) {
+							$.post("/storeedit",{data:rows,shoptype:2,region:request("region")},function(){
+								loadNor();
+							});
+							$('#dgnor').datagrid('acceptChanges');
+						}else{
+							//alert(JSON.stringify(rows)+"changes error");
+						}
+					}		
+				}
+				function clearnor(region,next)
+				{
+					$.post("/storeclear",{data:2,region:request("region",region)},function(data){
+						loadNor();
+						next();
+					});
+				}
+				function rejectnor()
+				{
+					$('#dgnor').datagrid('rejectChanges');
+					editIndexDgarmer = undefined;
+				}
+				function getChangesnor()
+				{
+					var rows = $('#dgnor').datagrid('getChanges');
+					alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+				}
+				function removenor()
+				{
+					if (!isNaN(editIndexDgarmer)) {
+						var curRow = $("#dgnor").datagrid("getSelected");
+						var parm = "2:"+curRow.id;
+						$.post("/storedelete",{data:parm,region:request("region")},function(){
+							loadNor();
+						})
+					};
+				}
+				function onClickRownor(index){
+					if (editIndexDgarmer != index){
+						if (endEditingnor()){
+							$('#dgnor').datagrid('selectRow', index)
+									.datagrid('beginEdit', index);
+												editIndexDgarmer = index;
+							
+						} else {
+							$('#dgnor').datagrid('selectRow', editIndexDgarmer);
+						}
+					}
+					
+				}
+				function onEndEditnor(index,row,changes){
+
+				}
+				function endEditingnor(){
+					if (editIndexDgarmer == undefined){return true}
+					if ($('#dgnor').datagrid('validateRow', editIndexDgarmer)){
+						//var ed = $('#dg').datagrid('getEditor', {index:editIndexDgarmer,field:'productid'});
+						// var productname = $(ed.target).combobox('getText');
+						// $('#dg').datagrid('getRows')[editIndexDgarmer]['productname'] = productname;
+						 $('#dgnor').datagrid('endEdit', editIndexDgarmer);
+						editIndexDgarmer = undefined;
+						return true;
+					} else {
+						return false;
+					}
+				}
+		script(type="text/javascript").
+					   var tooldgody =[
+							{
+								text:'刷新',
+								iconCls:'icon-reload',
+								handler:loadOdy
+							},
+							{
+								text:'添加',
+								iconCls:'icon-add',
+								handler:appendody
+							},
+							{
+								text:'保存',
+								iconCls:'icon-save',
+								handler:acceptody
+							},
+							{
+								text:'Clear',
+								iconCls:'icon-remove',
+								handler:clearody
+							},
+							{
+								text:'撤销',
+								iconCls:'icon-undo',
+								handler:rejectody
+							},
+							{
+								text:'Changes',
+								iconCls:'icon-search',
+								handler:getChangesody
+							},
+							{
+								text:'删除',
+								iconCls:'icon-remove',
+								handler:removeody
+							}
+						];
+						var editIndexOdy;
+						function appendody(){
+							if (endEditingody()){
+								$('#dgody').datagrid('appendRow',{id:99,shoptype:3,discount:1,poolid:0});
+								editIndexOdy = $('#dgody').datagrid('getRows').length-1;
+								$('#dgody').datagrid('selectRow', editIndexOdy)
+										.datagrid('beginEdit', editIndexOdy);
+							}
+						}
+						function acceptody(){
+								if (endEditingody()){
+								var rows = $("#dgody").datagrid('getChanges');
+								var validated = true;
+								var msg = "";
+								//把rows里的skills技能重置一下
+
+								if (rows.length>0&&validated) {
+									$.post("/storeedit",{data:rows,shoptype:3,region:request("region")},function(){
+										loadNor();
+									});
+									$('#dgody').datagrid('acceptChanges');
+								}else{
+									//alert(JSON.stringify(rows)+"changes error");
+								}
+							}		
+						}
+						function clearody(region,next)
+						{
+							$.post("/storeclear",{data:3,region:request("region",region)},function(data){
+								loadNor();
+								next();
+							});
+						}
+						function rejectody()
+						{
+							$('#dgody').datagrid('rejectChanges');
+							editIndexOdy = undefined;
+						}
+						function getChangesody()
+						{
+							var rows = $('#dgody').datagrid('getChanges');
+							alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+						}
+						function removeody()
+						{
+							if (!isNaN(editIndexOdy)) {
+								var curRow = $("#dgody").datagrid("getSelected");
+								var parm = "3:"+curRow.id;
+								$.post("/storedelete",{data:parm,region:request("region")},function(){
+									loadNor();
+								})
+							};
+						}
+						function onClickRowody(index){
+							if (editIndexOdy != index){
+								if (endEditingody()){
+									$('#dgody').datagrid('selectRow', index)
+											.datagrid('beginEdit', index);
+														editIndexOdy = index;
+									
+								} else {
+									$('#dgody').datagrid('selectRow', editIndexOdy);
+								}
+							}
+							
+						}
+						function onEndEditody(index,row,changes){
+
+						}
+						function endEditingody(){
+							if (editIndexOdy == undefined){return true}
+							if ($('#dgody').datagrid('validateRow', editIndexOdy)){
+								//var ed = $('#dg').datagrid('getEditor', {index:editIndexOdy,field:'productid'});
+								// var productname = $(ed.target).combobox('getText');
+								// $('#dg').datagrid('getRows')[editIndexOdy]['productname'] = productname;
+								 $('#dgody').datagrid('endEdit', editIndexOdy);
+								editIndexOdy = undefined;
+								return true;
+							} else {
+								return false;
+							}
+						}
+		script(type="text/javascript").
+				  var tooldgPvP =[
+					{
+						text:'刷新',
+						iconCls:'icon-reload',
+						handler:loadPvP
+					},
+					{
+						text:'添加',
+						iconCls:'icon-add',
+						handler:appendPvP
+					},
+					{
+						text:'保存',
+						iconCls:'icon-save',
+						handler:acceptPvP
+					},
+					{
+						text:'Clear',
+						iconCls:'icon-remove',
+						handler:clearPvP
+					},
+					{
+						text:'撤销',
+						iconCls:'icon-undo',
+						handler:rejectPvP
+					},
+					{
+						text:'Changes',
+						iconCls:'icon-search',
+						handler:getChangesPvP
+					},
+					{
+						text:'删除',
+						iconCls:'icon-remove',
+						handler:removePvP
+					}
+				];
+				var editIndexPvP;
+				function appendPvP(){
+					if (endEditingPvP()){
+						$('#dgPvP').datagrid('appendRow',{id:99,shoptype:4,discount:1,poolid:0});
+						editIndexPvP = $('#dgPvP').datagrid('getRows').length-1;
+						$('#dgPvP').datagrid('selectRow', editIndexPvP)
+								.datagrid('beginEdit', editIndexPvP);
+					}
+				}
+				function acceptPvP(){
+						if (endEditingPvP()){
+						var rows = $("#dgPvP").datagrid('getChanges');
+						var validated = true;
+						var msg = "";
+						//把rows里的skills技能重置一下
+
+						if (rows.length>0&&validated) {
+							$.post("/storeedit",{data:rows,shoptype:4,region:request("region")},function(){
+								loadNor();
+							});
+							$('#dgPvP').datagrid('acceptChanges');
+						}else{
+							//alert(JSON.stringify(rows)+"changes error");
+						}
+					}		
+				}
+				function clearQueenShop(region,next){
+					$.post("/storeclear",{data:17,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop(region,next)
+				{
+					clearOpenShop1(region,next);
+					clearOpenShop2(region,next);
+					clearOpenShop3(region,next);
+					clearOpenShop4(region,next);
+					clearOpenShop5(region,next);
+					clearOpenShop6(region,next);
+					clearOpenShop7(region,next);
+				}
+				function clearOpenShop1(region,next)
+				{
+					$.post("/storeclear",{data:10,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop2(region,next)
+				{
+					$.post("/storeclear",{data:11,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop3(region,next)
+				{
+					$.post("/storeclear",{data:12,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop4(region,next)
+				{
+					$.post("/storeclear",{data:13,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop5(region,next)
+				{
+					$.post("/storeclear",{data:14,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop6(region,next)
+				{
+					$.post("/storeclear",{data:15,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function clearOpenShop7(region,next)
+				{
+					$.post("/storeclear",{data:16,region:request("region",region)},function(data){
+						next();
+					});
+				}				
+				function clearPvP(region,next)
+				{
+					$.post("/storeclear",{data:4,region:request("region",region)},function(data){
+						next();
+					});
+				}
+				function rejectPvP()
+				{
+					$('#dgPvP').datagrid('rejectChanges');
+					editIndexPvP = undefined;
+				}
+				function getChangesPvP()
+				{
+					var rows = $('#dgPvP').datagrid('getChanges');
+					alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+				}
+				function removePvP()
+				{
+					if (!isNaN(editIndexPvP)) {
+						var curRow = $("#dgPvP").datagrid("getSelected");
+						var parm = "4:"+curRow.id;
+						$.post("/storedelete",{data:parm,region:request("region")},function(){
+							loadNor();
+						})
+					};
+				}
+				function onClickRowPvP(index){
+					if (editIndexPvP != index){
+						if (endEditingPvP()){
+							$('#dgPvP').datagrid('selectRow', index)
+									.datagrid('beginEdit', index);
+												editIndexPvP = index;
+							
+						} else {
+							$('#dgPvP').datagrid('selectRow', editIndexPvP);
+						}
+					}
+					
+				}
+				function onEndEditPvP(index,row,changes){
+
+				}
+				function endEditingPvP(){
+					if (editIndexPvP == undefined){return true}
+					if ($('#dgPvP').datagrid('validateRow', editIndexPvP)){
+						//var ed = $('#dg').datagrid('getEditor', {index:editIndexPvP,field:'productid'});
+						// var productname = $(ed.target).combobox('getText');
+						// $('#dg').datagrid('getRows')[editIndexPvP]['productname'] = productname;
+						 $('#dgPvP').datagrid('endEdit', editIndexPvP);
+						editIndexPvP = undefined;
+						return true;
+					} else {
+						return false;
+					}
+				}
+		script(type="text/javascript").
+					  var tooldgCoin =[
+							{
+								text:'刷新',
+								iconCls:'icon-reload',
+								handler:loadCoin
+							},
+							{
+								text:'添加',
+								iconCls:'icon-add',
+								handler:appendCoin
+							},
+							{
+								text:'保存',
+								iconCls:'icon-save',
+								handler:acceptCoin
+							},
+							{
+								text:'Clear',
+								iconCls:'icon-remove',
+								handler:clearCoin
+							},
+							{
+								text:'撤销',
+								iconCls:'icon-undo',
+								handler:rejectCoin
+							},
+							{
+								text:'Changes',
+								iconCls:'icon-search',
+								handler:getChangesCoin
+							},
+							{
+								text:'删除',
+								iconCls:'icon-remove',
+								handler:removeCoin
+							}
+						];
+						var editIndexCoin;
+						function appendCoin(){
+							if (endEditingCoin()){
+								$('#dgCoin').datagrid('appendRow',{id:99,shoptype:5,discount:1,poolid:0});
+								editIndexCoin = $('#dgCoin').datagrid('getRows').length-1;
+								$('#dgCoin').datagrid('selectRow', editIndexCoin)
+										.datagrid('beginEdit', editIndexCoin);
+							}
+						}
+						function acceptCoin(){
+								if (endEditingCoin()){
+								var rows = $("#dgCoin").datagrid('getChanges');
+								var validated = true;
+								var msg = "";
+								//把rows里的skills技能重置一下
+
+								if (rows.length>0&&validated) {
+									$.post("/storeedit",{data:rows,shoptype:5,region:request("region")},function(){
+										loadCoin();
+									});
+									$('#dgCoin').datagrid('acceptChanges');
+								}else{
+									//alert(JSON.stringify(rows)+"changes error");
+								}
+							}		
+						}
+						function clearCoin(region,next)
+						{
+							$.post("/storeclear",{data:5,region:request("region",region)},function(data){
+								loadCoin();
+								next();
+							});
+						}
+						function rejectCoin()
+						{
+							$('#dgCoin').datagrid('rejectChanges');
+							editIndexCoin = undefined;
+						}
+						function getChangesCoin()
+						{
+							var rows = $('#dgCoin').datagrid('getChanges');
+							alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+						}
+						function removeCoin()
+						{
+							if (!isNaN(editIndexCoin)) {
+								var curRow = $("#dgCoin").datagrid("getSelected");
+								var parm = "5:"+curRow.id;
+								$.post("/storedelete",{data:parm,region:request("region")},function(){
+									loadCoin();
+								})
+							};
+						}
+						function onClickRowCoin(index){
+							if (editIndexCoin != index){
+								if (endEditingCoin()){
+									$('#dgCoin').datagrid('selectRow', index)
+											.datagrid('beginEdit', index);
+														editIndexCoin = index;
+									
+								} else {
+									$('#dgCoin').datagrid('selectRow', editIndexCoin);
+								}
+							}
+							
+						}
+						function onEndEditCoin(index,row,changes){
+
+						}
+						function endEditingCoin(){
+							if (editIndexCoin == undefined){return true}
+							if ($('#dgCoin').datagrid('validateRow', editIndexCoin)){
+								//var ed = $('#dg').datagrid('getEditor', {index:editIndexCoin,field:'productid'});
+								// var productname = $(ed.target).combobox('getText');
+								// $('#dg').datagrid('getRows')[editIndexCoin]['productname'] = productname;
+								 $('#dgCoin').datagrid('endEdit', editIndexCoin);
+								editIndexCoin = undefined;
+								return true;
+							} else {
+								return false;
+							}
+						}
+		script(type="text/javascript").
+					  var tooldgBlack =[
+							{
+								text:'刷新',
+								iconCls:'icon-reload',
+								handler:loadBlack
+							},
+							{
+								text:'添加',
+								iconCls:'icon-add',
+								handler:appendBlack
+							},
+							{
+								text:'保存',
+								iconCls:'icon-save',
+								handler:acceptBlack
+							},
+							{
+								text:'Clear',
+								iconCls:'icon-remove',
+								handler:clearBlack
+							},
+							{
+								text:'撤销',
+								iconCls:'icon-undo',
+								handler:rejectBlack
+							},
+							{
+								text:'Changes',
+								iconCls:'icon-search',
+								handler:getChangesBlack
+							},
+							{
+								text:'删除',
+								iconCls:'icon-remove',
+								handler:removeBlack
+							}
+						];
+						var editIndexBlack;
+						function appendBlack(){
+							if (endEditingBlack()){
+								$('#dgBlack').datagrid('appendRow',{id:99,shoptype:6,discount:1,poolid:0});
+								editIndexBlack = $('#dgBlack').datagrid('getRows').length-1;
+								$('#dgBlack').datagrid('selectRow', editIndexBlack)
+										.datagrid('beginEdit', editIndexBlack);
+							}
+						}
+						function acceptBlack(){
+								if (endEditingBlack()){
+								var rows = $("#dgBlack").datagrid('getChanges');
+								var validated = true;
+								var msg = "";
+								//把rows里的skills技能重置一下
+
+								if (rows.length>0&&validated) {
+									$.post("/storeedit",{data:rows,shoptype:6,region:request("region")},function(){
+										loadBlack();
+									});
+									$('#dgBlack').datagrid('acceptChanges');
+								}else{
+									//alert(JSON.stringify(rows)+"changes error");
+								}
+							}		
+						}
+						function clearBlack(region,next)
+						{
+							$.post("/storeclear",{data:6,region:request("region",region)},function(data){
+								loadBlack();
+								next();
+							});
+						}
+						function rejectBlack()
+						{
+							$('#dgBlack').datagrid('rejectChanges');
+							editIndexBlack = undefined;
+						}
+						function getChangesBlack()
+						{
+							var rows = $('#dgBlack').datagrid('getChanges');
+							alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+						}
+						function removeBlack()
+						{
+							if (!isNaN(editIndexBlack)) {
+								var curRow = $("#dgBlack").datagrid("getSelected");
+								var parm = "6:"+curRow.id;
+								$.post("/storedelete",{data:parm,region:request("region")},function(){
+									loadBlack();
+								})
+							};
+						}
+						function onClickRowBlack(index){
+							if (editIndexBlack != index){
+								if (endEditingBlack()){
+									$('#dgBlack').datagrid('selectRow', index)
+											.datagrid('beginEdit', index);
+														editIndexBlack = index;
+									
+								} else {
+									$('#dgBlack').datagrid('selectRow', editIndexBlack);
+								}
+							}
+							
+						}
+						function onEndEditBlack(index,row,changes){
+
+						}
+						function endEditingBlack(){
+							if (editIndexBlack == undefined){return true}
+							if ($('#dgBlack').datagrid('validateRow', editIndexBlack)){
+								//var ed = $('#dg').datagrid('getEditor', {index:editIndexBlack,field:'productid'});
+								// var productname = $(ed.target).combobox('getText');
+								// $('#dg').datagrid('getRows')[editIndexBlack]['productname'] = productname;
+								 $('#dgBlack').datagrid('endEdit', editIndexBlack);
+								editIndexBlack = undefined;
+								return true;
+							} else {
+								return false;
+							}
+						}
+		script(type="text/javascript").
+					  var tooldgGuild =[
+							{
+								text:'刷新',
+								iconCls:'icon-reload',
+								handler:loadGuild
+							},
+							{
+								text:'添加',
+								iconCls:'icon-add',
+								handler:appendGuild
+							},
+							{
+								text:'保存',
+								iconCls:'icon-save',
+								handler:acceptGuild
+							},
+							{
+								text:'Clear',
+								iconCls:'icon-remove',
+								handler:clearGuild
+							},
+							{
+								text:'撤销',
+								iconCls:'icon-undo',
+								handler:rejectGuild
+							},
+							{
+								text:'Changes',
+								iconCls:'icon-search',
+								handler:getChangesGuild
+							},
+							{
+								text:'删除',
+								iconCls:'icon-remove',
+								handler:removeGuild
+							}
+						];
+						var editIndexGuild;
+						function appendGuild(){
+							if (endEditingGuild()){
+								$('#dgGuild').datagrid('appendRow',{id:99,shoptype:7,discount:1,poolid:0});
+								editIndexGuild = $('#dgGuild').datagrid('getRows').length-1;
+								$('#dgGuild').datagrid('selectRow', editIndexGuild)
+										.datagrid('beginEdit', editIndexGuild);
+							}
+						}
+						function acceptGuild(){
+								if (endEditingGuild()){
+								var rows = $("#dgGuild").datagrid('getChanges');
+								var validated = true;
+								var msg = "";
+								//把rows里的skills技能重置一下
+
+								if (rows.length>0&&validated) {
+									$.post("/storeedit",{data:rows,shoptype:7,region:request("region")},function(){
+										loadGuild();
+									});
+									$('#dgGuild').datagrid('acceptChanges');
+								}else{
+									//alert(JSON.stringify(rows)+"changes error");
+								}
+							}		
+						}
+						function clearGuild(region,next)
+						{
+							$.post("/storeclear",{data:7,region:request("region",region)},function(data){
+								loadGuild();
+								next();
+							});
+						}
+						function rejectGuild()
+						{
+							$('#dgGuild').datagrid('rejectChanges');
+							editIndexGuild = undefined;
+						}
+						function getChangesGuild()
+						{
+							var rows = $('#dgGuild').datagrid('getChanges');
+							alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+						}
+						function removeGuild()
+						{
+							if (!isNaN(editIndexGuild)) {
+								var curRow = $("#dgGuild").datagrid("getSelected");
+								var parm = "7:"+curRow.id;
+								$.post("/storedelete",{data:parm,region:request("region")},function(){
+									loadGuild();
+								})
+							};
+						}
+						function onClickRowGuild(index){
+							if (editIndexGuild != index){
+								if (endEditingGuild()){
+									$('#dgGuild').datagrid('selectRow', index)
+											.datagrid('beginEdit', index);
+														editIndexGuild = index;
+									
+								} else {
+									$('#dgGuild').datagrid('selectRow', editIndexGuild);
+								}
+							}
+							
+						}
+						function onEndEditGuild(index,row,changes){
+
+						}
+						function endEditingGuild(){
+							if (editIndexGuild == undefined){return true}
+							if ($('#dgGuild').datagrid('validateRow', editIndexGuild)){
+								//var ed = $('#dg').datagrid('getEditor', {index:editIndexGuild,field:'productid'});
+								// var productname = $(ed.target).combobox('getText');
+								// $('#dg').datagrid('getRows')[editIndexGuild]['productname'] = productname;
+								 $('#dgGuild').datagrid('endEdit', editIndexGuild);
+								editIndexGuild = undefined;
+								return true;
+							} else {
+								return false;
+							}
+						}
+		script(type="text/javascript").
+					  var tooldgboxshop =[
+						{
+							text:'刷新',
+							iconCls:'icon-reload',
+							handler:loadBoxShop
+						},
+						{
+							text:'添加',
+							iconCls:'icon-add',
+							handler:appendboxshop
+						},
+						{
+							text:'保存',
+							iconCls:'icon-save',
+							handler:acceptboxshop
+						},
+						{
+							text:'Clear',
+							iconCls:'icon-remove',
+							handler:clearboxshop
+						},
+						{
+							text:'撤销',
+							iconCls:'icon-undo',
+							handler:rejectboxshop
+						},
+						{
+							text:'Changes',
+							iconCls:'icon-search',
+							handler:getChangesboxshop
+						},
+						{
+							text:'删除',
+							iconCls:'icon-remove',
+							handler:removeboxshop
+						}
+					];
+					var editIndexDgboxshop;
+					function appendboxshop(){
+						if (endEditingboxshop()){
+							$('#dgboxshop').datagrid('appendRow',{id:99,shoptype:8,discount:1,poolid:0});
+							editIndexDgboxshopDgboxshop = $('#dgboxshop').datagrid('getRows').length-1;
+							$('#dgboxshop').datagrid('selectRow', editIndexDgboxshopDgboxshop)
+									.datagrid('beginEdit', editIndexDgboxshopDgboxshop);
+						}
+					}
+					function acceptboxshop(){
+							if (endEditingboxshop()){
+							var rows = $("#dgboxshop").datagrid('getChanges');
+							var validated = true;
+							var msg = "";
+							//把rows里的skills技能重置一下
+
+
+							$.post("/storeedit",{data:rows,shoptype:8,region:request("region")},function(){
+								loadBoxShop();
+							});
+							$('#dgboxshop').datagrid('acceptChanges');
+
+						}		
+					}
+					function clearboxshop(region,next)
+					{
+						$.post("/storeclear",{data:8,region:request("region",region)},function(data){
+							loadBoxShop();
+							next();
+						});
+					}
+					function rejectboxshop()
+					{
+						$('#dgboxshop').datagrid('rejectChanges');
+						editIndexDgboxshop = undefined;
+					}
+					function getChangesboxshop()
+					{
+						var rows = $('#dgboxshop').datagrid('getChanges');
+						alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+					}
+					function removeboxshop()
+					{
+						if (!isNaN(editIndexDgboxshop)) {
+							var curRow = $("#dgboxshop").datagrid("getSelected");
+							var parm = "8:"+curRow.id;
+							$.post("/storedelete",{data:parm,region:request("region")},function(){
+								loadBoxShop();
+							})
+						};
+					}
+					function onClickRowboxshop(index){
+						if (editIndexDgboxshop != index){
+							if (endEditingboxshop()){
+								$('#dgboxshop').datagrid('selectRow', index)
+										.datagrid('beginEdit', index);
+													editIndexDgboxshop = index;
+								
+							} else {
+								$('#dgboxshop').datagrid('selectRow', editIndexDgboxshop);
+							}
+						}
+						
+					}
+					function onEndEditboxshop(index,row,changes){
+
+					}
+					function endEditingboxshop(){
+						if (editIndexDgboxshop == undefined){return true}
+						if ($('#dgboxshop').datagrid('validateRow', editIndexDgboxshop)){
+							//var ed = $('#dg').datagrid('getEditor', {index:editIndexDgboxshop,field:'productid'});
+							// var productname = $(ed.target).combobox('getText');
+							// $('#dg').datagrid('getRows')[editIndexDgboxshop]['productname'] = productname;
+							 $('#dgboxshop').datagrid('endEdit', editIndexDgboxshop);
+							editIndexDgboxshop = undefined;
+							return true;
+						} else {
+							return false;
+						}
+					}
+		script(type="text/javascript").
+					  var tooldgdiscount =[
+						{
+							text:'刷新',
+							iconCls:'icon-reload',
+							handler:loadDiscount
+						},
+						{
+							text:'添加',
+							iconCls:'icon-add',
+							handler:appenddiscount
+						},
+						{
+							text:'保存',
+							iconCls:'icon-save',
+							handler:acceptdiscount
+						},
+						{
+							text:'Clear',
+							iconCls:'icon-remove',
+							handler:cleardiscount
+						},
+						{
+							text:'撤销',
+							iconCls:'icon-undo',
+							handler:rejectdiscount
+						},
+						{
+							text:'Changes',
+							iconCls:'icon-search',
+							handler:getChangesdiscount
+						},
+						{
+							text:'删除',
+							iconCls:'icon-remove',
+							handler:removediscount
+						}
+					];
+					var editIndexDgdiscount;
+					function appenddiscount(){
+						if (endEditingdiscount()){
+							$('#dgdiscount').datagrid('appendRow',{id:99,shoptype:9,discount:1,poolid:0});
+							editIndexDgdiscount = $('#dgdiscount').datagrid('getRows').length-1;
+							$('#dgdiscount').datagrid('selectRow', editIndexDgdiscount)
+									.datagrid('beginEdit', editIndexDgdiscount);
+						}
+					}
+					function acceptdiscount(){
+							if (endEditingdiscount()){
+							var rows = $("#dgdiscount").datagrid('getChanges');
+							var validated = true;
+							var msg = "";
+							//把rows里的skills技能重置一下
+
+							$.post("/storeedit",{data:rows,shoptype:9,region:request("region")},function(){
+								loadBoxShop();
+							});
+							$('#dgdiscount').datagrid('acceptChanges');
+
+						}		
+					}
+					function cleardiscount(region,next)
+					{
+						$.post("/storeclear",{data:9,region:request("region",region)},function(data){
+							loadDiscount();
+							next();
+						});
+					}
+					function rejectdiscount()
+					{
+						$('#dgdiscount').datagrid('rejectChanges');
+						editIndexDgdiscount = undefined;
+					}
+					function getChangesdiscount()
+					{
+						var rows = $('#dgdiscount').datagrid('getChanges');
+						alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+					}
+					function removediscount()
+					{
+						if (!isNaN(editIndexDgdiscount)) {
+							var curRow = $("#dgdiscount").datagrid("getSelected");
+							var parm = "9:"+curRow.id;
+							$.post("/storedelete",{data:parm,region:request("region")},function(){
+								loadBoxShop();
+							})
+						};
+					}
+					function onClickRowdiscount(index){
+						if (editIndexDgdiscount != index){
+							if (endEditingdiscount()){
+								$('#dgdiscount').datagrid('selectRow', index)
+										.datagrid('beginEdit', index);
+													editIndexDgdiscount = index;
+								
+							} else {
+								$('#dgdiscount').datagrid('selectRow', editIndexDgdiscount);
+							}
+						}
+						
+					}
+					function onEndEditdiscount(index,row,changes){
+
+					}
+					function endEditingdiscount(){
+						if (editIndexDgdiscount == undefined){return true}
+						if ($('#dgdiscount').datagrid('validateRow', editIndexDgdiscount)){
+							//var ed = $('#dg').datagrid('getEditor', {index:editIndexDgdiscount,field:'productid'});
+							// var productname = $(ed.target).combobox('getText');
+							// $('#dg').datagrid('getRows')[editIndexDgdiscount]['productname'] = productname;
+							 $('#dgdiscount').datagrid('endEdit', editIndexDgdiscount);
+							editIndexDgdiscount = undefined;
+							return true;
+						} else {
+							return false;
+						}
+					}					
+		style(type="text/css").
+					.panel{
+						float:left; 
+						margin-left: 20px;
+						margin-top: 20px;	   }
+	else
+		script(type="text/javascript").
+				   var config = {};
+					var advpool = [];
+					var otherpool = [];
+					var pvppool =[];
+					var normalpool =[];
+					var odypool = [];
+					var coinpool = [];
+					
+					$(function(){
+					   load(); 
+					   loadAdv();
+					   loadNor();
+					   loadOdy();
+					   loadPvP();
+					   loadCoin();
+					   loadGuild();
+					});
+					function getShopTypeByPoolName(store){
+						var parm = {text:"",value:"",shoptype:0};
+						parm.text = parm.value = store.poolid;
+						if (store.poolname.indexOf("normalshop")!=-1) {
+							parm.shoptype = 2;
+							normalpool.push(parm);
+						};
+						if (store.poolname.indexOf("pvpshop")!=-1) {
+							parm.shoptype = 4;
+							pvppool.push(parm);
+						};
+						if (store.poolname.indexOf("odsshop")!=-1) {
+							parm.shoptype = 3;
+							odypool.push(parm);
+						};
+						if (store.poolname.indexOf("coinshop")!=-1){
+							parm.shoptype = 5;
+							coinpool.push(parm);
+						}
+						if (store.poolname.indexOf("blackshop")!=-1){
+							parm.shoptype = 6;
+							coinpool.push(parm);
+						}					
+						if (store.poolname.indexOf("guildshop")!=-1){
+							parm.shoptype = 7;
+							coinpool.push(parm);
+						}								
+						return parm;
+					}
+					function load(){
+						$.ajax(
+								{
+									url:"/storepool",
+									async:false,
+									type:"post",
+									success:function(data){
+											config =eval("("+data+")");
+											for(var i=0;i<config.advs.length;i++)
+											{
+												var parm = {text:"",value:""};
+												parm.text = parm.value = config.advs[i];
+												advpool.push(parm);
+											}
+											for(var i=0;i<config.stores.length;i++)
+											{   
+												otherpool.push(getShopTypeByPoolName(config.stores[i]));				
+											}
+									   }
+								}
+							);
+					}
+					function loadAdv(){
+						$.post("/storelist",{data:1,region:request("region")},function(datas){
+							$("#dgadv").datagrid("loadData",datas);
+						});
+					}
+					function loadNor(){
+						$.post("/storelist",{data:2,region:request("region")},function(datas){
+							$("#dgnor").datagrid("loadData",datas);
+						});
+					}
+					function loadOdy(){
+						$.post("/storelist",{data:3,region:request("region")},function(datas){
+							$("#dgody").datagrid("loadData",datas);
+						});
+					}
+					function loadPvP(){
+						$.post("/storelist",{data:4,region:request("region")},function(datas){
+							$("#dgPvP").datagrid("loadData",datas);
+						});
+					}
+					function loadCoin(){
+						$.post("/storelist",{data:5,region:request("region")},function(datas){
+							$("#dgCoin").datagrid("loadData",datas);
+						})
+					}
+					function loadGuild(){
+						$.post("/storelist",{data:7,region:request("region")},function(datas){
+							$("#dgGuild").datagrid("loadData",datas);
+						})
+					}
+
+		style(type="text/css").
+					.panel{
+						float:left; 
+						margin-left: 20px;
+						margin-top: 20px;	   }

@@ -1,0 +1,122 @@
+br
+span 时区：
+input(type="hidden", name="timezone", id="timezone", value="")
+select(id="timezone_select",name="timezone_select",style="width:150px")
+div(id="warp_timezone")
+	input(type="checkbox",name="op_timezone",value="all",checked=_.contains(filters["timezone"],""))
+	span ALL
+	br
+	input(type="checkbox",name="op_timezone",value="-12",checked=_.contains(filters["timezone"],"-12"))
+	span -12
+	br
+	input(type="checkbox",name="op_timezone",value="-11",checked=_.contains(filters["timezone"],"-11"))
+	span -11
+	br
+	input(type="checkbox",name="op_timezone",value="-10",checked=_.contains(filters["timezone"],"-10"))
+	span -10
+	br
+	input(type="checkbox",name="op_timezone",value="-9",checked=_.contains(filters["timezone"],"-9"))
+	span -9
+	br
+	input(type="checkbox",name="op_timezone",value="-8",checked=_.contains(filters["timezone"],"-8"))
+	span -8
+	br
+	input(type="checkbox",name="op_timezone",value="-7",checked=_.contains(filters["timezone"],"-7"))
+	span -7
+	br
+	input(type="checkbox",name="op_timezone",value="-6",checked=_.contains(filters["timezone"],"-6"))
+	span -6
+	br
+	input(type="checkbox",name="op_timezone",value="-5",checked=_.contains(filters["timezone"],"-5"))
+	span -5
+	br
+	input(type="checkbox",name="op_timezone",value="-4",checked=_.contains(filters["timezone"],"-4"))
+	span -4
+	br
+	input(type="checkbox",name="op_timezone",value="-3",checked=_.contains(filters["timezone"],"-3"))
+	span -3
+	br
+	input(type="checkbox",name="op_timezone",value="-2",checked=_.contains(filters["timezone"],"-2"))
+	span -2
+	br
+	input(type="checkbox",name="op_timezone",value="-1",checked=_.contains(filters["timezone"],"-1"))
+	span -1
+	br
+	input(type="checkbox",name="op_timezone",value="0",checked=_.contains(filters["timezone"],"0"))
+	span 0
+	br
+	input(type="checkbox",name="op_timezone",value="1",checked=_.contains(filters["timezone"],"1"))
+	span 1
+	br
+	input(type="checkbox",name="op_timezone",value="2",checked=_.contains(filters["timezone"],"2"))
+	span 2
+	br
+	input(type="checkbox",name="op_timezone",value="3",checked=_.contains(filters["timezone"],"3"))
+	span 3
+	br
+	input(type="checkbox",name="op_timezone",value="4",checked=_.contains(filters["timezone"],"4"))
+	span 4
+	br
+	input(type="checkbox",name="op_timezone",value="5",checked=_.contains(filters["timezone"],"5"))
+	span 5
+	br
+	input(type="checkbox",name="op_timezone",value="6",checked=_.contains(filters["timezone"],"6"))
+	span 6
+	br
+	input(type="checkbox",name="op_timezone",value="7",checked=_.contains(filters["timezone"],"7"))
+	span 7
+	br
+	input(type="checkbox",name="op_timezone",value="8",checked=_.contains(filters["timezone"],"8"))
+	span 8
+	br
+	input(type="checkbox",name="op_timezone",value="9",checked=_.contains(filters["timezone"],"9"))
+	span 9
+	br
+	input(type="checkbox",name="op_timezone",value="10",checked=_.contains(filters["timezone"],"10"))
+	span 10
+	br
+	input(type="checkbox",name="op_timezone",value="11",checked=_.contains(filters["timezone"],"11"))
+	span 11
+	br
+	input(type="checkbox",name="op_timezone",value="12",checked=_.contains(filters["timezone"],"12"))
+	span 12
+	br
+script(type="text/javascript").
+	$("#warp_timezone").hide();
+	$(function(){
+		$('#timezone_select').combo({
+			 editable:false,
+			 multiple:true
+		});
+		$('#warp_timezone').appendTo($('#timezone_select').combo('panel'));
+		$("#warp_timezone").show();
+		$('#warp_timezone input').click(function(){
+			timezone_Check(this);
+		});
+	});
+	function timezone_Check(input_obj)
+	{
+		var parmArr = [];
+		if($("#timezone").val()!="")
+			 parmArr = $("#timezone").val().split(",");
+		if(input_obj.checked)
+		{
+			if($(input_obj).val()!="")
+				parmArr.push($(input_obj).val())
+		}
+		else
+		{
+			var parmP  = [];
+			for(var i=0; i< parmArr.length; i++)
+			{
+				if(parmArr[i] == $(input_obj).val())
+				{
+					continue;
+				}
+				parmP.push(parmArr[i]);
+			}
+			parmArr = parmP;
+		}
+		$("#timezone").val(parmArr.join(","));
+		$("#timezone_select").combo("setText",parmArr.join(","));
+	}

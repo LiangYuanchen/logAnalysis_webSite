@@ -1,0 +1,1870 @@
+/////////////////////////////////////////////////////////////////////////
+//   基础结构                                                          //
+/////////////////////////////////////////////////////////////////////////
+
+//位缓存
+message DB_BitCache
+{
+	repeated int32			 	bit								= 1;
+}
+
+message DB_BanLogin
+{
+	optional bool				banlogin						= 1[default = false];
+	optional int32				time							= 2[default = 0];
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+//   玩家数据                                                          //
+/////////////////////////////////////////////////////////////////////////
+message DB_PlatBind
+{
+	optional string				type							= 1;
+	optional string				id								= 2;
+}
+
+message DB_User
+{
+	optional int64				uid								= 1[default = 0];
+	optional string				pid								= 2[default = ""];
+	optional int32				last_login_time					= 3[default = 0];
+	optional string				last_login_ip					= 4[default = ""];
+	optional int32				regist_time						= 5[default = 0];
+	optional int32				last_logout_time				= 6[default = 0];
+	optional DB_Player			player							= 7;
+	optional DB_BanLogin		banlogin						= 8;
+	optional string				account							= 9[default = ""];
+	repeated DB_PlatBind		platbinds						= 10;
+	optional int32				region							= 11[default = 1];
+    optional int32              hastakeinviterw                 = 12;
+    repeated string             sendinvitefbs                   = 13;
+}
+
+message DB_Player
+{
+	optional DB_AdventureMgr	advmgr							= 1;
+	optional DB_TavernMgr		tavernmgr						= 2;
+	optional int32				nextinstid						= 3[default=1];
+	optional DB_BattleMgr		battlemgr						= 4;
+	optional DB_RoomMgr			roommgr							= 5;
+	optional DB_StorageMgr		storagemgr						= 6;
+	optional DB_DishMgr			dishmgr							= 7;
+	optional DB_BackupMgr		backupmgr						= 8;
+	optional DB_QuestMgr		questmgr						= 9;
+	optional DB_SmithMgr		smithmgr						= 10;
+	optional DB_ChapterMgr		chaptermgr						= 11;
+	optional DB_TaskMgr			taskmgr							= 12;
+	optional DB_ShopMgr			shopmgr							= 13;
+	optional DB_MailMgr			mailmgr							= 14;
+	optional int32				dailyreward						= 15[default = 0];
+	optional bool				takedaily						= 16[default = false];
+	optional int32				limitrw							= 17[default = 0];
+	optional string				payload							= 18[default = "1"];
+	optional DB_OneTimeOption	onetimeoption					= 19;
+	optional DB_GuildMgr		guildmgr						= 20;
+	optional DB_ExploreMgr		exploremgr						= 21;
+	optional DB_ActivityMgr		activitymgr						= 22;
+	optional DB_ChatMgr			chatmgr							= 23;
+	//optional int32				dailyrwbit						= 24;
+	optional int32				gemsignincount					= 25;
+	optional int32				dailyaccumulatetime				= 26[default = 0];
+	optional int32				takeaccrw						= 27[default = 0];
+    optional DB_DungeonMgr      dungeonmgr                      = 28;
+	optional int32				lastgetonlinerewardtime			= 29[default = 0];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////
+message DB_RegionControl
+{
+    optional int32              lastregion                      = 1[default = 99];
+    repeated int32              newregions                      = 2;
+    repeated int32              hotregions                      = 3;
+    repeated int32              closeregion                     = 4;
+    repeated int32              newuserregions                  = 5;
+}
+
+message DB_MultiLangText
+{
+    optional string				language						= 1;
+    optional string				content							= 2;
+}
+
+message DB_MultiLangActivityHeader
+{
+    optional string				language						= 1;
+    optional string				title							= 2;
+    optional string				helptext						= 3;
+    optional string				content							= 4;
+}	
+
+message DB_ActivityReward
+{
+    optional int32		        itemid							= 1[default = 0];
+    optional int32		        amount							= 2[default = 0];
+}
+
+message DB_MultiLangPic
+{
+    optional string				language						= 1;
+    optional string				pic								= 2;
+}
+
+message DB_ActivitySwitch
+{
+    optional bool			    isopen							= 1[default = false];
+    optional int32			    start							= 2[default = 0];
+    optional int32			    end								= 3[default = 0];
+}
+
+message DB_ActivitySub
+{
+    optional int32			    typeid							= 1[default = 0];
+    repeated DB_MultiLangText   subtext						    = 2;
+    repeated int32              req                             = 3;//finishvalue,...
+    repeated DB_ActivityReward	rewards						    = 4;
+}
+
+message DB_Activity1
+{
+    optional DB_ActivitySwitch      switch                      = 1;
+    repeated DB_MultiLangActivityHeader	header				    = 2;
+    repeated DB_ActivitySub			subcontents					= 3;
+}
+    
+message DB_CommonSetting
+{
+	message Activity7Days
+	{
+		optional bool			open							= 1[default = false];
+	}
+	message ActivityAccumulateBuyGem
+	{
+		optional bool			open							= 1[default = false];
+		optional int32			start							= 2[default = 0];
+		optional int32			end								= 3[default = 0];
+	}
+	message ActivityBoxShop
+	{
+		optional bool			open							= 1[default = false];
+		optional int32			start							= 2[default = 0];
+		optional int32			end								= 3[default = 0];
+	}
+	message ActivityDiscountShop
+	{
+		optional bool			open							= 1[default = false];
+		optional int32			start							= 2[default = 0];
+		optional int32			end								= 3[default = 0];
+	}
+	message ActivityBindFB
+	{
+		optional bool			open							= 1[default = true];
+	}
+	message ActivityFollowFB
+	{
+		optional bool			open							= 1[default = true];
+	}   
+	message ShareFB
+	{
+		optional int32			sharetype						= 1[default = 0];
+	}
+	message NewLeaveMsgId
+	{
+		optional int32			questmsgid						= 1[default = 0];
+		optional int32			advmsgid						= 2[default = 0];
+	}
+	message ActivityQuestRw
+	{
+		optional bool		        isopen						= 1[default = false];
+		optional int32		        start						= 2[default = 0];
+		optional int32		        end							= 3[default = 0];
+	}
+
+	message ActivityPvPRw
+	{
+		optional bool		        isopen						= 1[default = false];
+		optional int32		        start						= 2[default = 0];
+		optional int32		        end							= 3[default = 0];
+	}
+
+	message ActivityOdyessyRw
+	{
+		optional bool		        isopen						= 1[default = false];
+		optional int32		        start						= 2[default = 0];
+		optional int32		        end							= 3[default = 0];
+	}
+	
+	message ActivityMailSpecial
+	{
+		optional bool		        isopen						= 1[default = false];
+		optional int32		        start						= 2[default = 0];
+		optional int32		        end							= 3[default = 0];
+	}
+	message ActivityQueenLottery
+	{
+		optional bool		        isopen						= 1[default = false];
+		optional int32		        start						= 2[default = 0];
+		optional int32		        end							= 3[default = 0];
+	}
+	message ActivityQueenQuest
+	{
+		optional bool		        isopen						= 1[default = false];
+		optional int32		        start						= 2[default = 0];
+		optional int32		        end							= 3[default = 0];
+	}
+
+    /////////////////////////////////////normal 17///////////////////////////////////////////
+	
+	message DB_MultiLangNormalAct
+	{
+		optional string				text							= 1;
+		optional string				pic								= 2;
+		optional string				language						= 3;
+	}
+	
+	message NormalActivitys
+	{
+		repeated DB_MultiLangNormalAct	normalacts					= 1;
+		optional int32					typeid						= 2;
+		optional int32					weight						= 3;
+		optional DB_ActivitySwitch      switch                      = 4;
+	}
+	
+	message Activity7DayNewAct
+	{
+		optional bool			open							= 1[default = true];
+		optional int32			start							= 2[default = 0];
+	}
+	message RegionActivity
+	{
+		optional Activity7Days		sevendays					= 21;
+		optional ActivityAccumulateBuyGem	accumulatebuygem	= 22;
+		optional ActivityBoxShop	boxshop						= 23;
+		optional ActivityDiscountShop   discountshop			= 24;
+		optional ActivityBindFB		bindfb						= 25;
+		optional ActivityFollowFB	followfb					= 26;
+		optional ShareFB			sharefb						= 29;
+		optional ActivityQuestRw	questrw						= 30;
+		optional ActivityPvPRw		pvprw						= 31;
+		optional ActivityOdyessyRw	odyessyrw					= 32;
+		optional int32				regionid					= 33;
+
+        //17 normal activity
+		optional DB_Activity1       dailybuygemrw			    = 34;
+		optional DB_Activity1       weekbuggemrw				= 35;
+		optional DB_Activity1       questcountrw				= 36;
+		optional DB_Activity1       odyesscountrw			    = 37;
+		optional DB_Activity1       pvpcountrw					= 38;
+		optional DB_Activity1       tavernlevelrw			    = 39;
+		optional DB_Activity1	    cookracerw					= 40;
+		optional DB_Activity1	    smithracerw				    = 41;
+		optional DB_Activity1       runessynracerw			    = 42;
+		optional DB_Activity1	    recruitracerw			    = 43;
+		optional DB_Activity1	    gemcookrw					= 44;
+		optional DB_Activity1	    buycoinrw					= 45;
+		optional DB_Activity1	    buyenergyrw				    = 46;
+		optional DB_Activity1	    costcoinrw					= 47;
+		optional DB_Activity1	    costgemrw					= 48;
+		optional DB_Activity1       costenergy				    = 49;
+		//optional DB_Activity1       discountshoprw			= 50;
+		repeated NormalActivitys	normalactivitys			    = 51;
+		//new sevenday switch
+		optional Activity7DayNewAct	sevendaynewact				= 52;
+		optional DB_Activity1		buygemrw					= 53;
+		optional ActivityMailSpecial mailspecial				= 54;
+		optional ActivityQueenLottery queenlottery				= 55;
+		optional ActivityQueenQuest queenquest					= 56;
+	}
+	message MergeRegion
+	{
+		optional uint32			oldregion			= 1;
+		optional uint32			desrigion			= 2;
+		optional uint32			mergetime			= 3;
+	}
+
+	//optional Activity7Days		sevendays					= 1;
+	//optional ActivityAccumulateBuyGem	accumulatebuygem		= 2;
+	//optional ActivityBoxShop	boxshop							= 3;
+	//optional ActivityDiscountShop   discountshop				= 4;
+	//optional ActivityBindFB		bindfb						= 5;
+	//optional ActivityFollowFB	followfb						= 6;
+	optional DB_RegionControl   rctl							= 7;
+	optional NewLeaveMsgId		newmsgid						= 8;
+	//optional ShareFB			sharefb							= 9;
+	//optional ActivityQuestRw	questrw							= 10;
+	//optional ActivityPvPRw		pvprw						= 11;
+	//optional ActivityOdyessyRw	odyessyrw					= 12;
+	repeated RegionActivity			regionactivitys				= 13;
+    optional int32                  todaytime                   = 14;
+    optional int32                  globalonetime               = 15[default = 0];
+	repeated MergeRegion			mergerecord					= 16;
+    optional bool                   chattranslate               = 17[default = true];
+}
+/////////////////////////////////////////////////////////////////////////
+//   玩家数据                                                          //
+/////////////////////////////////////////////////////////////////////////
+message DB_BackupMgr
+{
+	repeated DB_Backup          backups							= 1;
+}
+message DB_Backup
+{
+	optional int32			    dateTime						= 1;
+	optional string			    name							= 2;
+ 	optional DB_User 		    user							= 3;
+}
+
+message DB_Room
+{
+	optional int32			    instid							= 1[default = 0];
+	optional int32			    typeid							= 2[default = 0];
+	optional int32			    level							= 3[default = 1];
+	optional int32			    upgradeendtime					= 4[default = 0];
+}
+
+message DB_RoomMgr
+{
+	repeated DB_Room		    rooms							= 1;
+}
+
+message DB_PVPDiffSetting
+{
+	repeated int32			    skilltypeid						= 1;
+}
+
+message DB_GuildDiffSetting
+{
+	repeated int32			    skilltypeid						= 1;
+}
+
+message DB_Adventure
+{
+	message SkillData
+	{
+		optional int32          skillId							= 1[default = 0];
+		optional int32          level							= 2[default = 1];
+	}
+	message SkillDatas
+	{
+		optional int32	        curskill						= 1;
+		repeated SkillData      skill							= 2;
+	}
+	optional DB_StorageItem		weapon							= 1;
+	optional DB_StorageItem		armor							= 2;
+	optional DB_StorageItem		item							= 3;
+	repeated SkillData		    skills							= 4;
+	repeated int32			    skillpos						= 5;
+	optional int32			    skillexp						= 6[default = 0];
+	optional SkillData		    raceskill						= 7;
+	repeated SkillDatas		    allskills						= 8;
+	optional DB_StorageItem		offhand							= 9;
+	optional DB_PVPDiffSetting	pvpdiff							= 10;
+	optional DB_GuildDiffSetting	guilddiff					= 11;
+}
+
+message DB_OtherAdv
+{
+
+}
+
+message DB_AdvObj
+{
+	enum SKILLUNLOCK
+	{
+		VERSION_BASE	= 0;
+		VERSION_201607	= 1;
+	}
+	optional int32			    instId							= 1[default = 0];
+	optional int32			    typeId							= 2[default = 0];
+	optional int32			    exp								= 3[default = 0];
+	optional int32			    level							= 4[default = 0];
+	optional int32			    star							= 5[default = 0];
+	optional string			    name							= 6[default = ""];
+	optional DB_Adventure		fightadv						= 7;
+	optional DB_OtherAdv		otheradv						= 8;
+    optional int32              starstep                        = 9[default = 0];
+    optional SKILLUNLOCK        unlockversion                   = 10[default = VERSION_BASE];
+}
+
+message DB_Summon
+{
+	optional int32			    type							= 1[default = 0];
+	optional int32			    totalsummon						= 2[default = 0];
+	optional int32			    lastsummontime					= 3[default = 0];
+	optional int32			    freesummononeday				= 4[default = 0];
+}
+
+message DB_AdventureMgr
+{
+	optional int32			    lastgenetime					= 1[default = 0];
+	repeated DB_AdvObj		    roomfightadvs					= 2;
+	repeated DB_AdvObj		    roomotheradvs					= 3;
+	repeated DB_AdvObj		    outsideadvs						= 4;
+	repeated DB_Summon		    summon							= 5;
+	repeated int32			    pvpadvs							= 6;
+	repeated DB_AdvObj		    familiars						= 7;
+//	optional int32			    summonenergy					= 8;//弃用，占位
+	optional int32			    pvpfamiliarid					= 9[default = 0];
+	optional int32			    summonamount					= 10[default = 0];
+	optional int32			    geneoutamount					= 11[default = 0];
+	optional int32			    summonlegendamount				= 12[default = 0];
+//	optional int32			    gemsummonadd					= 13[default = 1000000];//弃用，占位
+	optional int32			    exchaged						= 14[default = 0];
+	optional int32			    legendrate						= 15[default = 1];
+	optional int32			    eliterate						= 16[default = 25];
+	optional int32			    maxfp							= 17[default = 0];
+	optional int32			    summonelite10diffcount			= 18[default = 1000];
+    repeated int32              pvpadvs2                        = 19;
+    optional int32			    pvpfamiliarid2					= 20[default = 0];
+    repeated int32              pvpadvs3                        = 21;
+    optional int32			    pvpfamiliarid3					= 22[default = 0];
+	optional bool				issummoncommon10				= 23[default = true];
+	optional bool				issummonelite					= 24[default = true];
+	optional int32				exchangeamount					= 25[default = 0];
+}
+
+message DB_Tavern
+{
+	message IOSPurchase
+	{
+		optional int32			time							= 1[default = 0];
+		optional string			transaction_id					= 2;
+		optional string			product_id						= 3;
+	}
+	optional int32			    Id								= 1[default = 0];
+	optional int32			    Exp								= 2[default = 0];
+	optional int32			    Coin							= 3[default = 0];
+	optional int32			    GemOther						= 4[default = 0];
+	optional int32			    GemBuy							= 5[default = 0];
+	optional int32			    GemOtherTotal					= 6[default = 0];
+	optional int32			    GemBuyTotal						= 7[default = 0];
+	optional int32			    Energy							= 8[default = 0];
+	optional int32			    lastenergyupdate				= 9[default = 0];
+	optional string			    name							= 10[default =""];
+	repeated int32			    tutorial						= 11;
+	repeated int32			    tutorialstart					= 12;
+	optional int32			    odysseycoin						= 13[default = 0];
+	optional int32			    fame							= 14[default = 0];
+	optional int32			    pvpcoin							= 15[default = 0];
+	optional int32			    sweepticket						= 16[default = 0];
+	optional int32			    BoughtEnergyNum					= 17[default = 0];
+	optional int32			    header							= 19[default = -1];
+	optional int32			    monthcard						= 20[default = 0];
+	optional int32			    guildcoin						= 21[default = 0];
+	repeated IOSPurchase		iosbuy							= 22;
+	optional DB_GlobalNewsletterRegion newsletterregion			= 23;
+	optional int32				queststartypeid					= 24;
+	optional int32				queststarmsgcount				= 25[default = 0];
+	optional int32				queststarmsgtime				= 26[default = 0];
+	optional int32				adventurermsgcount				= 27[default = 0];
+	optional int32				adventurermsgtime				= 28[default = 0];
+	optional float				accumulatemoney					= 29[default = 0];
+	optional bool				istakeaccmoneyrw				= 30[default = false];
+	optional int32				seniormonthcard					= 31[default = 0];
+	optional int32				QueenCoin						= 32[default = 0];
+}
+
+message DB_TavernMgr
+{
+	repeated DB_Tavern		    taverns							= 1;
+}
+
+message DB_PvPData
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    level							= 2[default = 0];
+	optional int32			    star							= 3[default = 0];
+	optional int32			    equipset						= 4[default = 0];
+}
+
+message DB_PvPRobotData
+{
+	repeated DB_AdvObj		    pvpadvs							= 1;
+	optional DB_AdvObj		    familiar						= 2;
+}
+
+message DB_GlobalUserInfo
+{
+	optional string			    pid								= 1[default =""];
+	optional int64			    uid								= 2[default = 0];
+	optional int32		 	    tavernlevel						= 3[default = 1];
+	repeated DB_PvPData		    pvpadvs							= 4;
+	optional string			    name							= 5[default =""];
+	optional int32			    pvpScore						= 6[default = 0];
+//	optional int32			    pvpleague						= 7[default = 0];//占位
+	optional int32			    pvpgroup						= 8[default = 0];
+	optional int32			    pvpuptime						= 9[default = 0];
+	optional int32			    pvpwincount						= 10[default = 0];
+	optional int32			    pvptotalcount					= 11[default = 0];
+	optional int32			    pvprank							= 12[default = 0];//组内排名,取数据时用
+	optional DB_PvPData		    pvpfamiliar						= 13;
+	optional int32			    header							= 14[default = 0];
+	optional int32			    fp								= 15[default = 0];
+	optional DB_PvPRobotData	robotdata						= 16;//机器人才会有这部分
+	optional int32			    region							= 17[default = 1];
+	optional int32			    pvphistorymaxscore				= 18[default = 1400];
+	optional int32			    pvpweekrw						= 19[default = 0];
+    repeated DB_PvPData         pvpadvs2                        = 20;
+    optional DB_PvPData		    pvpfamiliar2					= 21;
+    repeated DB_PvPData         pvpadvs3                        = 22;
+    optional DB_PvPData		    pvpfamiliar3					= 23;
+    optional int32              pvpfp                           = 24[default = 0];
+    optional int32              odysseypvpadvs                  = 25[default = 1];
+    optional bool               initpvpfp                       = 26[default = false];
+    optional int32              guildid                         = 27[default = 0];
+    optional int32              viplv                           = 28[default = 0];
+}
+
+message DB_GlobalShopItem
+{
+	optional int32			    poolid							= 1[default = 0];
+	optional int32			    discount						= 2[default = 0];   
+}
+
+message DB_GlobalShop
+{
+	optional int32			    shoptype						= 1[default = 0];
+	repeated DB_GlobalShopItem	items							= 2;
+	optional int32			    hotversion						= 3;
+	optional int32				refreshtime						= 4[default = 0];
+}
+
+message DB_GlobalShopInfo
+{
+	repeated DB_GlobalShop		shops							= 1;
+	optional string			    cfgmd5							= 2;
+	optional int32			    region							= 3[default = 1];
+}
+
+message DB_MailMutiLang
+{
+    optional string				title							= 1[default = ""];
+    optional string				text							= 2[default = ""];
+    optional string				language						= 3[default = ""];
+}
+
+message DB_GlobalMailContent
+{
+//	optional string			    title							= 1[default = ""];;
+//	optional string			    text							= 2[default = ""];;
+	repeated int32			    typeid							= 3;
+	repeated int32			    amount							= 4;
+	optional string			    url								= 5[default = ""];
+	repeated DB_MailMutiLang	mailmutilang					= 6;
+}
+
+message DB_GlobalMail
+{
+	enum SENDTYPE
+	{
+		ALL		            = 0;
+		PLATFORM	        = 2;
+		TAVERNLVEQUAL	    = 4;
+		TAVERNLVLESS	    = 8;
+		TAVERNLVGREAT	    = 16;   
+		SPECIFY		        = 32;
+		PVPRANK		        = 64;
+		ONLYOLDPLAYER	    = 128;
+		VIPLEVEL			= 256;
+		BINDFB				= 512;
+		REGISTERTIME		= 1024;
+	}
+	message Target
+	{
+		optional int32			platform						= 1[default = 0];
+		optional int32			tavernlv						= 2[default = 0];
+		repeated int64			uid								= 3;
+		optional int32			pvprank							= 4[default = 0];
+		optional int32			starttime						= 5[default = 0];
+		repeated int32			viplevel						= 6;
+		optional bool			bindfb							= 7[default = false];
+		optional uint64			registertimebegin				= 8[default = 0];
+		optional uint64			registertimeend					= 9[default = 0];
+	}
+	optional int32			    index							= 1[default = 0];
+	optional int32			    sendtime						= 2[default = 0];
+	optional int32			    sendtype						= 3;
+	optional int32			    expiretime						= 4;
+	optional Target			    target							= 5;
+	optional DB_GlobalMailContent	content						= 6;
+	optional int32			    region							= 7[default = 1];
+}
+
+message DB_GlobalMailInfo
+{
+	repeated DB_GlobalMail		mails							= 1;
+	optional int32			    allocindex						= 2[default = 1];
+}
+
+message DB_GlobalDailyRw
+{
+	optional int32			    day								= 1;
+	optional int32			    month							= 2;
+	optional int32			    itemid							= 3;
+	optional int32			    amount							= 4;
+}
+
+message DB_GlobalDailyRwInfo
+{
+	optional int32			    region							= 1[default = 1];
+	repeated DB_GlobalDailyRw	drws							= 2;
+}
+
+message DB_GlobalPvPDailyRw
+{
+	repeated int32			    typeid							= 1;
+	repeated int32			    amount							= 2;
+	repeated int64			    uid								= 3;
+	repeated int32			    rank							= 4;
+	optional int32			    index							= 5[default = 0];
+	optional int32			    time							= 6[default = 0];
+	optional bool				isdouble						= 7[default = false];
+}
+
+///////////////////////////////////////////////////////////DB_GlobalGuild///////////////////////////////////////////////////
+message DB_GlobalGuildMemberQuest
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int64			    maxdamage						= 2[default = 0];
+	optional int32			    rank							= 3[default = 0];
+	optional bool			    cantake							= 4[default = false];
+	optional int32			    maxdamagetime					= 5[default = 0];
+}
+message DB_GlobalGuildShare
+{
+	optional int32			    type							= 1[default = 0];
+	repeated int64			    uid								= 2;
+	optional int32			    time							= 3[default = 0];
+}
+message DB_GlobalGuildMember
+{
+	optional bool			    isonline						= 1[default = false];
+	optional int32			    role							= 2[default = 200];
+	repeated DB_GlobalGuildMemberQuest	quest					= 3;
+	optional int32			    addtime							= 4[default = 0];
+	optional int32			    lastlogin						= 5[default = 0];
+	optional int64			    uid								= 6[default = 0];
+	optional string			    name							= 7;
+	optional int32			    tavernlv						= 8[default = 0];
+	optional int32			    header							= 9[default = 0];
+	optional int32			    viplv							= 10[default = 0];
+	optional int32			    contributetotal					= 11[default = 0];
+	optional int32			    totaltakeshare					= 12[default = 0];
+	optional DB_GlobalGuildShare	share						= 13;
+	optional int32			    ctbpoint7day					= 14[default = 0];
+}
+message DB_GlobalGuildRecord
+{
+	enum TYPE
+	{
+		INGUILD		    = 1;
+		EXPEL		    = 2;
+		SETADJUTANT	    = 3;
+		RMADJUTANT	    = 4;
+		CONTRIBUTE	    = 5;
+		RESETQUEST	    = 6;
+		OUTGUILD	    = 7;
+		CAPTAINCHANGE	= 8;
+		TAKESHARE	    = 9;
+		SHARE		    = 10;
+		LEVELUP		    = 11;
+        CREATEGUILD     = 12;
+	}
+	optional int64			    uid1							= 1[default = 0];
+	optional int64			    uid2							= 2[default = 0];
+	optional int32			    time							= 3[default = 0];
+	optional TYPE			    action							= 4;
+	optional int32			    typeid							= 5[default = 0];
+	optional string			    name1							= 6;
+	optional string			    name2							= 7;
+}
+message DB_GlobalGuildApply
+{
+	optional int64			    uid								= 1[default = 0];
+	optional int32			    header							= 2[default = 0];
+	optional int32			    tavernlv						= 3[default = 0];
+	optional string			    name							= 4;
+	optional int32			    viplv							= 5[default = 0];
+	optional int32			    time							= 6[default = 0];
+}
+message DB_GlobalGuildQuest
+{
+	enum STATUS
+	{
+		OPEN		    = 1;
+		CLOSE		    = 2;
+	}
+	optional int32			    typeid							= 1[default = 0];
+	optional STATUS			    status							= 2[default = CLOSE];
+	optional int64			    damage							= 3[default = 1000000];
+	optional bool			    finishedonce					= 4[default = false];
+	optional int32			    deadtime						= 5[default = 0];
+}
+message DB_GlobalGuildWarSupport
+{
+	optional bool			    bused							= 1[default = false];
+	optional DB_AdvObj		    adv								= 2;
+}
+message DB_GlobalGuildWarDefense
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    level							= 2[default = 0];
+	optional int32			    star							= 3[default = 0];
+	optional int32			    equipset						= 4[default = 0]; 
+	optional int32			    fp								= 5[default = 0]; 
+}
+message DB_GlobalGuildWarFightRecord
+{
+	optional bool			    initiative						= 1[default = false];
+	optional int64			    uid								= 2[default = 0];
+	optional int32			    star							= 3[default = 0];
+	optional int32			    time							= 4[default = 0];
+}
+message DB_GlobalGuildWarMember
+{
+	enum USERTYPE
+	{
+		NORMAL		    = 1;
+		ESCAPE		    = 2;
+		ROBOT		    = 3;
+		REPLENISH	    = 4;
+	}
+	optional int64				uid								= 1[default = 0];
+	repeated DB_GlobalGuildWarDefense	defenseadvs				= 2;
+	optional DB_GlobalGuildWarDefense	defensefamiliar			= 3;
+	repeated DB_GlobalGuildWarSupport	supportadvs				= 4;
+	optional int32				fightcount						= 5[default = 0];
+	repeated DB_GlobalGuildWarFightRecord	fightrecord			= 6;
+	optional USERTYPE			usertype						= 7[default = NORMAL];
+	optional bool				takereward						= 8[default = false];
+	optional int64				replenishid						= 9[default = 0];
+	optional int32				starcount						= 10[default = 0];
+	optional int32				lastrank						= 11[default = 0];
+	optional bool				takerankrw						= 12[default = false];
+}
+message DB_GlobalGuildWarRecord
+{
+	optional int32				time							= 1[default = 0];
+	optional int32				selfstar						= 2[default = 0];
+	optional int32				enemystar						= 3[default = 0];
+	optional int32				enemyicon						= 4[default = 0];
+	optional string				enemyname						= 5[default = ""];
+}
+message DB_GlobalGuildWar
+{
+	enum RESULT
+	{
+		WIN	            = 1;
+		LOSE	        = 2;
+		DRAW	        = 3;
+		NONE	        = 4;
+	}
+	optional bool			    isregister						= 1[default = false];
+	optional int32			    enemyguild						= 2[default = 0];
+	optional int32			    enemyguildregion				= 3[default = 0];
+	repeated DB_GlobalGuildWarMember	members					= 4;
+	repeated DB_GlobalGuildWarRecord	records					= 5;
+	optional int32			    wincount						= 6;
+	optional int32			    drawcount						= 7;
+	optional int32			    losecount						= 8;
+	optional RESULT			    reward							= 9[default = NONE];
+	optional bool			    isclose							= 10[default = true];
+}
+message DB_GlobalGuildShareReplay
+{
+    optional int64                      uid1                    = 1;
+    optional int32                      lv1                     = 2;
+    optional int32                      header1                 = 3;
+    optional string                     name1                   = 4;  
+
+    optional int64                      uid2                    = 5;
+    optional int32                      lv2                     = 6;
+    optional int32                      header2                 = 7;
+    optional string                     name2                   = 8; 
+
+    optional int32                      replaytime              = 9;
+    optional bool                       user1                   = 10;
+    optional int32                      sharetime               = 11;
+    optional int32                      replayversion           = 12;
+    optional int32                      playerVersion           = 13;
+}
+message DB_GlobalGuild
+{
+	optional int32			    id								= 1[default = 0];
+	optional int32			    icon							= 2[default = 0];
+	optional int32			    point							= 3[default = 0];
+	optional int32			    totalpoint						= 4[default = 0];
+	optional string			    name							= 5;
+	optional string			    declaratioin					= 6;
+	repeated DB_GlobalGuildMember	members						= 7;
+	repeated DB_GlobalGuildRecord	records						= 8;
+	repeated DB_GlobalGuildApply	applys						= 9;
+	optional int64			    creator							= 10[default = 0];
+	optional int32			    createtime						= 11[default = 0];
+	optional bool			    autopermit						= 12[default = true];
+	optional int32			    todaypoint						= 13[default = 0];
+	repeated DB_GlobalGuildQuest	quest						= 14;
+	repeated DB_ChatRecord		chatrecord						= 15;
+	optional DB_GlobalGuildWar	guildwar						= 16;
+    repeated DB_GlobalGuildShareReplay sharereplays             = 17;
+}
+message DB_GlobalGuildRegion
+{
+	enum WARSTEP
+	{
+		CLOSE		    = 0;
+		REGISTER	    = 1;
+		PREPARE		    = 2;
+		MATCH		    = 3;
+		FIGHT		    = 4;
+		REST		    = 5;
+	}
+	optional int32			    region							= 1[default = 0];
+	repeated DB_GlobalGuild		guilds							= 2;
+	optional int32			    baseguildid						= 3[default = 1];
+	optional WARSTEP		    warstep							= 4[default = REGISTER];
+    optional bool               hasreplacenewequipforsupportadv = 5[default = false];
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+message DB_NewsletterContent
+{
+	optional string			    pic								= 1[default = ""];
+	optional string			    content							= 2[default = ""];
+}
+
+message DB_NewsletterLang
+{
+    optional string			    title							= 1[default = ""];
+    repeated DB_NewsletterContent	contents					= 2;
+    optional string             language                        = 3[default = ""];
+}
+
+message DB_GlobalNewsletter
+{
+//	optional string			    title							= 1[default = ""];
+	optional int32			    time							= 2[default = 0];
+	optional string			    version							= 3[default = ""];
+	optional string			    npc								= 4[default = ""];
+	optional string			    url								= 5[default = ""];
+//	repeated DB_NewsletterContent	contents					= 6;
+    repeated DB_NewsletterLang  multilang                       = 7; 
+    repeated int32              region                          = 8;
+    optional bool               allcansee                       = 9[default = true];
+}
+
+message DB_GlobalNewsletterRegion
+{
+	repeated DB_GlobalNewsletter	newsletters					= 1;
+}
+
+message DB_GlobalLeaveMsgInfo
+{
+	optional int32					msgid						= 1;
+	optional int64					uid							= 2;
+	optional string					msgcontent					= 3;
+	optional int32					time						= 4;
+	optional int32					okcount						= 5[default = 0];
+	optional int32					nocount						= 6[default = 0];
+	optional bool					isshow						= 7[default = true];
+	optional int32					header						= 8;
+	optional string					name						= 9;
+	optional int32					level						= 10;
+	repeated int64					praiseuid					= 11;
+	repeated int64					denialuid					= 12;
+}
+
+message DB_GlobalLeaveMsgs
+{
+	repeated DB_GlobalLeaveMsgInfo	msgbytime					= 1;
+	repeated DB_GlobalLeaveMsgInfo	msgbypraise					= 2;
+	optional int32					typeid						= 3;
+}
+
+
+///////////////////////////////////////////////////////////////globalreplay//////////////////////////////////////////////////////////////
+message DB_GlobalPTPosition
+{
+	optional float                  x                           = 1 [default = 0.0];
+	optional float                  y                           = 2 [default = 0.0];
+}
+
+message DB_GlobalPTChangeAnimation
+{
+	required float                  time                        = 1 [default = 0.0];
+	required int32                  animationId                 = 2 [default = 0];
+	required bool					repeated 					= 3 [default = false];
+}
+
+message DB_GlobalPTChangePosition
+{
+	required float                  beginTime                   = 1 [default = 0.0];
+	required float                  endTime                     = 2 [default = 0.0];
+	required DB_GlobalPTPosition 	beginPos					= 3;
+	required DB_GlobalPTPosition    endPos                      = 4;
+	optional int32                  type                        = 5 [default = 0];
+}
+
+message DB_GlobalPTChangeHeadIcon
+{
+	required int32 					iconType 					= 1;
+	required bool 					isCrit 						= 2;
+	required float 					time 						= 3;
+}
+
+message DB_GlobalPTChangeDir
+{
+	required float					time 						= 1 [default = 0.0];
+	required int32 					newDir						= 2 [default = 1];
+}
+
+
+message DB_GlobalPTChangeActorCommon
+{
+	required int32 					sceneId 					= 1 [default = 0];
+	required float 					time 						= 2 [default = 1];
+	required int32 					command 					= 3 [default = 2];
+	repeated int32					paramInt 					= 4;
+	repeated float 					paramFloat					= 5;
+}
+
+message DB_GlobalPTChangeFlagValue
+{
+	required float 					time 						= 1;
+	required int32 					flag 						= 2;
+	required int32 					op 							= 3;
+	optional int32 					paramInt 					= 4;
+	optional int32 					paramFloat 					= 5;
+}
+
+message DB_GlobalPTChangeAction
+{
+	required int32 					action 						= 1 [default = 0];
+	repeated int32					paramInt 					= 2;
+	repeated float 					paramFloat					= 3;
+	repeated DB_GlobalPTPosition 	paramPos 					= 4;
+	required int32 					style 						= 5 [default = 0];
+}
+
+message DB_GlobalPTChangeActionBatch
+{
+	required int32 					 	sceneId 					= 1 [default = 0];
+	required int32 					 	target 						= 2 [default = 0];
+	required int32 						beginTime					= 3;
+	repeated DB_GlobalPTChangeAction 	actions 					= 4;
+}
+
+
+message DB_GlobalPTChangeAttackAnimationAdd
+{
+	required int32 					effectIndex				 	= 1 [default = 0];
+	required float 					Time 					 	= 2 [default = 0.0];
+	required int32 					tag 						= 3 [default = 0];		
+}
+
+message DB_GlobalPTChangeAttackAnimationRemove
+{
+	required int32 					effectIndex				 	= 1 [default = 0];
+	required float 					Time 					 	= 2 [default = 0.0];
+	required int32 					tag 						= 3 [default = 0];	
+}
+
+message DB_GlobalPTChangeActorEffectAdd
+{
+	required int32 					targetSceneId 				= 1 [default = 0];
+	required int32 					effectIndex 				= 2 [default = 1];
+	optional int32 					spinePHIndex 				= 3 [default = 0];
+	optional int32 					dir 						= 4 [default = 1];
+	required bool 					inDirLayer					= 5 [default = true];
+	required float 					time 						= 6 [default = 0.0];
+}
+
+message DB_GlobalPTChangeEffectManagerAdd
+{
+	required int32 					effectIndex 				= 1 [default = 0];
+	required float 					time 						= 2 [default = 0.0];
+	required int32 					managerType 				= 3 [default = 0];
+}
+
+
+message DB_GlobalPTChangeEffectManager
+{
+	required int32 					effectIndex 				= 1 [default = 0];
+	required float 					time 						= 2 [default = 0.0];
+	required int32 					managerType 				= 3 [default = 0];
+	required int32 					operationType 				= 4 [default = 0];
+}
+
+message DB_GlobalPTChangeChestEffect
+{
+	required int32 					effectIndex 				= 1 [default = 0];
+	required float 					time 						= 2 [default = 0.0];
+	required int32 					tag 						= 3 [default = 0];
+	required bool 					loop 						= 4 [default = false];
+	required int32 					inoutType 					= 5 [default = 0];
+	required bool 					applyBodyScale 				= 6 [default = false];
+	required int32 					operationType 				= 7 [default = 0];
+}
+
+message DB_GlobalPTChangeTimeScale
+{
+	required int32 					sceneId 					= 1 [default = 0];
+	optional float 					timeScaleChange 			= 2 [default = 0.0];
+	required float 					time 						= 3 [default = 0.0];
+	required int32 					op 							= 4 [default = 0];
+}
+
+message DB_GlobalPTChangeHalo
+{
+	required int32 					effectIndex 				= 1 [default = 0];
+	required float 					time 						= 2 [default = 0.0];
+	required int32 					operationType 				= 3 [default = 0];
+	required int32 					tag 						= 4 [default = 0];
+}
+
+message DB_GlobalPTChangeValue
+{
+	required int32 					type 						= 1 [default = 0];
+	optional int32 					newPercent 					= 2 [default = 0];
+	optional int32 					valueChange 				= 3 [default = 0];
+	required float   				time 						= 4 [default = 0];
+	optional bool 					isCritial					= 5 [default = false];
+}
+
+message DB_GlobalPTChangeSound
+{
+	required int32 					type 						= 1 [default = 0];
+	required float 					time 						= 3 [default = 0.0];
+	repeated int32					soundIds 					= 4;
+}
+
+message DB_GlobalPTBuff
+{
+	required int32                  sceneObjectId               = 1;
+	required int32                  buffId                      = 2;
+	required float                  createTime                  = 3;
+}
+
+message DB_GlobalPTThrowObject
+{
+	required int32                  sceneObjectId               = 1;
+	required int32                  throwObjectId               = 2;
+	required float                  beginTime                   = 3;
+	required float 					endTime 					= 4;
+	required DB_GlobalPTPosition 	beginPos 					= 5;
+	optional DB_GlobalPTPosition 	endPos 						= 6;
+	optional DB_GlobalPTPosition 	controlPos 					= 7;
+	optional int32 					actorBeginSceneObjectId 	= 8;
+	optional int32 					actorEndSceneObjectId 		= 9;
+	optional int32 					dir 						= 10;
+	optional int32 					actorThrow					= 11;
+}
+
+message DB_GlobalPTSpecialEffect
+{
+	required int32 					effectId 					= 1;
+	required int32 					sceneObjectId 				= 2;
+	required float 					time 						= 3;
+	required int32 					op 							= 4;
+}
+
+message DB_GlobalPTTombstone
+{
+	required int32 					sceneObjectId 	= 1;
+	optional int32 					opType 		= 2[default = 0];
+	optional float 					param 		= 3[default = 0];
+	optional int32 					camp 			= 4[default = 0];
+	optional DB_GlobalPTPosition    initPosition    = 5;
+}
+
+message DB_GlobalPTActor
+{
+	required int32                  sceneObjectId               = 1;
+	required float                  createTime                  = 2;
+	required int32                  camp                        = 3[default = 1];
+	required int32                  actorType                   = 4[default = 0];
+	required int32					initDir 					= 5[default = 1];
+	optional DB_GlobalPTPosition    initPosition                = 6;
+	optional int32                  initAnimation               = 7;
+	repeated DB_GlobalPTChangeAnimation changesAnimation        = 8;
+	repeated DB_GlobalPTChangePosition changesPosition          = 9;
+	repeated DB_GlobalPTChangeDir   changesDir					= 10;
+	repeated DB_GlobalPTChangeAttackAnimationAdd   		changesAttackAnimationAdd 		= 11;
+	repeated DB_GlobalPTChangeAttackAnimationRemove     changesAttackAnimationRemove 	= 12;
+	repeated DB_GlobalPTChangeActorEffectAdd 			changesActorEffectAdd 			= 13;
+	repeated DB_GlobalPTChangeEffectManager 			changesEffectManager 			= 14;
+	repeated DB_GlobalPTChangeChestEffect 				changesChestEffect				= 15;
+	repeated DB_GlobalPTChangeHalo 						changesHalo						= 16;
+	repeated DB_GlobalPTChangeActorCommon				changesActorCommon 				= 17;
+	repeated DB_GlobalPTChangeActionBatch 				changesActionBatch 				= 18;
+	repeated DB_GlobalPTChangeValue 					changesValue  					= 19;
+	repeated DB_GlobalPTChangeHeadIcon 					changesHeadIcon 				= 20;
+	repeated DB_GlobalPTChangeTimeScale 				changesTimeScale 				= 21;
+	repeated DB_GlobalPTChangeFlagValue  				changesFlagValue 				= 22;
+	repeated DB_GlobalPTSpecialEffect 					specialEffects 					= 23;
+}
+
+message DB_GlobalPTFreezeData
+{
+	required int32 					sceneId 					= 1;
+	optional int32 					excludeSceneId 				= 2 [default = -1];
+	required float 					time 						= 3;
+	required int32 					type 						= 4;
+}
+
+message DB_GlobalPTSceneCommon
+{
+	required int32 					type 						= 1;
+	required float 					time 						= 2;
+}
+
+message DB_GlobalPTExternalObject
+{
+	required int32 					sceneId 					= 1;
+	required int32 					type 						= 2;
+	required float 					time 						= 3;
+	optional int32 					targetSceneId				= 4;
+	optional int32 					dir 						= 5;
+	optional int32 					extOp 						= 6;
+	repeated float 					extOpParamFloat 			= 7;
+	repeated int32 					extOpParamInt 				= 8;
+}
+
+message DB_GlobalPTScene
+{
+	repeated DB_GlobalPTActor       actors                      = 1;
+	repeated DB_GlobalPTThrowObject throwObjects                = 2;
+	repeated DB_GlobalPTBuff        buffs                       = 3;
+	required string                 sceneName                   = 4;
+	optional DB_GlobalPTActor       familiar                    = 5;
+	repeated DB_GlobalPTChangeSound sounds 						= 6;
+	repeated DB_GlobalPTFreezeData 	freezeObjects				= 7;
+	repeated DB_GlobalPTSceneCommon sceneCommon 				= 8;
+	repeated DB_GlobalPTExternalObject externalObjects 			= 9;
+	repeated DB_GlobalPTTombstone 		tombstoneObjects 		= 10;
+	
+}
+
+message DB_GlobalPTReplay
+{
+	required DB_GlobalPTScene       scene                       = 1;
+}
+
+message DB_GlobalPTSkillInformation
+{
+	required int32                  skillId                     = 1;
+	required int32                  skillLevel                  = 2;
+}
+
+message DB_GlobalPTActorInformation
+{
+	required int32                  		sceneObjectId               = 1;
+	required int32                  		raceId                      = 2;
+	required int32                  		classId                     = 3;
+	required int32                  		star                        = 4;
+	optional int32                  		weaponId                    = 5 [default = 0];
+	optional int32                  		weaponLevel                 = 6 [default = 1];
+	repeated DB_GlobalPTSkillInformation 	skills 		                = 7;
+	required int32 							initHp						= 8 [default = 0];
+	required int32 							initEnergy					= 9 [default = 0];
+	required int32                  		actorType                   = 10[default = 0];
+	optional int32 							level 						= 11[default = 1];
+	optional int32 							equipLevel 					= 12[default = 0];
+}
+
+message DB_GlobalPTReplayInformation
+{
+	repeated DB_GlobalPTActorInformation reds                   = 1;
+	repeated DB_GlobalPTActorInformation blues                  = 2;
+	repeated DB_GlobalPTActorInformation createInBattles        = 3;
+	optional DB_GlobalPTActorInformation familiar               = 4;
+	optional float timeOfReplay                                 = 5;
+	optional int64 winnerUID                                    = 6;
+	optional uint64 replaySize                                  = 7;
+	optional uint32 attackTime                                  = 8;
+	required uint32 stageIndex                                  = 9;
+}
+
+message DB_GlobalPTReplayInformationPKG
+{
+	repeated DB_GlobalPTReplayInformation informations          = 1; 
+}
+
+
+message DB_GlobalPTReplayPKG
+{
+	required int32 version                                      = 1 [default = 0];
+	required int64 redUID                                       = 2;
+	required int64 blueUID                                      = 3;
+	required int32 attackTime                                   = 4;
+	optional int64 winnerUID                                    = 5;
+	optional DB_GlobalPTReplayInformationPKG infomations        = 6;
+	repeated DB_GlobalPTReplay replays                          = 7;
+    optional bool  remove                                       = 8[default = false];
+    required int32 recordId 									= 9[default = 0];
+    optional int32 refcount                                     = 10[default = 0];
+    optional int32 playerVersion 								= 11[default = 0];
+}
+
+message DB_GlobalLegendSetting
+{
+	message SummonSetting
+	{
+		optional int32			advid							= 1;
+		optional int32			start							= 2[default = 0];
+		optional int32			end								= 3[default = 0];
+	}
+	
+	repeated SummonSetting		summonsetting					= 1;
+	optional int32			    region							= 2[default = 1];
+}
+///////////////////////////////////////////////////////////////globalreplay//////////////////////////////////////////////////////////////
+message DB_GlobalPreDayPVPInfo
+{
+	message List
+	{
+		optional int64				uid				= 1;
+		optional int32				score			= 2;
+	}
+
+	repeated List	rankinfos	= 1;
+}
+
+message DB_GlobalAdvStarsInfo
+{
+	message List
+	{
+		optional int64				uid				= 1;
+		optional int32				stars			= 2;
+	}
+
+	repeated List	rankinfos	= 1;
+}
+
+message DB_GlobalData
+{
+	repeated DB_GlobalUserInfo	userinfo						= 1;
+	optional DB_GlobalShopInfo	shopinfo						= 2;
+	optional DB_GlobalMailInfo	mailinfo						= 3;
+	optional DB_GlobalDailyRwInfo	drwinfo						= 4;
+	repeated DB_GlobalPvPDailyRw	pvpdailyrws					= 5;
+	optional int32			    pvpdailytime					= 6;
+	optional int32			    googlebroadcastindex			= 7[default = 1];
+	optional int32			    region							= 8[default = 1];
+	optional DB_GlobalGuildRegion	globalguildregion			= 9;
+//	repeated DB_GlobalNewsletterRegion newsletterregion			= 10;//弃用，占位
+	optional DB_GlobalLeaveMsgs		globalqueststarmsgs			= 11;
+	optional DB_GlobalLeaveMsgs		globaladventurermsgs		= 12;
+    optional DB_GlobalNewsletterRegion newsletterall            = 13;
+	repeated DB_GlobalLegendSetting		legendsetting			= 14;
+	optional DB_GlobalPreDayPVPInfo		predaypvpinfo			= 15;
+	optional DB_GlobalAdvStarsInfo		advstarsinfo			= 16;
+}
+
+message DB_PlatidInfo
+{
+	required	int64		    uid       						= 1[default = 0];		//uid
+	optional	string		    password						= 2[default =""];		//密码
+	optional	int32		    regionid						= 3[default = 1];		//region id
+	optional	int32		    header							= 4[default = 0];
+	optional	string		    name							= 5[default =""];
+	optional	int32		    tavernlv						= 6[default = 0];
+}
+
+message DB_PlatInviteLv
+{
+    optional    int32           lv                              = 1[default = 0];
+    optional    int32           count                           = 2[default = 0];
+}
+
+message DB_PlatidInfoList {
+	repeated	DB_PlatidInfo	RoleInfo						= 1;				        //platid对应的角色信息
+	optional	int32		    result							= 2[default = 0];           //加载数据用
+	optional	string		    pid2							= 3[default = "none"];      //被本帐号绑定的那个pid
+	optional	int32		    time							= 4[default = 0];           //创建时间
+	optional	bool		    seeall							= 5[default = false];		//see all region
+	optional	string		    bindmepid						= 6[default = "none"];      //绑定了本帐号的那个pid
+    optional    string          inviterfb                       = 7[default = ""];          //邀请本帐号来玩游戏的facebookid
+    repeated    int64           inviteuids                      = 8;
+    repeated    string          invitefbs                       = 9;
+    optional    int32           takeinviterwcount               = 10;
+    repeated    DB_PlatInviteLv invitelv                        = 11;
+}
+
+message DB_BattleRecord
+{
+	optional string			    name							= 1;
+	optional int32			    fp								= 2[default = 0];
+	optional int32			    time							= 3[default = 0];
+	optional int64			    enemyuid						= 4[default = 0];
+	optional int32			    score							= 5[default = 0];
+	optional int32			    more							= 6[default = 0];
+	optional int32			    header							= 7[default = 0];
+	optional int32			    msg_id							= 8[default = 0];
+    optional int32              more2                           = 9[default = 0];
+	//more的解释
+	//union 
+	//{
+	//	int			            m_nMore;
+	//	struct 
+	//	{
+	//	char			        m_cInitiative;			//0，被动，1，主动	
+	//	char			        m_cResult;			//0，胜，1，负
+	//	char			        m_cRevenge;			//0，不能复仇，1，可以复仇
+	//	char			        m_cTavernLv;			//0，tavernlv	
+	//	}u;
+	//
+	//};
+}
+
+message DB_PvPPlayer
+{
+	optional DB_GlobalUserInfo	info							= 1;
+	optional int32			    winaddscore						= 2[default = 0];
+	optional int32			    losesubscore					= 3[default = 0];
+    optional string             guildname                       = 4;
+    optional int32              guildicon                       = 5[default = 0]; 
+}
+
+message DB_BattleMgr
+{
+	repeated DB_BattleRecord	records							= 1;
+	optional int32			    pvpcounttoday					= 2[default = 0];
+	optional int32			    refreshpvptoday					= 3[default = 0];
+	repeated DB_PvPPlayer		pvplist							= 4;
+	optional int32			    protecttime						= 5[default = 0];
+	optional int32			    pvpscore						= 6[default = 0];
+	optional int32			    wincount						= 7[default = 0];
+	optional int32			    totalcount						= 8[default = 0];
+	optional bool			    bgetpvpscore					= 9[default = false];
+	optional int32			    top10battle						= 10[default = 0];
+    optional bool               cantakewinrw                    = 11[default = false];
+    optional int32              sharewreplaycount               = 12[default = 0];
+}
+
+message DB_ItemAdj
+{
+	optional string			    name							= 1[default = ""];
+	optional double			    value							= 2[default = 0.0];
+}
+
+message DB_ItemProperty
+{
+	optional int32			    level							= 1[default = 0];
+    repeated int32              runes                           = 2;
+    repeated int32              runespos                        = 3;
+}
+
+message DB_StorageItem
+{
+	optional int32			    instid							= 1[default = 0];
+	optional int32			    typeid							= 2[default = 0];
+	optional int32			    count							= 3[default = 0];
+	optional DB_ItemProperty	item							= 4;
+}
+
+message DB_MustDrop
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    mustdrop						= 2[default = 0];
+}
+
+message DB_StorageMgr
+{
+	message Category
+	{
+		optional int32			type							= 1[default = 0];
+		repeated DB_StorageItem items							= 2;
+	}
+
+	repeated DB_MustDrop		mustdrop						= 1;
+	repeated Category		    categorys						= 2;
+}
+
+message DB_Cooking
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    endtime							= 2[default = 0];
+	optional int32			    count							= 3[default = 0];
+}
+
+message DB_DishRoom
+{
+	optional int32			    roomid							= 1[default = 0];
+	repeated DB_Cooking		    cookings						= 2;
+}
+
+message DB_DishMgr
+{
+	repeated DB_DishRoom		dishrooms						= 1;
+}
+
+message DB_EliteAdvStatus
+{
+	optional int32			    advid							= 1[default = 0];
+	optional int32			    hp								= 2[default = 0];
+	optional int32			    cd								= 3[default = -1];
+}
+
+message DB_EliteEnemy
+{
+	repeated DB_AdvObj		    advs							= 1;
+	optional int32			    fp								= 2[default = 0];
+	optional int64			    uid								= 3[default = 0];
+	optional string			    name							= 4;
+	optional int32			    header							= 5[default = 0];
+}
+
+message DB_EliteQuest
+{
+	optional bool			    isunlocked						= 1[default = false];
+	optional int32			    curstage						= 2[default = 0];
+	optional int32			    resetcount						= 3[default = 1];
+	optional bool			    bfinished						= 4[default=false];
+	optional int32			    nobestdropround					= 5[default = 0];
+	repeated DB_EliteAdvStatus	advstatus						= 6;
+	repeated int32			    advids							= 7;
+	optional DB_EliteEnemy		enemy							= 8;
+	optional int32			    lastresettime					= 9[default = 0];
+	repeated DB_EliteAdvStatus	enemyadvstatus					= 10;
+	optional int32			    todayplaycount					= 11[default = 0];
+	optional int32			    oldchapters						= 12[default = 0];
+	optional int32			    curchapter						= 13[default = 0];
+	optional bool			    basicreward						= 14[default = false];
+	optional int32			    lastrwstage						= 15[default = 0];
+	repeated int64			    leftenemyuid					= 16;
+}
+
+message DB_Quest
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    playcount						= 2[default = 0];
+	optional int32			    resetcount						= 3[default = 0];
+	optional int32			    star							= 4[default = 0];
+//	optional int32			    nobestdroprounds				= 5[default = 0];//占用不可删除
+	optional int32			    cmplv							= 6[default = 0];//3个难度的完成度放在一个int里
+	optional bool			    isnew							= 7[default = false];
+	optional int32			    rw7day							= 8[default = 0];
+	//rw7day的解释
+	//union 
+	//{
+	//	int			            m_nRw7day;
+	//	struct 
+	//	{
+	//	char			        m_cIsStar1rw;			//0，不能领，1，能领
+	//	char			        m_cIsStar2rw;			//0，不能领，1，能领
+	//	char			        m_cIsStar3rw;			//0，不能领，1，能领
+	//	char			        m_cStar1rwcmp;			//0，没领， 1， 领过了
+	//	char			        m_cStar2rwcmp;			//0，没领， 1， 领过了
+	//	char			        m_cStar3rwcmp;			//0，没领， 1， 领过了
+	//	}u;
+	//
+	//};
+}
+
+message DB_QuestMgr
+{
+	repeated DB_Quest		    quests							= 1;
+	optional DB_EliteQuest		elitequest						= 2;
+	repeated DB_Quest		    todayrewardquest				= 3;
+	repeated int32			    unlockrwquest					= 4;
+}
+
+message DB_RandomReward
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    amount							= 2[default = 0];
+	optional DB_StorageItem		reward							= 3;
+	optional DB_AdvObj			adv								= 4;
+}
+
+message DB_SmithRoom
+{
+	optional int32			    roomid							= 1[default = 0];
+	optional int32			    type							= 2[default = 0];
+	optional int32			    endtime							= 3[default = 0];
+	optional int32			    instid							= 4[default = 0];
+	optional int32			    advid							= 5[default = 0];
+}
+
+message DB_SmithMgr
+{
+	repeated DB_SmithRoom		rooms							= 1;
+}
+
+message DB_Chapter
+{
+	optional int32			    chapterid						= 1[default = 0];
+	optional int32			    questtypeid						= 2[default = 0];
+	optional bool			    openflag						= 3[default = false];
+}
+
+message DB_ChapterMgr
+{
+	repeated DB_Chapter		    chapters						= 1;
+}
+
+message DB_Task
+{
+	optional string			    type							= 1[default = ""];
+	optional string			    finishtype						= 2[default = ""];
+	repeated int32			    value							= 3;
+}
+
+message DB_TaskDailyValue
+{
+	optional int32			    daily							= 1[default = 0];
+	optional int32			    daily1							= 2[default = 0];
+}
+
+message DB_DailyTask
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    value							= 2[default = 0];
+	optional bool			    baccept							= 3[default = false];
+	optional int32			    advid							= 4[default = 0];
+    optional bool               active                          = 5[default = false];
+}
+
+message DB_TaskMgr
+{
+	repeated DB_Task		    tasks							= 1;
+	repeated int32			    taskrw							= 2;
+	repeated DB_DailyTask		dailytasks						= 3;
+	optional DB_TaskDailyValue	dailyvalue						= 4;
+	
+}
+
+message DB_ShopItem
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    purchasedcount					= 2[default = 0];
+	optional int32			    discount						= 3[default = 0];
+}
+
+message DB_ShopBase
+{
+	repeated DB_ShopItem	    shopitems						= 1;
+	optional int32			    nextupdate						= 2[default = 0];
+	optional int32			    refreshcount					= 3[default = 0];
+	optional int32			    shoptype						= 4[default = 0];
+	optional int32			    hotversion						= 5[default = 0];
+    optional int32			    start							= 6[default = 0];
+    optional int32			    end								= 7[default = 0];
+    optional bool               open							= 8[default = true];
+}
+
+message DB_ShopMgr
+{
+	repeated DB_ShopBase		shops							= 1;
+	optional string			    cfgmd5							= 2;
+}
+
+message DB_MailReward
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    amount							= 2[default = 0];
+}
+
+message DB_Mail
+{
+	enum TYPE
+	{
+		OTHER		    = 0;
+		PVP		        = 1;
+		SWEEPTICKET	    = 2;
+		ENERGYREWARD	= 3;
+		MONTHSUB	    = 4;
+		GUILDPERMIT	    = 5;
+		GUILDRW		    = 6;
+		GUILDWARRW	    = 7;
+        PVPWINRW        = 8;
+        NORMALACTIVITYRW= 9;
+		MONTHSENIOR		= 10;
+	}
+	optional int32			    instid							= 1[default = 0];
+	optional int32			    index							= 2[default = 0];
+	optional int32			    expiretime						= 3[default = 0];
+	optional string			    title							= 4;
+	optional string			    text							= 5;
+	repeated DB_MailReward		reward							= 6;
+	optional TYPE			    type							= 7[default = PVP];
+	optional string			    url								= 8[default = ""];
+	optional bool				isdouble						= 9[default = false];
+	repeated DB_MailMutiLang	mailmutilang					= 10;
+}
+
+message DB_MailOpened
+{
+	optional int32			    index							= 1[default = 0];
+	optional int32			    expiretime						= 2[default = 0];
+}
+
+message DB_MailMgr
+{
+	repeated DB_MailOpened		openedmails						= 1;
+	repeated DB_Mail		    mails							= 2;
+}
+
+message DB_ChatMgr
+{
+    optional int32              dis_msg_time                    = 1;         
+}
+
+
+message DB_FriendUpInfo
+{
+	optional int64			    uid								= 1[default = 0];
+	optional int32			    tavernlv						= 2[default = 0];
+	optional string			    tavernname						= 3;
+	repeated DB_AdvObj		    advs							= 4;
+	repeated DB_AdvObj		    familiars						= 5;
+}
+
+message DB_OneTimeOption
+{
+	optional int32			    step							= 1[default = 0];
+}
+
+message DB_GuildApply
+{
+	optional int32			    guildid							= 1[default = 0];
+	optional int32			    time							= 2[default = 0];
+}
+
+message DB_GuildMgr
+{
+	optional int32			    guildid							= 1[default = 0];
+	optional int32			    ctbpoint7day					= 2[default = 0];
+	optional int32			    playcount						= 3[default = 0];
+	repeated DB_GuildApply		applys							= 4;
+	optional int32			    ctbcounttoday					= 5[default = 0];
+	optional int32			    takesharetoday					= 6[default = 0];
+	optional int32			    lastexittime					= 7[default = 0];
+	//war
+	optional int32			    warplaycount					= 8[default = 0];
+	repeated int32			    defendadvid						= 9;
+	repeated int32			    supportadvid					= 10;
+	optional int32			    defendfamiliar					= 11[default = 0];
+}
+
+
+message DB_ExploreMine
+{
+	optional int32			    typeid							= 1[default = 0];
+	optional int32			    endtime							= 2[default = 0];
+	optional int32			    advid							= 3[default = 0];
+	optional int32			    pos								= 4[default = 0];
+}
+
+message DB_ExploreMgr
+{
+	repeated DB_ExploreMine		mines							= 1;
+	optional int32			    resetcount						= 2[default = 0];
+}
+
+message DB_ChatRecord
+{
+	optional int64			    uid								= 1[default = 0];
+	optional string			    name							= 2[default = ""];
+	optional int32			    header							= 3[default = 0];
+	optional int32			    time							= 4[default = 0];
+	optional string			    content							= 5[default = ""];
+	optional int32			    region							= 6[default = 0];
+    optional int32              type                            = 7[default = 0];
+}
+
+message DB_Activity7Day
+{
+	optional  int32             login_days						= 1[default = 0];
+	optional  int32             draw_authority					= 2[default = 0];
+
+	//向客户端带数据
+	optional bool		        isopen							= 10;
+	//////////////////////////////新7日数据///////////////////////////
+	//repeated int32				limitsaleid					= 11;
+	optional int32				loginrw							= 12[default = 0];
+//union
+//{
+//	int			            loginrw;
+//	struct 
+//	{
+//	char			        m_cIsDay1rw : 2;			//0，不能领，1，能领
+//	char			        m_cIsDay2rw : 2;			//0，不能领，1，能领
+//	char			        m_cIsDay3rw : 2;			//0，不能领，1，能领
+//	char			        m_cIsDay4rw : 2;			//0，不能领，1，能领
+//	char			        m_cIsDay5rw : 2;			//0，不能领，1，能领
+//	char			        m_cIsDay6rw : 2;			//0，不能领，1，能领
+//	char			        m_cIsDay7rw : 2;			//0，不能领，1，能领
+//	char			        m_cDay1rwget : 2;			//0，没领， 1， 领过了
+//	char			        m_cDay2rwget : 2;			//0，没领， 1， 领过了
+//	char			        m_cDay3rwget : 2;			//0，没领， 1， 领过了
+//	char			        m_cDay4rwget : 2;			//0，没领， 1， 领过了
+//	char			        m_cDay5rwget : 2;			//0，没领， 1， 领过了
+//	char			        m_cDay6rwget : 2;			//0，没领， 1， 领过了
+//	char			        m_cDay7rwget : 2;			//0，没领， 1， 领过了
+//	}u;
+//
+//};
+	optional bool				newisopen						= 13[default = true];
+	optional int32				newactstart						= 14[default = 0];
+}
+
+message DB_AccumulateGem
+{
+	optional int32		        accumulate						= 1[default = 0];
+	repeated int32		        hastake							= 2;
+
+	//向客户端带数据
+	optional bool		        isopen							= 10;
+	optional int32		        start							= 11;
+	optional int32		        end								= 12;
+}
+
+message DB_ActivityBindFB
+{
+	optional bool		        isbindfb						= 1[default = false];
+	optional bool		        hastakerw						= 2[default = false];
+
+	//向客户端带数据
+	optional bool		        isopen							= 10;
+}
+
+message DB_ActivityFollowFB
+{
+	optional bool		        hastake							= 1[default = false];
+
+	//向客户端带数据
+	optional bool		        isopen							= 10;
+}
+message DB_ActivityQuestRw
+{
+	optional bool		        isopen							= 1;
+	optional int32		        start							= 2;
+	optional int32		        end								= 3;
+}
+
+message DB_ActivityPvPRw
+{
+	optional bool		        isopen							= 1;
+	optional int32		        start							= 2;
+	optional int32		        end								= 3;
+}
+
+message DB_ActivityOdyessyRw
+{
+	optional bool		        isopen							= 1;
+	optional int32		        start							= 2;
+	optional int32		        end								= 3;
+}
+
+message DB_ActivityMailSpecial
+{
+	optional bool		        isopen							= 1;
+	optional int32		        start							= 2;
+	optional int32		        end								= 3;
+}
+
+message DB_ActivityQueenQuestOpen
+{
+	optional bool		        isopen							= 1;
+	optional int32		        start							= 2;
+	optional int32		        end								= 3;
+}
+
+message DB_QueenQuestAdvStatus
+{
+	optional int32			    advid							= 1[default = 0];
+	optional int32			    hp								= 2[default = 0];
+	optional int32			    cd								= 3[default = -1];
+}
+
+message DB_ActivityQueenQuest
+{
+	optional int32		        endthisday						= 1;
+	repeated bool		        questlottery					= 2;
+	optional int32		        finishindex						= 3[default = -1];
+	optional int32		        tavernlevel						= 4[default = 0];
+	repeated DB_QueenQuestAdvStatus	advstatus					= 5;
+	repeated DB_QueenQuestAdvStatus	enemyadvstatus				= 6;
+}
+
+message DB_ActivityQueenLotteryBox
+{
+	//1.倍数 2. 价格
+	optional uint32		        multiples						= 1[default = 1];
+	optional uint32		        curprice						= 2[default = 0];
+}
+
+message DB_ActivityQueenLottery
+{
+	repeated DB_ActivityQueenLotteryBox		        boxstatus	= 1;
+	optional uint32		        totalTimes						= 2[default = 0];
+	optional uint32		        totalcost						= 3[default = 0];
+	optional bool		        isopen							= 4;
+	optional int32		        start							= 5;
+	optional int32		        end								= 6;
+	optional bool				scepter							= 7[default = false];
+	optional bool				crown							= 8[default = false];
+	optional bool		        summonqueen						= 9[default = false];
+}
+
+///////////////////////////////////////////////normal 17///////////////////////////////////////////
+message DB_ActivityRw1
+{
+    optional int32		        istake						    = 1[default = 0];
+    optional int32              endtime                         = 2[default = 0];
+    repeated int32				finishcount						= 3;
+}
+
+message DB_ActivityMgr
+{
+	optional DB_Activity7Day	activity7day					= 1;
+	optional DB_AccumulateGem	accumulategem					= 2;
+	optional DB_ActivityBindFB	bindfb							= 3;
+	optional DB_ActivityFollowFB	followfb					= 4;
+	optional DB_ActivityQuestRw questrw							= 5;
+	optional DB_ActivityPvPRw   pvprw							= 6;
+	optional DB_ActivityOdyessyRw odysseyrw						= 7;
+
+    
+    /////////////////////////////////////normal 17///////////////////////////////////////////
+	optional DB_ActivityRw1     dailybuygemrw				= 8;
+	optional DB_ActivityRw1     weekbuggemrw			    = 9;
+	optional DB_ActivityRw1     questcountrw				= 10;
+	optional DB_ActivityRw1     odyesscountrw				= 11;
+	optional DB_ActivityRw1     pvpcountrw				    = 12;
+	optional DB_ActivityRw1     tavernlevelrw			    = 13;
+	optional DB_ActivityRw1	    cookracerw					= 14;
+	optional DB_ActivityRw1	    smithracerw					= 15;
+	optional DB_ActivityRw1     runessynracerw			    = 16;
+	optional DB_ActivityRw1	    recruitracerw		        = 17;
+	optional DB_ActivityRw1	    gemcookrw					= 18;
+	optional DB_ActivityRw1	    buycoinrw					= 19;
+	optional DB_ActivityRw1	    buyenergyrw					= 20;
+	optional DB_ActivityRw1	    costcoinrw					= 21;
+	optional DB_ActivityRw1	    costgemrw					= 22;
+	optional DB_ActivityRw1     costenergy					= 23;
+	optional DB_ActivityRw1     discountshoprw			    = 24;
+	optional DB_ActivityRw1		buygemrw					= 25;
+	//////////////////////////////////
+	optional DB_ActivityMailSpecial mailspecial				= 26;
+	optional DB_ActivityQueenQuestOpen queenquest			= 27;
+	optional DB_ActivityQueenLottery queenlottery			= 28;
+	optional DB_ActivityQueenQuest queenqueststatus			= 29;
+}
+
+message DB_Dungeon
+{
+    optional int32              typeid                          = 1[default = 0];
+    optional int32              playcount                       = 2[default = 0];
+    optional int32              diff                            = 3[default = 0];
+    optional int32              cmplv                           = 4[default = 0];
+    optional int32              resetcount                      = 5[default = 0];
+}
+
+message DB_DungeonMgr
+{
+    repeated DB_Dungeon         quests                          = 1;
+}

@@ -1,0 +1,382 @@
+extends ../layouts/default
+
+block head
+  link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+  link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+       .container: .jumbotron
+               form(method='get')
+                       input(type='hidden', name='action', value='statistical')
+                       label 开始时间
+                       input.easyui-datebox(name="op",value=filters["op"])                        
+                       label 结束时间
+                       input.easyui-datebox(name="ed",value=filters["ed"]) 
+                       include ../layouts/country
+                       include ../layouts/onlypaid
+                       include ../layouts/region
+                       input(name="num",type="hidden",value="100000")                     
+                       input(type="submit",value="检索",name="sub")
+               each ys in configs
+                       div(style="min-width:700px;height:400px",class="#{ys.name}")
+               each ys in categories
+                          div(style="min-width:700px;height:400px",class="#{ys.name}")
+block js
+               script(type="text/javascript", src="/js/highcharts.js")
+               script(type="text/javascript", src="/js/exporting.js")
+               script(type="text/javascript", src="/js/jeasyui.js")
+               script(type="text/javascript", src="/js/underscore-min.js")
+               script(type="text/javascript").
+                     var configs=!{JSON.stringify(configs)};
+                     var map_property = {SweepTicketGet:"获取",SweepTicketCost:"消耗",MailTake:"VIP",TaskTakeRW:"任务(成就)"};
+                       $(function(){
+                               connect();
+                               $("[name=sub]").click(function(){
+                                  connect();
+                                });
+                               });
+                       function connect(){
+
+                               //alert("configs.count:"+configs.length);
+                               var cb=function(i){
+                                       //alert("now config:"+i);
+                                       if(i!=configs.length-1)
+                                               showAll(++i,cb);
+                                       };              
+                               showAll(0,cb);
+                       }
+                       function showAll(i,next){
+                               var name = configs[i].name;
+                               dataBind(name,function(){
+                                       next(i);
+                                       });
+                       }
+                       function dataBind(name,next){
+                               var op=$("[name=op]").val();
+                               var ed=$("[name=ed]").val();
+                               var num=$("[name=num]").val();
+                               var country=$("#country").val();
+                               var onlypaid=$("#onlypaid").attr("checked");
+                               var region=$('#region').combo('getValue');
+                               $.post('/jsonServer?ttype=1&name='+name,{action:"phaseStatistical",region:region,op:op,ed:ed,num:num,country:country,onlypaid:onlypaid},function(data){
+                                       init(name,data);
+                                       next();
+                               });     
+                       }
+                       function init(name,data){
+                            var config ={
+                               title: {
+                                   text:data.title,
+                                   x: -20 //center
+                               },
+                               subtitle: {
+                                   text: data.subtitle,
+                                   x: -20
+                               },
+                               xAxis: {
+                                   categories: data.xAxis.reverse(),
+                               },
+                               yAxis: {
+                                   title: {
+                                       text: data.ytitle,
+                                   },
+                                   plotLines: [{
+                                       value: 0,
+                                       width: 1,
+                                       color: '#808080'
+                                   }]
+                               },
+                               tooltip: {
+                                   headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                                   pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                       '<td style="padding:0"><b>{point.y} 个</b></td></tr>',
+                                   footerFormat: '</table>',
+                                   shared: true,
+                                   useHTML: true
+                               },
+                               legend: {
+                                   layout: 'vertical',
+                                   align: 'right',
+                                   verticalAlign: 'middle',
+                                   borderWidth: 0
+                               },
+                               series: []
+                           }
+                           if(name=="GemGetBuyC")
+                            {
+                               config.chart = {type:'column'};
+                            }
+                           
+                           for (var property in data.yAxis){
+                                   var thename = property;
+                                   if(map_property[property])
+                                      thename = map_property[property];
+                                   var serie={name:thename,data:data.yAxis[property].reverse()};
+                                   config.series.push(serie);      
+                           } 
+                           //console.log(JSON.stringify(config));
+                           $('.'+name).highcharts(config);
+                       }
+               script(type="text/javascript").
+                var a=[];
+                var userKeys=!{userKeys};
+                var userValues=!{userValues};
+                var Difficulty={1:"普通",2:"困难",3:"地狱"};
+                   function inithighcharts(name,text,datas){
+                      if(datas.category.name=="sweepticketCost")
+                        {
+                            var costs={};
+                            var keys = datas.datas.keys;
+                            var values = datas.datas.values;
+                            for(var i=0;i<datas.datas.keys.length;i++)
+                            {
+                              costs[keys[i]]=values[i];
+                            }
+                            keys=[];
+                            values=[];
+                            for(var i=0;i<userKeys.length;i++)
+                            {
+                              var trackkey = userKeys[i];
+                              if(costs[trackkey+"_1"])
+                                {
+                                    keys.push(userValues[i]+"_"+Difficulty[1]);
+                                    values.push(costs[trackkey+"_1"]);
+                                }
+                               if(costs[trackkey+"_2"])
+                                {
+                                    keys.push(userValues[i]+"_"+Difficulty[2]);
+                                    values.push(costs[trackkey+"_2"]);
+                                }
+                               if(costs[trackkey+"_3"])
+                                {
+                                    keys.push(userValues[i]+"_"+Difficulty[3]);
+                                    values.push(costs[trackkey+"_3"]);
+                                }
+                            }
+                            datas.datas.keys = keys;
+                            datas.datas.values = values;
+                          $('.'+datas.category.name).highcharts({
+                              title: {
+                                  text: datas.category.text
+                              },                      
+                              xAxis: {
+                                  categories: datas.datas.keys,
+                                    labels:{
+                                        step:10,
+                                        staggerLines:2
+                                    }
+                              },
+                               yAxis: {
+                                     title: {
+                                         text: datas.category.yname,
+                                     }
+                                 },
+                              series: [{
+                                  type: 'column',
+                                  name: datas.category.name,
+                                  key:datas.category.keys,
+                                  data: datas.datas.values
+                              }]
+                          });
+                        }
+                      else
+                        {
+
+
+                        for(var i = 0;i<datas.datas.keys.length;i++)
+                          {
+                            if(map_property[datas.datas.keys[i]])
+                              {
+                                datas.datas.keys[i] = map_property[datas.datas.keys[i]];
+                              }
+                          }
+
+                          $('.'+datas.category.name).highcharts({
+                              title: {
+                                  text: datas.category.text
+                              },                      
+                              xAxis: {
+                                  categories: datas.datas.keys,
+                                    labels:{
+                                        step:1,
+                                        staggerLines:2
+                                    }
+                              },
+                               yAxis: {
+                                     title: {
+                                         text: datas.category.yname,
+                                     }
+                                 },
+                              series: [{
+                                  type: 'column',
+                                  name: datas.category.name,
+                                  key:datas.category.keys,
+                                  data: datas.datas.values
+                              }]
+                          });
+                        }
+                      a.push(datas);
+                   }
+                    function inithighchartsShow(name,text,datas){
+                      for(var i = 0;i<datas.datas.keys.length;i++)
+                        {
+                          if(map_property[datas.datas.keys[i]])
+                            {
+                              datas.datas.keys[i] = map_property[datas.datas.keys[i]];
+                            }
+                        }                    
+                          $('.'+datas.category.name).highcharts({
+                            title: {
+                                text: datas.category.text
+                            },                        
+                            scrollbar: {
+                                enabled: true
+                            },
+                            xAxis: {
+                                categories: datas.datas.keys,
+                                labels:{
+                                    step:6,
+                                    staggerLines:1
+                                }
+                            },
+                             yAxis: {
+                                   title: {
+                                       text: datas.category.yname,
+                                   }
+                               },
+                            series: [{
+                                type: 'column',
+                                name: datas.category.name,
+                                key:datas.category.keys,
+                                data: datas.datas.values
+                            }]
+                        });                
+                    }
+                    function getFormat(){
+                      if(this.isFirst)
+                        return this.value;
+                      if(this.isLast)
+                        return this.value;
+                      return "";
+                    }
+
+                   var starLevelNames = ["advLevel1","advLevel2","advLevel3","advLevel4","advLevel5"];
+                   var starLevel = {text:"冒险者星级等级分布",name:"advlevel",keys:[],datas:[],values:[],holdtime:0};
+                   var starLegend = ["legendLevel1","legendLevel2","legendLevel3","legendLevel4","legendLevel5"];
+                   var legendLevel = {text:"冒险者星级等级分布",name:"legendlevel",keys:[],datas:[],values:[],holdtime:0};
+                   var categories = !{JSON.stringify(categories)};
+                   function getStarLevel(starsLevel,stars)
+                   {
+                       for(var i=0;i<starsLevel.length;i++)
+                        {
+                          var starLevelValues = _.filter(stars.datas,function(parm){
+                            return parm.category.name==starsLevel[i]
+                            });
+                          starLevelValues = starLevelValues[0];
+                          var values = {name:starsLevel[i],value:[]};
+                          for(var j=0;j<stars.keys.length;j++){
+                                var hasValue = false;
+                                for(var k=0;k<starLevelValues.datas.keys.length;k++)
+                                  {
+                                     if(starLevelValues.datas.keys[k] == stars.keys[j]){
+                                       values.value.push(starLevelValues.datas.values[k]);
+                                       hasValue = true;
+                                       break;
+                                       }
+                                  }
+                                if(!hasValue)
+                                  values.value.push(0);
+
+                          }
+                          stars.values.push(values);
+                        }
+                        stars.text = stars.datas[0].category.text;
+                      $('.'+stars.name).highcharts({
+                          title: {
+                              text: stars.text
+                          },
+                          xAxis: {
+                              categories: stars.keys
+                          },
+                          chart: {
+                              type: 'column'
+                          },
+                          plotOptions: {
+                              column: {
+                                  stacking: 'percent'
+                              }
+                          },
+                           yAxis: {
+                                min: 0,
+                                title: {
+                                    text: 'Total advLevel'
+                                }
+                            },
+                          tooltip: {
+                              pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+                              shared: true
+                          },
+                          series: [{
+                              name: stars.values[0].name,
+                              data: stars.values[0].value
+                          },
+                          {
+                              name: stars.values[1].name,
+                              data: stars.values[1].value
+                          },
+                          {
+                              name: stars.values[2].name,
+                              data: stars.values[2].value
+                          },
+                          {
+                              name: stars.values[3].name,
+                              data: stars.values[3].value
+                          },
+                          {
+                              name: stars.values[4].name,
+                              data: stars.values[4].value
+                          }]
+                      });
+                   }
+                   $(function () {
+                      for(var i=0;i<categories.length;i++){
+                        var category = categories[i];
+                        if (category){
+                          var logdate = $("[name=logdate]").val();
+                           var op=$("[name=op]").val();
+                           var ed=$("[name=ed]").val();
+                           var country=$("#country").val();
+                           var onlypaid = $("#onlypaid").attr("checked");
+                           var region = $('#region').combo('getValue');
+                          $.post("/globalStatistical",{stype:category.sType,country:country,logdate:logdate,region:region ,op:op,ed:ed,onlypaid:onlypaid},function(result){
+                              if(_.contains(starLevelNames,result.category.name))
+                                {
+                                  starLevel.keys = _.uniq(starLevel.keys.concat(result.datas.keys));
+                                  starLevel.datas.push(result);
+                                  starLevel.holdtime++;
+                                }
+                              else if(_.contains(starLegend,result.category.name))
+                                {
+                                  legendLevel.keys = _.uniq(legendLevel.keys.concat(result.datas.keys));
+                                  legendLevel.datas.push(result);
+                                  legendLevel.holdtime++;
+                                }
+                              else{
+                                if(result.category.show)
+                                  inithighchartsShow(result.category.name,result.category.text,result);
+                                else
+                                  inithighcharts(result.category.name,result.category.text,result);
+                              }
+                                if(starLevel.holdtime==5)
+                                  {
+                                      starLevel.holdtime++;
+                                      getStarLevel(starLevelNames,starLevel);
+                                  }
+                                if(legendLevel.holdtime==5)
+                                  {
+                                      legendLevel.holdtime++;
+                                      getStarLevel(starLegend,legendLevel);  
+                                  } 
+                            });
+                        }
+                      }
+                   });    

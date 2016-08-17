@@ -1,0 +1,20 @@
+div(id="warp_region",style="padding:5px")
+script(type="text/javascript").
+	var get_warpRegion = function(){
+		$.post("/getregion",null,function(data){
+		var arrStr = data.split(":");
+		if(!arrStr||arrStr.length<2)
+			return;
+		var firstRegionId =parseInt( arrStr[0]);
+		var lastRegionId =parseInt( arrStr[1]);
+		var divRegion=$("#warp_region");
+		for(var i=firstRegionId;i<lastRegionId+1;i++)
+			{
+				var aregion =$( "<a onClick='javascript:window.location.href=\"?region="+i+"\"' class='easyui-linkbutton' data-options=\"iconCls:'icon-reload',plain:true\" href='?region="+i+"' >分区"+i+"</a>");
+				divRegion.append(aregion);
+			}
+		});	
+	}
+	$(function(){
+		get_warpRegion();
+	});

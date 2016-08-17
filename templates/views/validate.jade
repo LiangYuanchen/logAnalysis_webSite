@@ -1,0 +1,23 @@
+html
+
+  //- HTML HEADER
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+  body
+    h1 >o<
+    if validate===false
+      密码和验证不等
+    if validate
+      密码设置成功
+    if email
+      p.text-larger #{email}
+      form(method="post",action="/validate")
+        p.text-larger Password:
+        input(type="password",id="password",value="",name="password")
+        p.text-larger Validate:
+        input(type="password",id="validate",value="",name="validate")
+        input(type="hidden",id="token",value=[token],name="token")
+        br
+        input(type="submit",value="提交")

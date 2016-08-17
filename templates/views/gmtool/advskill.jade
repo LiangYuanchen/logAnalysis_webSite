@@ -1,0 +1,267 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - AdvSkill
+
+block content
+	.container: .jumbotron(style="")
+		if hasPermission
+			table(style="min-width:700px",id="skill1")
+			table(style="min-width:700px",id="skill2")
+			table(style="min-width:700px",id="skill3")
+			table(style="min-width:700px",id="skill4")
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	script(type="text/javascript").
+		function request(paras)
+		{ 
+			var url = location.href; 
+			var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+			var paraObj = {} 
+			for (i=0; j=paraString[i]; i++){ 
+			paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+			} 
+			var returnValue = paraObj[paras.toLowerCase()]; 
+			if(typeof(returnValue)=="undefined"){ 
+			return "";
+			}else{ 
+			if(returnValue.indexOf('#')>-1)
+			    returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+			return returnValue;
+			} 
+		}
+	if hasPermission
+		script(type="text/javascript").
+			var instid = request("instid");
+			var uid = request("uid");
+			function init()
+			{
+				$.post("/advskilllist",{uid:uid,instid:instid},function(data){
+					data = JSON.parse(data);
+					var skill1 = data["1"];
+					var skill2 = data["2"];
+					var skill3 = data["3"];
+					var skill4 = data["4"];
+					dataBind(1,skill1);
+					dataBind(2,skill2);
+					dataBind(3,skill3);
+					dataBind(4,skill4);
+				});			
+			}
+
+			function dataBind(num,theData){
+				var strSKill = "skill" + num;
+				$('#' + strSKill).datagrid({
+				title:strSKill,
+				data:theData,
+				singleSelect:true,
+				toolbar:[
+					{
+						text:"保存",
+						iconCls:'icon-add',
+						handler:append
+					},
+					{
+						text:"添加",
+						iconCls:'icon-add',
+						handler:eval("add"+num)
+					},
+					{
+						text:"删除",
+						iconCls:'icon-del',
+						handler:eval("del"+num)
+					}
+				],
+				columns:[
+				[
+					{field:"skillid",title:'skillid',width:150,editor:'numberbox'},
+					{field:'level',title:'level',width:170,editor:'numberbox'}
+				]			],
+				onClickRow:eval("onClickRow"+num)
+				});					
+			}
+			init();
+			function append(){
+				endEditing1();
+				endEditing2();
+				endEditing3();
+				endEditing4();
+				var skill1 = $("#skill1").datagrid("getRows");
+				var skill2 = $("#skill2").datagrid("getRows");
+				var skill3 = $("#skill3").datagrid("getRows");
+				var skill4 = $("#skill4").datagrid("getRows");
+				var parm = {};
+				parm.instid = request("instid");
+				parm["1"] = skill1;
+				parm["2"] = skill2;
+				parm["3"] = skill3;
+				parm["4"] = skill4;
+				var p = {};
+				p.uid = request("uid");
+				p.data = parm;
+				$.post("/editadvskilllist",p,function(data){
+					init();
+				});
+			}
+
+			var editIndex1 = undefined;
+			function onClickRow1(index){
+				if (editIndex1 != index){
+					if (endEditing1()){
+						$('#skill1').datagrid('selectRow', index).datagrid('beginEdit', index);
+						editIndex1 = index;
+
+					} else {
+						$('#skill1').datagrid('selectRow', editIndex1);
+					}
+				}
+			}			
+			function endEditing1(){
+			    if (editIndex1 == undefined){return true}
+
+			        if ($('#skill1').datagrid('validateRow', editIndex1)){
+			             $('#skill1').datagrid('endEdit', editIndex1);
+			            editIndex1 = undefined;
+			            return true;
+			        } else {
+			            return false;
+			        }
+			}
+
+			function add1(){
+				if (endEditing1()){
+					$("#skill1").datagrid('appendRow',{skillid:0,level:0});
+					editIndex1 = $('#skill1').datagrid('getRows').length-1;
+					$('#skill1').datagrid('selectRow', editIndex1)
+					.datagrid('beginEdit', editIndex1);
+				}		
+			}
+			function del1(){
+				if (editIndex1 == undefined){return}
+				$('#skill1').datagrid('cancelEdit', editIndex1)
+				        .datagrid('deleteRow', editIndex1);
+				editIndex1 = undefined;				
+			}
+			var editIndex2 = undefined;
+			function onClickRow2(index){
+				if (editIndex2 != index){
+					if (endEditing2()){
+						$('#skill2').datagrid('selectRow', index).datagrid('beginEdit', index);
+						editIndex2 = index;
+
+					} else {
+						$('#skill2').datagrid('selectRow', editIndex2);
+					}
+				}
+			}			
+			function endEditing2(){
+			    if (editIndex2 == undefined){return true}
+
+			        if ($('#skill2').datagrid('validateRow', editIndex2)){
+			             $('#skill2').datagrid('endEdit', editIndex2);
+			            editIndex2 = undefined;
+			            return true;
+			        } else {
+			            return false;
+			        }
+			}
+
+			function add2(){
+				if (endEditing2()){
+					$("#skill2").datagrid('appendRow',{skillid:0,level:0});
+					editIndex2 = $('#dgwea').datagrid('getRows').length-1;
+					$('#skill2').datagrid('selectRow', editIndex2)
+					.datagrid('beginEdit', editIndex2);
+				}		
+			}
+			function del2(){
+				if (editIndex2 == undefined){return}
+				$('#skill2').datagrid('cancelEdit', editIndex2)
+				        .datagrid('deleteRow', editIndex2);
+				editIndex2 = undefined;				
+			}	
+			var editIndex3 = undefined;
+			function onClickRow3(index){
+				if (editIndex3 != index){
+					if (endEditing3()){
+						$('#skill3').datagrid('selectRow', index).datagrid('beginEdit', index);
+						editIndex3 = index;
+
+					} else {
+						$('#skill3').datagrid('selectRow', editIndex3);
+					}
+				}
+			}			
+			function endEditing3(){
+			    if (editIndex3 == undefined){return true}
+
+			        if ($('#skill3').datagrid('validateRow', editIndex3)){
+			             $('#skill3').datagrid('endEdit', editIndex3);
+			            editIndex3 = undefined;
+			            return true;
+			        } else {
+			            return false;
+			        }
+			}
+
+			function add3(){
+				if (endEditing3()){
+					$("#skill3").datagrid('appendRow',{skillid:0,level:0});
+					editIndex3 = $('#dgwea').datagrid('getRows').length-1;
+					$('#skill3').datagrid('selectRow', editIndex3)
+					.datagrid('beginEdit', editIndex3);
+				}		
+			}
+			function del3(){
+				if (editIndex3 == undefined){return}
+				$('#skill3').datagrid('cancelEdit', editIndex3)
+				        .datagrid('deleteRow', editIndex3);
+				editIndex3 = undefined;				
+			}		
+
+			var editIndex4 = undefined;
+			function onClickRow4(index){
+				if (editIndex4 != index){
+					if (endEditing4()){
+						$('#skill4').datagrid('selectRow', index).datagrid('beginEdit', index);
+						editIndex4 = index;
+
+					} else {
+						$('#skill4').datagrid('selectRow', editIndex4);
+					}
+				}
+			}			
+			function endEditing4(){
+			    if (editIndex4 == undefined){return true}
+
+			        if ($('#skill4').datagrid('validateRow', editIndex4)){
+			             $('#skill4').datagrid('endEdit', editIndex4);
+			            editIndex4 = undefined;
+			            return true;
+			        } else {
+			            return false;
+			        }
+			}
+
+			function add4(){
+				if (endEditing4()){
+					$("#skill4").datagrid('appendRow',{skillid:0,level:0});
+					editIndex4 = $('#dgwea').datagrid('getRows').length-1;
+					$('#skill4').datagrid('selectRow', editIndex4)
+					.datagrid('beginEdit', editIndex4);
+				}		
+			}
+			function del4(){
+				if (editIndex4 == undefined){return}
+				$('#skill4').datagrid('cancelEdit', editIndex4)
+				        .datagrid('deleteRow', editIndex4);
+				editIndex4 = undefined;				
+			}					
+			
+
+

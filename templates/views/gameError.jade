@@ -1,0 +1,85 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		//- img(src='/images/logo.svg', width='160')
+		form(method='get')
+			input(type='hidden', name='action', value='statistical')
+			label 查询时间 
+			input.easyui-datebox(name="firstDate",id="firstDate",value=filters["firstDate"])
+			input.easyui-datebox(name="lastDate",id="lastDate",value=filters["lastDate"])
+			label uid
+			input.textbox(name="uid",id="uid",value=filters["uid"])
+			select(name="errorType",id="errorType")
+				option(value="0") --
+				option(value="80302") googlePlay验证
+			input(type="submit",id="sub",value="检索")
+
+		//#container(style="min-width:700px;height:400px")
+
+		table(style="min-width:700px",id="dg")
+		<br/>
+		table(style="min-width:700px",id="dgmsg")
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type="text/javascript", src="/js/formatterDg.js")
+		script(type='text/javascript').
+			//$("[name=date]").datebox({});
+				
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+
+			}
+			var handlerErr = !{JSON.stringify(handlerErr)};
+			var msgErr =  !{JSON.stringify(msgErr)};
+			$("#errorType").val("!{filters.errorType}");
+			$('#dg').datagrid({
+			data:handlerErr,
+			singleSelect:true,
+			pagination:true,
+			url:'/gameError?action=handleErr',
+			queryParams:{uid:$("#uid").val(),firstDate:Date.parse( $("#firstDate").val())/1000,lastDate:Date.parse( $("#lastDate").val())/1000,errorType:$("#errorType").val()},
+			pageSize:50,
+			columns:[
+				[
+					{field:"uid",title:'uid',width:150,sortable:true,order:'desc'},
+					{field:'timeStamp',title:'日期',width:170,formatter:formatterDate,sortable:true,order:'desc'},
+					{field:'category',title:'errorID',width:70,sortable:true,order:'desc'},
+					{field:'message',title:'错误信息',width:800,sortable:true,order:'desc'}
+				]
+			]
+			});			
+			$('#dgmsg').datagrid({
+				data:msgErr,
+				singleSelect:true,
+				pagination:true,
+				url:'/gameError?action=msgErr',
+				queryParams:{uid:$("#uid").val(),firstDate:Date.parse( $("#firstDate").val())/1000,lastDate:Date.parse( $("#lastDate").val())/1000,errorType:$("#errorType").val()},
+				pageSize:50,
+				columns:[
+					[
+						{field:'uid',title:'uid',width:150,sortable:true,order:'desc'},
+						{field:'timeStamp',title:'日期',width:170,formatter:formatterDate,sortable:true,order:'desc'},
+						{field:'message',title:'错误信息',width:400,sortable:true,order:'desc'}						
+					]
+				]
+			});
+
+			$(function(){
+				var queryParams = $('#dg').datagrid('options').queryParams;
+				var queryParamsMsg = $('#dgmsg').datagrid('options').queryParams; 
+				queryParams.firstDate = Date.parse( $("#firstDate").val())/1000;
+				queryParams.lastDate = Date.parse( $("#lastDate").val())/1000;
+
+				});

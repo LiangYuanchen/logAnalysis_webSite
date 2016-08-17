@@ -1,0 +1,176 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+block content
+	.container: .jumbotron
+		form(method='get')
+			label 酒馆名称
+			input.textbox(name="tavernName",id="tavernName",value=filters["tavernName"])
+			label 国别
+			input.textbox(name="country",id="country",value=filters["country"])
+			label 用户名
+			input.textbox(name="username",id="username",value=filters["username"])
+			label uid
+			input.textbox(name="uid",id="uid",value=filters["uid"])
+			label usernames
+			input.textbox(name="usernames",id="usernames",value=filters["usernames"])
+			label 查询重复设备账号
+			if filters["repeated"]
+				input(type="checkbox",name="repeated",id="repeated",checked=true)
+			else
+				input(type="checkbox",name="repeated",id="repeated")
+			input(type="submit",id="sub",value="检索")
+		div(id="container")
+		table(style="min-width:700px",id="dg",title="用户",data-options="rownumbers:true,singleSelect:true,pagination:true,url:'/gameUser',pageSize:50,onClickRow:rowClicked")
+			thead
+				tr
+					th(data-options="field:'uid',width:120,sortable:true,order:'desc'") uid
+					th(data-options="field:'username',width:100,sortable:true,order:'desc'") 用户名
+					th(data-options="field:'tavernName',width:80,sortable:true,order:'desc' ") 酒馆名称
+					th(data-options="field:'region',width:40,sortable:true,order:'desc'") 分区
+					//- th(data-options="field:'userRegTime',width:100") 注册时间
+					th(data-options="field:'innExp',width:80,sortable:true,order:'desc'") 经验
+					th(data-options="field:'level',width:80,sortable:true,order:'desc'") 等级
+					th(data-options="field:'gembuy',width:80,sortable:true,order:'desc'") 宝石-真
+					th(data-options="field:'gemother',width:80,sortable:true,order:'desc'") 宝石-假
+					th(data-options="field:'gembuytotal',width:50,sortable:true,order:'desc'") 已购买宝石-真
+					th(data-options="field:'gold',width:60,sortable:true,order:'desc'") 金币
+					th(data-options="field:'power',width:60,sortable:true,order:'desc'") 能量
+					th(data-options="field:'lastlogtime',width:120,formatter:formatterDate,sortable:true,order:'desc'") 最后登录时间
+					th(data-options="field:'registerdate',width:120,formatter:formatterDate,sortable:true,order:'desc'") 注册时间
+					th(data-options="field:'activetime',width:30,sortable:true,order:'desc',formatter:formatterHours") 活跃时间(小时)
+					th(data-options="field:'advCount',width:30,sortable:true,order:'desc' ") 冒险者数量
+					th(data-options="field:'lastQuest',width:120,sortable:true,order:'desc' ") 最后关卡(弃用)
+					th(data-options="field:'lastQuestTypeId',width:120,sortable:true,order:'desc' ") 普通关卡
+					th(data-options="field:'lastHardQuestTypeId',width:120,sortable:true,order:'desc' ") 困难关卡
+					th(data-options="field:'country',width:50,sortable:true,order:'desc'") 国别
+					th(data-options="field:'paidtime',width:150,sortable:true,order:'desc'") 付费次数
+					th(data-options="field:'bindAccout',width:150,formatter:formatterAccount") 绑定
+block js
+		script(type="text/javascript", src="/map/highmaps.js")
+		script(type="text/javascript", src="/mapdata/mapdata.js")
+		script(type="text/javascript", src="/mapdata/custom/world.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type="text/javascript", src="/js/jeasyui.js")
+		script(type='text/javascript').
+			function rowClicked(index)
+			{
+				var row = $("#dg").datagrid("getRows")[index];
+				if(!row.paidtime)		
+				{
+					$.post("/handle",{actions:"paidtimeHandle",uid:row.uid},function(data){
+						row.paidtime = data;
+						$("#dg").datagrid("refreshRow",index);
+					});
+				}
+			}
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd hh:mm:ss");
+				}
+				else 
+					 return "";
+
+			}
+			function formatterHours(val,row){
+				var time =parseInt(val);
+				if(time>0)
+					return Math.floor((val%86400)/3600); 
+				else
+					return 0;
+			}
+			function formatterAccount(val,row){
+			return val.join(",");
+			}
+			var data=!{JSON.stringify(mapDatas)};
+			//var data = [{key:"cn",value:5}];
+			$(function(){
+				var mapKey = "custom/world";
+				var mapGeoJSON=Highcharts.maps[mapKey];
+				//- $.each(mapGeoJSON.features, function (index, feature) {
+				//- 	data.push({
+				//- 			key: feature.properties['hc-key'],
+				//- 		value: index
+				//- 	});
+				//- });				
+
+				$("#dg").datagrid({
+						queryParams:{usernames:$("#usernames").val(),uid:$("#uid").val(),username:$("#username").val(),tavernName:$("#tavernName").val(),country:$("#country").val(),repeated:$("#repeated:checked").val()}
+					});
+				var pager = $('#dg').datagrid().datagrid('getPager');
+
+				// Instantiate chart
+				$("#container").highcharts('Map', {
+
+					title: {
+						text: null
+					},
+
+					mapNavigation: {
+						enabled: true
+					},
+
+					colorAxis: {
+						min: 0,
+						stops: [
+							[0, '#EFEFFF'],
+				 			[0.5, Highcharts.getOptions().colors[0]],
+							[1, Highcharts.Color(Highcharts.getOptions().colors[0]).brighten(-0.5).get()]
+						]
+					},
+
+					legend: {
+						layout: 'vertical',
+						align: 'left',
+						verticalAlign: 'bottom'
+					},
+
+					series: [{
+						data: data,
+						mapData: mapGeoJSON,
+						joinBy: ['hc-key', 'key'],
+						name: '注册用户',
+						states: {
+							hover: {
+								color: Highcharts.getOptions().colors[2]
+							}
+						},
+						dataLabels: {
+							enabled: false,
+							formatter: function () {
+								return mapKey === 'custom/world' || mapKey === 'countries/us/us-all' ?
+										(this.point.properties && this.point.properties['hc-a2']) :
+										this.point.name;
+							}
+						},
+						point: {
+							events: {
+								// On click, look for a detailed map
+								//- click: function () {
+								//- 	var key = this.key;
+								//- 	$('#mapDropdown option').each(function () {
+								//- 		if (this.value === 'countries/' + key.substr(0, 2) + '/' + key + '-all.js') {
+								//- 			$('#mapDropdown').val(this.value).change();
+								//- 		}
+								//- 	});
+								//- }
+							}
+						}
+					}, {
+						type: 'mapline',
+						name: "Separators",
+						data: Highcharts.geojson(mapGeoJSON, 'mapline'),
+						nullColor: 'gray',
+						showInLegend: false,
+						enableMouseTracking: false
+					}]
+				});
+
+
+			});
+
+

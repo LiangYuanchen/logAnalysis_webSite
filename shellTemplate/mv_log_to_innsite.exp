@@ -1,0 +1,5 @@
+#!/bin/sh
+scp ssh3:~/inn1_$1.log ./
+scp ssh4:~/inn2_$1.log ./
+scp ./inn*_$1.log ssh2:~/server/innSite/baseData
+rm -f inn*.log

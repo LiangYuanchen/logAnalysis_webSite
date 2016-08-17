@@ -1,0 +1,8 @@
+extends /layouts/default
+
+block body-contents
+	h1 Hi~ *|first_name|*
+	p.text-larger 无尽酒馆 #{brand}:
+		p.text-larger 宕机啦(#{msg.ip})
+		p.text-larger #{msg.msg}
+	+button({ url: '#{msg.url}' , label: 'Open innSite' })

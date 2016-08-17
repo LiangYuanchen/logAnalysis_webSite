@@ -1,0 +1,1 @@
+﻿module.exports = {host:["101.200.147.151","101.200.147.151"],port:["2014","2015"],adminUid:'10001',localHost:'127.0.0.1',indexLocation:"/gmtool/index"}

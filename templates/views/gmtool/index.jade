@@ -1,0 +1,817 @@
+extends ../../layouts/default
+
+block css
+	
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+	script(type="text/javascript", src="/jquery.min.js")
+block intro
+	.container
+		h1 GMTool - User Edit
+		h3
+		h2 
+block content
+	if hasPermission
+		div.
+					<div id="tb" style="height:auto">
+					</div>
+					<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="getuser()">User</a>
+					<a href="javascript:void(0)" title="全局用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="getglobaluser()">GlobalUser</a>
+					<a href="javascript:void(0)" title="重置任务" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="resetQuest()">任务重置</a>
+					<a href="javascript:void(0)" title="结束做菜" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="dishend()">结束做菜</a>
+
+					<a href="javascript:void(0)" id="clearAll" title="初始化所用用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearit()">Clear</a>
+					<a href="javascript:void(0)" id="clearStorage" title="清空仓库" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearstorage()">ClearStorage</a>
+
+					<a href="javascript:void(0)" title="获取所有数据——debug" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="AllDebug()">GiveAll_Debug</a>
+					
+					<a href="javascript:void(0)" title="隔天登录" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="logindiffday()">LoginDiffDay</a>
+					<a href="javascript:void(0)" title="奥德赛关卡配置改变后，重置奥德赛" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="resetodyssey()">ResetOdyssey</a>
+					<a href="javascript:void(0)" title="隔天登录" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="delbind_facebook()">解除fackbook账号绑定</a>	
+					<br/>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(1)" >新用户-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(2)" >基本信息-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(4)" >冒险者-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(8)" >酒馆-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(16)" >战斗记录-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(32)" >PvPScore-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(64)" >PvPList-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(4096)" >战斗力-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(8192)" >战斗力排行榜-全局</a>
+					<a href="javascript:void(0)" title="全局数据操作" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="update2Global(128)" >公会-全局</a>
+					
+					<form method="post" id="fileform" style="display:none" enctype="multipart/form-data" action="/import">
+					    <input type="hidden" name="uid">
+					    <input type="file" name="thumbnail" id="file">				    
+					    <span id="progress"></span>
+					    <input type="submit">
+					</form>
+					<br id="pg1" />
+					        <table id="pg" class="easyui-propertygrid" style="width:auto;" data-options="
+					                    method:'post',
+					                    showGroup:true,
+					                    showHeader:false,
+					                    scrollbarSize:0,
+					                    toolbar:toolPg,
+					                    onAfterEdit:afterEditTavern,
+					                    onLoadSuccess:tavernLoadSuccess
+					                              ">
+					        </table>
+					<br id="dg1" />
+					    <table id="dg" class="easyui-datagrid" title="冒险者列表" style="width:auto;height:auto"
+					            data-options="singleSelect:true,collapsible:true,method:'post',
+					                onClickRow:onClickRow,
+					                onEndEdit:onEndEdit,
+					                toolbar:toolDg,
+					                onLoadSuccess:adventurerLoadSuccess
+					            ">
+					        <thead>
+					            <tr>
+					                <th data-options="field:'istatus1',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP1</th>
+					                <th data-options="field:'istatus2',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP2</th>
+					                <th data-options="field:'istatus3',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP3</th>
+					                <th data-options="field:'instid',width:40,formatter:formatterAdvId" rowspan='2' >instId</th>
+					                <th data-options="field:'typeid',width:150,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data: advMg,               
+					                        required:true,
+					                        onSelect:UpdateSkill
+					                    }
+					                },formatter:fomatterAdv" rowspan='2' >名字</th>
+					                <th data-options="field:'exp',width:60,align:'right'" rowspan='2' >经验</th>
+					                <th data-options="field:'level',width:20,align:'right',editor:'numberbox'" rowspan='2' >等级</th>
+					                <th data-options="field:'raceid',width:60,formatter:fomatterRac" rowspan='2' >种族</th>
+					                <th data-options="field:'classid',width:60,align:'center',formatter:fomatterCla" rowspan='2' >职业</th>
+					                <th data-options="field:'star',width:20,align:'center',editor:'numberbox'
+					                " rowspan='2' >星级</th>
+					                <th data-options="field:'weaponid',width:60,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        required:false,
+					                        onSelect:UpdateWeapon
+					                    }
+					                } ,formatter:formatterAdvWeapon" rowspan='2' >武器</th>
+					                <th data-options="field:'offhandid',width:60,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        required:false,
+					                        onSelect:UpdateOffhand
+					                    }
+					                } ,formatter:formatterAdvOffhand" rowspan='2' >副手</th>					                
+					                <th data-options="field:'armorid',width:60,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        required:false,
+					                        onSelect:UpdateArmor
+					                    }
+					                },formatter:formatterAdvArmor" rowspan='2'>防具</th>
+					                <th data-options=" field:'itemid',width:60,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        required:true,
+					                        onSelect:UpdateItem
+					                    }
+					                },formatter:formatterAdvItem" rowspan='2' >饰品</th>
+					                <th data-options="field:'equipset',width:30" rowspan='2'>装等</th>
+					                <th colspan='2' >技能1</th>
+					                <th colspan='2' >技能2</th>
+					                <th colspan='2' >技能3</th>
+					                <th data-options="field:'skillexp',width:40,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:skipMg,
+					                        required:true
+					                    }
+					                },formatter:fomatterSkiP " rowspan='2' >技能点</th>
+					                <th data-options="field:'skillid4',width:60,formatter:fomatterRaceSkill " rowspan='2' >种族技能</th>
+					                <th data-options="field:'level4',width:40,editor:'numberbox' " rowspan='2' >族技等级</th>
+					            </tr>
+					            <tr>
+					                <th data-options='field:"skillid1",width:140,align:"right",editor:{
+					                    type:"combobox",
+					                    options:{
+					                        valueField:"value",
+					                        textField:"text",
+					                        data:skiMg
+					                    }
+					                },formatter:fomatterSki ' >技能</th>
+					                <th data-options='field:"level1",width:20,align:"right",editor:"numberbox"'>等级</th>
+					               <th data-options='field:"skillid2",width:140,align:"right",editor:{
+					                    type:"combobox",
+					                    options:{
+					                        valueField:"value",
+					                        textField:"text",
+					                        data:skiMg
+					                    }
+					                },formatter:fomatterSki' >技能</th>
+					                <th data-options='field:"level2",width:20,align:"right",editor:"numberbox"'>等级</th>
+					               <th data-options='field:"skillid3",width:140,align:"right",editor:{
+					                    type:"combobox",
+					                    options:{
+					                        valueField:"value",
+					                        textField:"text",
+					                        data:skiMg
+					                    }
+					                },formatter:fomatterSki' >技能</th>
+					                <th data-options='field:"level3",width:20,align:"right",editor:"numberbox"'>等级</th>
+					            </tr>
+					        </thead>
+					    </table>
+					        <br id="Dgequip1" />
+					       <table id="Dgequip" class="easyui-datagrid" title="仓库-装备" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgequip,sort:{sortName:'instid',sortOrder:'desc'},
+					        onClickRow:onClickRowDgequip,
+					        onLoadSuccess:equipLoadSuccess
+					        	" >
+					                <thead>
+					                    <tr>
+					                   <th data-options="field:'instid',title:'instid',width:50,sortable:true,order:'desc'">InstId</th>
+					                   <th data-options="formatter:getTypeID" >TypeID</th>      
+					                   <th data-options="field:'typeid',width:120,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:equipMg,
+					                            required:true
+					                        }
+					                    },formatter:formatterEquip " >装备</th>  
+					                    <th data-options="field:'count',width:120,editor:'numberbox'" >数量</th>
+					                    <th data-options="field:'items',width:800,editor:'text'" >prototype</th>
+					                    </tr>
+					                </thead>
+					        </table>
+					<br style="margin:200px" />					    
+					    <br id="dgFamiliar1" />
+					      <table id="dgFamiliar" class="easyui-datagrid" title="佣兽列表" style="width:auto;height:auto"
+					            data-options="singleSelect:true,collapsible:true,method:'post',
+					                onClickRow:onClickRowFamiliar,
+					                onEndEdit:onEndEdit,
+					                toolbar:toolDgFamiliar,
+					                onLoadSuccess:familiarLoadSuccess
+					            ">
+					        <thead>
+					            <tr>
+					 <!--                <th data-options="field:'istatus',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP</th> -->
+					                <th data-options="field:'istatus1',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP1</th>
+					                <th data-options="field:'istatus2',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP2</th>
+					                <th data-options="field:'istatus3',width:40,editor:{type:'checkbox',options:{on:'P',off:''}},formatter:
+					                function(val,row){
+					                    if(val=='P')
+					                        return '<input type=checkbox checked=true >';
+					                    else
+					                        return '<input type=checkbox >';
+					                }
+					                 " rowspan='2' >PVP3</th>					                 
+					                <th data-options="field:'instid',width:40,editor:'text'" rowspan='2' >instId</th>
+					                <th data-options="field:'typeid',width:80,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data: familarMg,               
+					                        required:true
+					                    }
+					                },formatter:fomatterfamiliar" rowspan='2' >名字</th>
+					                <th data-options="field:'exp',width:80,align:'right'" rowspan='2' >经验</th>
+					                <th data-options="field:'level',width:80,align:'right',editor:'numberbox'" rowspan='2' >等级</th>
+					                <th data-options="field:'star',width:20,align:'center',editor:'numberbox'" rowspan='2' >星级</th>					                
+					<!--            <th data-options="field:'weaponid',width:80,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:equipMg,
+					                        required:false
+					                    }
+					                } ,formatter:formatterEquip" rowspan='2' >武器</th>
+					                <th data-options="field:'armorid',width:80,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:equipMg,
+					                        required:true
+					                    }
+					                },formatter:formatterEquip " rowspan='2'>防具</th>
+					                <th data-options=" field:'itemid',width:80,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:equipMg,
+					                        required:true
+					                    }
+					                },formatter:formatterEquip  " rowspan='2' >饰品</th>
+					                <th colspan='2' >技能1</th>
+					                <th colspan='2' >技能2</th>
+					                <th colspan='2' >技能3（人类专属）</th>              
+					                <th data-options="field:'questid',width:80,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:queMg,
+					                        required:false
+					                    }
+					                },formatter:fomatterQue " rowspan='2' >任务</th>
+					            </tr> -->
+					                <th data-options="field:'skillexp',width:80,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:skipMg,
+					                        required:true
+					                    }
+					                },formatter:fomatterSkiP " rowspan='2' >技能点</th>  					            
+					            	<th colspan='2' >技能1</th>
+					                <th colspan='2' >技能2</th>
+					                
+					            <tr>
+					                <th data-options='field:"skillid1",width:100,align:"right",editor:{
+					                    type:"combobox",
+					                    options:{
+					                        valueField:"value",
+					                        textField:"text",
+					                        data:skiMg
+					                    }
+					                },formatter:fomatterSki ' >技能</th>
+					                <th data-options='field:"level1",width:20,align:"right",editor:"numberbox"'>等级</th>
+					               <th data-options='field:"skillid2",width:100,align:"right",editor:{
+					                    type:"combobox",
+					                    options:{
+					                        valueField:"value",
+					                        textField:"text",
+					                        data:skiMg
+					                    }
+					                },formatter:fomatterSki' >技能</th>
+					                <th data-options='field:"level2",width:20,align:"right",editor:"numberbox"'>等级</th>
+					            </tr>
+					        </thead>
+					    </table>
+					    <br id="dgBack1" />
+
+					    <table id="dgBack" class="easyui-datagrid" title="存档" style="width:auto;height:auto"     data-options="singleSelect:true,collapsible:true,method:'post',toolbar:toolBackup,
+					        onLoadError:loadDGBackError
+					    "  >
+					            <thead>
+					                <tr>
+					                    <th data-options="field:'name',width:190,formatter:fomatterunescape" >名称</th>
+					                    <th data-options="field:'date',width:260,formatter:getBackupDate" >时间</th>
+					                </tr>
+					            </thead>
+					    </table>
+
+					    <br id="dgState1" />
+
+					    <table id="dgState" class="easyui-datagrid" title="战斗记录" style="width:auto;height:auto"     data-options="singleSelect:true,collapsible:true,method:'post',toolbar:toolState">
+					            <thead>
+					                <tr>
+					                    <th data-options="field:'date',width:160,formatter:formatterDateStr " >Date</th>
+					                    <th data-options="field:'EnemyUid',width:160 " >EnemyUid·</th>
+					                    <th data-options="field:'result',width:160,formatter:formatterVic " >result</th>
+					           <!--          <th data-options="field:'wincount',width:160,formatter:function(val,row){
+					                     var b =  parseInt(row.wincount)/parseInt(row.count)*100 ;
+					                     return val + '('+ b + '%)';
+					                } " >胜场（胜率）</th> -->
+					                </tr>
+					            </thead>
+					    </table>
+
+					    <br id="dgquest1" />
+					    <table id="dgquest" class="easyui-datagrid" title="任务" style="width:auto;height:auto;" data-options="
+					    singleSelect:true,collapsible:true,method:'post',toolbar:tooldgquest,onClickRow:onClickRowDgquest,
+					    onLoadSuccess:questLoadSuccess
+					    " >
+					            <thead>
+					                <tr>
+					                    <th data-options="formatter:getTypeID" >TypeID</th> 
+					               <th data-options="field:'typeid',width:160,editor:{
+					                    type:'combobox',
+					                    options:{
+					                        valueField:'value',
+					                        textField:'text',
+					                        data:queMg,
+					                        required:true
+					                    }
+					                },
+					                    formatter:fomatterQue " >名称</th>  
+
+					                <th data-options="field:'star',width:240,editor:'numberbox'" >难度</th>        
+					                <th data-options="field:'playcount',width:240,editor:'numberbox'" >胜利次数</th> 
+					                <th data-options="field:'cmplv',width:240,editor:'numberbox'" >已打星级</th>
+					                </tr>
+					            </thead>
+					    </table>
+
+					<br id="dgdish1"/>
+
+					        <table id="dgdish" class="easyui-datagrid" title="仓库-烹饪" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgdish,
+					        onClickRow:onClickRowDgdish,
+					        onLoadSuccess:dishLoadSuccess
+					        " >
+					                <thead>
+					                    <tr>
+					                        <th data-options="formatter:getTypeID" >TypeID</th> 
+					                   <th data-options="field:'typeid',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:disMg,
+					                            required:true
+					                        }
+					                    },formatter:fomatterDish " >烹饪</th>  
+					                    <th data-options="field:'count',width:240,editor:'numberbox'" >数量</th>
+					                    </tr>
+					                </thead>
+					        </table>
+
+					        <br id="dgmtr1" />
+					        <table id="dgmtr" class="easyui-datagrid" title="仓库-材料" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgmtr,onClickRow:onClickRowDgmtr,
+					        onLoadSuccess:meterialLoadSuccess
+					        " >
+
+					                <thead>
+					                    <tr>
+					                        <th data-options="formatter:getTypeID" >TypeID</th> 
+					                   <th data-options="field:'typeid',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:mtrMg,
+					                            required:true
+					                        }
+
+					                    },
+					                        formatter:formatterMtr " >材料</th>  
+
+					                    <th data-options="field:'count',width:240,editor:'numberbox'" >数量</th>
+					                    </tr>
+					                </thead>
+					        </table>
+					        <br id="dgitem1" />
+
+					<!--       <table id="dgitem" class="easyui-datagrid" title="仓库-饰品" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgitem,
+					        onClickRow:onClickRowDgitem,
+					        onLoadSuccess:itemLoadSuccess
+					        " >
+					                <thead>
+					                    <tr>
+					                    <th data-options="formatter:getTypeID" >TypeID</th> 
+					                   <th data-options="field:'typeid',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:iteMg,
+					                            required:true
+					                        }
+					                    },formatter:fomatterIte " >饰品</th>  
+					                    <th data-options="field:'count',width:240,editor:'numberbox'" >数量</th>
+					                    </tr>
+					                </thead>
+					        </table> 
+					        <br id="dgwea1" />
+
+					       <table id="dgwea" class="easyui-datagrid" title="仓库-武器" style="width:auto;height:auto" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgwea,
+					        onClickRow:onClickRowDgwea" >
+					                <thead>
+					                    <tr>
+					                   <th data-options="formatter:getTypeID" >TypeID</th>      
+					                   <th data-options="field:'instid',title:'instid',width:50">InstId</th>
+					                   <th data-options="field:'typeid',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:weaMg,
+					                            required:true
+					                        }
+					                    },formatter:fomatterWea " >武器</th>  
+					                    <th data-options="field:'count',width:240,editor:'numberbox'" >数量</th>
+					                    <th data-options="field:'items',width:800,editor:'text'" >prototype</th>
+					                    </tr>
+					                </thead>
+					        </table>
+					        <br id="dgarmer1" />
+
+					          <table id="dgarmer" class="easyui-datagrid" title="仓库-防具" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgarmer,
+					        onClickRow:onClickRowDgarmer" >
+					                <thead>
+					                    <tr>
+					                    <th data-options="formatter:getTypeID" >TypeID</th>       
+					                   <th data-options="field:'typeid',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:armMg,
+					                            required:true
+					                        }
+					                    },formatter:fomatterArm " >防具</th>  
+					                    <th data-options="field:'count',width:240,editor:'numberbox'" >数量</th>
+					                    </tr>
+					                </thead>
+					        </table>
+					        <br id="dgskill1" /> -->
+
+					          <table id="dgskill" class="easyui-datagrid" title="仓库-技能" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgskill,
+					        onClickRow:onClickRowDgskill,
+					        onLoadSuccess:skillLoadSuccess
+					        " >
+					                <thead>
+					                    <tr>     
+					                 <th data-options="formatter:getTypeID" >TypeID</th>                
+					                   <th data-options="field:'typeid',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:skiMg,
+					                            required:true
+					                        }
+					                    },formatter:fomatterSki" >技能</th>
+					                    <th data-options="field:'count',width:240,editor:'numberbox'" >数量（无用）</th>
+					                    </tr>
+					                </thead>
+					        </table>
+					        <br id="dgtask1" />
+
+					        <table id="dgtask" class="easyui-datagrid" title="玩家任务" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgtask,
+					        onClickRow:onClickRowDgtask,
+					        onLoadSuccess:taskLoadSuccess
+					        " >
+					                <thead>
+					                    <tr>     
+					                        <th data-options="field:'tasktype_finishtype',width:160,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'text',
+					                            textField:'text',
+					                            data:taskMg,
+					                            required:false,
+					                            onSelect:updateTask
+					                        }
+					                    }" >TaskType+FinishType</th>
+					                        <th data-options="field:'tasktype',width:160" >TaskType</th>
+					                        <th data-options="field:'finishtype',width:160" >FinishType</th>
+					                        <th data-options="field:'finishvalue',width:160,editor:'numberbox'" >FinishValue</th>
+					                        <th data-options="field:'count',formatter:getFinishCount" >完成数量</th>
+					                    </tr>
+					                </thead>
+					        </table>
+					        <br id="dgTutorial1" />
+					        <table id="dgTutorial" class="easyui-datagrid" title="新手指引" style="width:auto;height:auto;" data-options="
+					        singleSelect:true,collapsible:true,method:'post',toolbar:tooldgTutorial,onClickRow:onClickRowTutorial,
+					        onLoadSuccess:tutorialLoadSuccess
+					        " >
+					                <thead>
+					                    <tr>     
+					                        <th data-options="field:'typeid',width:100,editor:{
+					                        type:'combobox',
+					                        options:{
+					                            valueField:'value',
+					                            textField:'text',
+					                            data:tutorialMg,
+					                            required:true
+					                        }
+					                    }" >TypeID</th>
+					                    	<th data-options="width:100,formatter:formatterTutorialName">Name</th>
+					                        <th data-options="field:'roomType',width:100,formatter:formatterTutorialRT">RoomType</th>
+					                        <th data-options="field:'requireQuestId',formatter:formatterTutorialRQ">RequestQuestId</th>
+					                        <th data-options="field:'unlocks',formatter:formatterTutorialUL">Unlocks</th>
+					                        <th data-options="field:'isfinish',formatter:formatterIsFinish ">Statu</th>
+					                    </tr>
+					                </thead>
+					        </table>
+
+					<br style="margin:200px" />
+					<div class="easyui-panel" title="Upload File" style="width:400px;padding:30px 70px 50px 70px;display:none">
+					<form method="post" name="form_import" enctype="multipart/form-data" action="/import">
+					  <input type="hidden" name="uid" value=""/>
+					  <input type="file" name="thumbnail">
+					  <input type="button"  value="Upload" name="Upload" >
+					</form>
+					</div>
+					<pre style='float:left;width:400px;'  id='user' ></pre>
+					<pre style='float:right;width:400px;'  id='globaluser' ></pre>
+	else
+		div.
+					<br id="pg1" />
+
+					        <table id="pg" class="easyui-propertygrid" style="width:auto;" data-options="
+					                    method:'post',
+					                    showGroup:true,
+					                    showHeader:false,
+					                    scrollbarSize:0,
+					                    toolbar:[],
+					                    onLoadSuccess:tavernLoadSuccess
+					                              ">
+					        </table>
+
+
+					<br id="dg1" />
+
+						<table id="dg" class="easyui-datagrid" title="冒险者列表" style="width:auto;height:auto"
+								data-options="singleSelect:true,collapsible:true,method:'post',
+									onClickRow:[],
+									onEndEdit:[],
+									toolbar:[]
+								">
+							<thead>
+								<tr>
+									<th data-options="field:'istatus',width:40,formatter:
+									function(val,row){
+										if(val=='P')
+											return '<input type=checkbox checked=true >';
+										else
+											return '<input type=checkbox >';
+									}
+									 " rowspan='2' >PVP</th>
+									<th data-options="field:'instid',width:40" rowspan='2' >instId</th>
+									<th data-options="field:'typeid',width:150,formatter:fomatterAdv" rowspan='2' >名字</th>
+									<th data-options="field:'exp',width:80,align:'right'" rowspan='2' >经验</th>
+									<th data-options="field:'level',width:20,align:'right'" rowspan='2' >等级</th>
+									<th data-options="field:'raceid',width:80,formatter:fomatterRac" rowspan='2' >种族</th>
+									<th data-options="field:'classid',width:80,align:'center',formatter:fomatterCla" rowspan='2' >职业</th>
+									<th data-options="field:'star',width:20,align:'center'" rowspan='2' >星级</th>
+									<th data-options="field:'weaponid',width:80 ,formatter:formatterEquip" rowspan='2' >武器</th>
+									<th data-options="field:'armorid',width:80,formatter:formatterEquip " rowspan='2'>防具</th>
+									<th data-options=" field:'itemid',width:80,formatter:formatterEquip  " rowspan='2' >饰品</th>
+									<th colspan='2' >技能1</th>
+									<th colspan='2' >技能2</th>
+									<th colspan='2' >技能3</th>
+									<th data-options="field:'skillexp',width:40,formatter:fomatterSkiP " rowspan='2' >技能点</th>
+									<th data-options="field:'raceskillid',width:60,formatter:fomatterRaceSkill " rowspan='2' >种族技能</th>
+									<th data-options="field:'raceskilllevel',width:40 " rowspan='2' >族技等级</th>
+								</tr>
+								<tr>
+									<th data-options='field:"skillid1",width:140,align:"right",formatter:fomatterSki ' >技能</th>
+									<th data-options='field:"level1",width:20,align:"right"'>等级</th>
+								   <th data-options='field:"skillid2",width:140,align:"right",formatter:fomatterSki' >技能</th>
+									<th data-options='field:"level2",width:20,align:"right"'>等级</th>
+								   <th data-options='field:"skillid3",width:140,align:"right",formatter:fomatterSki' >技能</th>
+									<th data-options='field:"level3",width:20,align:"right"'>等级</th>
+								</tr>
+							</thead>
+						</table>
+						<br id="dgFamiliar1" />
+						  <table id="dgFamiliar" class="easyui-datagrid" title="佣兽列表" style="width:auto;height:auto"
+								data-options="singleSelect:true,collapsible:true,method:'post',
+									onClickRow:[],
+									onEndEdit:[],
+									toolbar:[]
+								">
+							<thead>
+								<tr>
+									<th data-options="field:'instid',width:40" rowspan='2' >instId</th>
+									<th data-options="field:'typeid',width:80,formatter:fomatterAdv" rowspan='2' >名字</th>
+									<th data-options="field:'exp',width:80,align:'right'" rowspan='2' >经验</th>
+									<th data-options="field:'level',width:80,align:'right'" rowspan='2' >等级</th>
+									<th data-options="field:'weaponid',width:80 ,formatter:formatterEquip" rowspan='2' >武器</th>
+									<th data-options="field:'armorid',width:80,formatter:formatterEquip " rowspan='2'>防具</th>
+									<th data-options=" field:'itemid',width:80,formatter:formatterEquip  " rowspan='2' >饰品</th>
+									<th colspan='2' >技能1</th>
+									<th colspan='2' >技能2</th>
+									<th colspan='2' >技能3（人类专属）</th>
+									<th data-options="field:'skillexp',width:80,formatter:fomatterSkiP " rowspan='2' >技能点</th>				
+								<tr>
+									<th data-options='field:"skillid1",width:100,align:"right",formatter:fomatterSki ' >技能</th>
+									<th data-options='field:"level1",width:20,align:"right"'>等级</th>
+								   <th data-options='field:"skillid2",width:100,align:"right",formatter:fomatterSki' >技能</th>
+									<th data-options='field:"level2",width:20,align:"right"'>等级</th>
+								   <th data-options='field:"skillid3",width:100,align:"right",formatter:fomatterSki' >技能</th>
+									<th data-options='field:"level3",width:20,align:"right"'>等级</th>
+								</tr>
+							</thead>
+						</table>
+						<br id="dgBack1" />
+
+						<table id="dgBack" class="easyui-datagrid" title="存档" style="width:auto;height:auto"	 data-options="singleSelect:true,collapsible:true,method:'post',toolbar:[],
+							onLoadError:[]
+						"  >
+								<thead>
+									<tr>
+										<th data-options="field:'name',width:190,formatter:fomatterunescape" >名称</th>
+										<th data-options="field:'date',width:260,formatter:getBackupDate" >时间</th>
+									</tr>
+								</thead>
+						</table>
+
+						<br id="dgState1" />
+
+						<table id="dgState" class="easyui-datagrid" title="战斗记录" style="width:auto;height:auto"	 data-options="singleSelect:true,collapsible:true,method:'post',toolbar:[]">
+								<thead>
+									<tr>
+										<th data-options="field:'date',width:160,formatter:formatterDateStr " >Date</th>
+										<th data-options="field:'EnemyUid',width:160 " >EnemyUid·</th>
+										<th data-options="field:'result',width:160,formatter:formatterVic " >result</th>
+									</tr>
+								</thead>
+						</table>
+
+						<br id="dgquest1" />
+						<table id="dgquest" class="easyui-datagrid" title="任务" style="width:auto;height:auto;" data-options="
+						singleSelect:true,collapsible:true,method:'post',toolbar:[],onClickRow:[]" >
+								<thead>
+									<tr>
+										<th data-options="formatter:getTypeID" >TypeID</th> 
+								   <th data-options="field:'typeid',width:160,formatter:fomatterQue " >名称</th>  
+									<th data-options="field:'starttime',width:240,formatter:formatterDateStr" >开始时间</th>
+									<th data-options="field:'star',width:240" >数量</th>		
+									<th data-options="field:'playcount',width:240" >胜利次数</th> 
+									<th data-options="field:'lastplaytime',width:240,formatter:formatterDateStr" >最近游戏时间</th>			 
+									</tr>
+								</thead>
+						</table>
+
+					<br id="dgdish1"/>
+
+							<table id="dgdish" class="easyui-datagrid" title="仓库-烹饪" style="width:auto;height:auto;" data-options="
+							singleSelect:true,collapsible:true,method:'post',toolbar:[],
+							onClickRow:[]" >
+									<thead>
+										<tr>
+											<th data-options="formatter:getTypeID" >TypeID</th> 
+									   <th data-options="field:'typeid',width:160,formatter:fomatterDish " >烹饪</th>  
+										<th data-options="field:'count',width:240" >数量</th>
+										</tr>
+									</thead>
+							</table>
+
+							<br id="dgmtr1" />
+							<table id="dgmtr" class="easyui-datagrid" title="仓库-材料" style="width:auto;height:auto;" data-options="
+							singleSelect:true,collapsible:true,method:'post',toolbar:[],onClickRow:[]" >
+
+									<thead>
+										<tr>
+											<th data-options="formatter:getTypeID" >TypeID</th> 
+									   <th data-options="field:'typeid',width:160,formatter:formatterMtr " >材料</th>  
+
+										<th data-options="field:'count',width:240" >数量</th>
+										</tr>
+									</thead>
+							</table>
+							<br id="dgitem1" />
+
+							<table id="dgskill" class="easyui-datagrid" title="仓库-技能" style="width:auto;height:auto;" data-options="
+							singleSelect:true,collapsible:true,method:'post',toolbar:[],
+							onClickRow:[],
+							onLoadSuccess:skillLoadSuccess" >
+									<thead>
+										<tr>	 
+									 <th data-options="formatter:getTypeID" >TypeID</th>				
+									   <th data-options="field:'typeid',width:160,formatter:fomatterSki" >技能</th>
+										<th data-options="field:'count',width:240" >数量（无用）</th>
+										</tr>
+									</thead>
+							</table>
+							<br id="dgtask1" />
+
+							<table id="dgtask" class="easyui-datagrid" title="玩家任务" style="width:auto;height:auto;" data-options="
+							singleSelect:true,collapsible:true,method:'post',toolbar:[],
+							onClickRow:[],
+							onLoadSuccess:taskLoadSuccess" >
+									<thead>
+										<tr>	 
+											<th data-options="field:'tasktype_finishtype',width:160" >TaskType+FinishType</th>
+											<th data-options="field:'tasktype',width:160" >TaskType</th>
+											<th data-options="field:'finishtype',width:160" >FinishType</th>
+											<th data-options="field:'finishvalue',width:160" >FinishValue</th>
+											<th data-options="field:'count',formatter:getFinishCount" >完成数量</th>
+										</tr>
+									</thead>
+							</table>
+							<br id="dgTutorial1" />
+							<table id="dgTutorial" class="easyui-datagrid" title="新手指引" style="width:auto;height:auto;" data-options="
+							singleSelect:true,collapsible:true,method:'post',toolbar:[],onClickRow:[]" >
+									<thead>
+										<tr>	 
+											<th datadata-options="field:'typeid',width:100" >TypeID</th>
+											<th -options="field:'roomType',width:100,formatter:formatterTutorialRT">RoomType</th>
+											<th data-options="field:'requireQuestId',formatter:formatterTutorialRQ">RequestQuestId</th>
+											<th data-options="field:'unlocks',formatter:formatterTutorialUL">Unlocks</th>
+										</tr>
+									</thead>
+							</table>
+
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/jquery.binarytransport.js")
+	script(type="text/javascript").
+		var tutorialids = !{JSON.stringify(tutorialids)};
+		var tutorialnames = !{JSON.stringify(tutorialnames)};
+		var islive = !{islive};
+		var taverneditCount = !{taverneditCount};
+		$(function(){
+			if(taverneditCount>0)
+				$("h2").text("被过滤");
+			});
+	script(type="application/javascript", src="/js/index.js")

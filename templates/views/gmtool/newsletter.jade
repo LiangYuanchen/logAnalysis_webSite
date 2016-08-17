@@ -1,0 +1,417 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Newsletter
+		//div(id="region",style="padding:5px")
+block content
+	if hasPermission
+		.container: .jumbotron(style="")
+			h2 NewsLetter
+			div(style="float:left;width:250px;")
+				div(class="easyui-panel",title="添加",style="width:250px;padding:30px 60px;")
+					form(method="post",action="/newsletteredit")
+						div(style="margin:20px 0;")
+							//div Title:
+							//input(class="easyui-textbox",id="title",data-options="",style="width:100%,height:32px",value="Legend Awaken")
+							//div(style="margin:20px 0;", class="qunfa")
+							div URL:
+							input(class="easyui-textbox",id="url",data-options="",style="width:100%,height:32px",value="https://www.facebook.com/tavernheroes")
+							div(style="margin:20px 0;", class="qunfa")
+							div REGION:
+							input(class="easyui-textbox",id="regionObj",data-options="",style="width:100%,height:32px",value="0")
+							div(style="margin:20px 0;", class="qunfa")
+							div VERSION:
+							input(class="easyui-textbox",id="version",data-options="",style="width:100%,height:32px",value="0.16.68")
+							div(style="margin:20px 0;", class="qunfa")
+							div NPC:
+							input(class="easyui-textbox",id="npc",data-options="",style="width:100%,height:32px",value="newsletter_pic3.png")
+							div(style="margin:20px 0;", class="qunfa")
+							div Time:
+							input(class="easyui-datetimebox",id="time",style="width:100%,height:32px")
+							div(style="margin:20px 0;", class="qunfa")
+							hr
+							div(style="margin:20px 0;")
+								div Title:
+								input(class="easyui-textbox",id="title",data-options="",style="width:100%,height:32px",value="Legend Awaken")
+							div(style="margin:20px 0;")
+								div Language:
+								input(class="easyui-textbox",id="language",data-options="",style="width:100%,height:32px;")
+							hr
+							div(style="margin:20px 0;")
+								div Pic:
+								input(class="easyui-textbox",id="pic",data-options="",style="width:100%,heigth:32px;")
+							div(style="margin:20px 0;")
+								div Content:
+								textarea(style="width:127px;heigth:157px",id="content")
+							div(style="margin:20px 0;")
+								a(href="#",onclick="addContent()",class="easyui-linkbutton",iconCls="icon-reload",style="width:100%,height:32px") 内容添加
+								a(href="#",onclick="clearContents()",class="easyui-linkbutton",iconCls="icon-reload",style="width:100%,height:32px") Clear
+							div(style="margin:20px 0;")
+								div newsletterContent:
+								div(id="warp_contents")
+								input(id="contents",type="hidden")
+							hr
+							div(style="margin:20px 0;")
+								a(href="#",onclick="addLang()",class="easyui-linkbutton",iconCls="icon-reload",style="width:100%,height:32px") lang添加
+							div(style="margin:20px 0;")
+								div newsletterLang:
+								div(id="warp_langs")
+								input(id="langs",type="hidden")
+							hr
+							div(style="margin:20px 0;")
+								a(href="#",onclick="addnewsletter()",class="easyui-linkbutton",iconCls="icon-ok",style="width:100%,height:32px") 提交
+			div(style="float:left;width:700px; margin-left:20px")
+				table(id="tt",class="easyui-datagrid",title="newsletterlist",style="width:auto;height:auto;",data-options="singleSelect:true,collapsible:true,method:'post',toolbar:tooldg,rownumbers:true,fitColumns:true,view:detailview")
+					thead
+						tr
+							//th(data-options="field:'title',width:60") title
+							th(data-options="field:'time',width:80,formatter:formatDate ") time
+							th(data-options="field:'version',width:80 ") version
+							th(data-options="field:'npc',width:80") npc
+							th(data-options="field:'url',width:80") url
+							th(data-options="field:'region',width:80") region
+
+			div(style="clear:both")
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	if hasPermission
+		script(type="text/javascript").
+			  //var str = '1234567890';
+			  //str = str.replace(/(?=(?:\d{3})+(?!\d))/g,',');
+			  // alert(str);
+			//$.post("/getregion",null,function(data){
+			//	var arrStr = data.split(":");
+			//	if(!arrStr||arrStr.length<2)
+			//		return;
+			//	firstRegionId =parseInt( arrStr[0]);
+			//	lastRegionId =parseInt( arrStr[1]);
+			//	var divRegion=$("#region");
+			//	for(var i=firstRegionId;i<lastRegionId+1;i++)
+			//		{
+			//			var aregion =$( "<a class='easyui-linkbutton' data-options=\"iconCls:'icon-reload',plain:true\" href='?reg="+i+"' >分区"+i+"</a>");
+			//			divRegion.append(aregion);
+			//		}
+			//});
+
+	
+			function request(paras)
+			{ 
+			var url = location.href; 
+			var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+			var paraObj = {} 
+			for (i=0; j=paraString[i]; i++){ 
+			paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+			} 
+			var returnValue = paraObj[paras.toLowerCase()]; 
+			if(typeof(returnValue)=="undefined"){ 
+			return "";
+			}else{ 
+			if(returnValue.indexOf('#')>-1)
+			    returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+			return returnValue;
+			} 
+			}
+			  function checkQunfa(){
+			  	if(this.checked)
+			  		$(".qunfa").css("display","block");
+			  	else
+			  		$(".qunfa").css("display","none");
+			  }
+			  $(function(){
+			  	  $("[name=checkQunfa]").click(checkQunfa);
+				  $("#tt").datagrid({
+						 detailFormatter:function(rowIndex,rowData){
+							  var returns ="";
+							  var lang = rowData.multilang;
+							  if(lang&&lang.length>0)
+							  	{
+								  for(var l=0;l<lang.length;l++)
+								  	{
+								  		var data = lang[l];
+										returns+="<p>" +
+												 "language:" + data.language +
+												 "<br/>" +
+												 "title:" + data.title +
+												"</p>";
+										var cdata = data.contents;
+										if(cdata && cdata.length > 0)
+										{
+											for(var i=0;i<cdata.length;i++)
+											{
+												var data = cdata[i];
+												returns+="<p>" +
+														  "<blockquote>" +
+														  "pic:" + data.pic +
+														  "<br/>" +
+														  "content:" + data.content +
+														  "</blockquote>" +
+														  "</p>";
+											}
+										}
+								  	}
+							  	}
+							  	return returns;
+						 }
+					});
+				  load();		
+				  template();
+			  });
+			  function load(){
+			 		var region = parseInt(request("reg")) || 0;
+					$.post("/newsletterlist",{data:region},function(data){
+						if(data)
+							data = JSON.parse(data);
+						data = data || [];
+						var result = {};
+						result.rows = data || [];
+						result.length = data.length || 0;
+						 $("#tt").datagrid("loadData",result);
+					});
+			  }
+
+			  var tooldg = [
+					{
+					text:'删除',
+					iconCls:'icon-remove',
+					handler:delMail
+					}
+			  ];
+
+			  var hasAdd = false;
+
+			  function formatDate(val,row){
+					var date = new Date(val*1000);
+					return date.format("yyyy-MM-dd hh:mm:ss");
+			  }
+
+			  function delMail()
+			  {
+					var cmd = $("#tt").datagrid("getSelected");
+					if (isNaN(cmd.time)) {
+						 alert("没有选中行！！！");
+						 return;
+					};
+					var time = cmd.time;
+					var region = request("reg") || 0;
+					$.post("/newsletterdel",{data:{region:region,time:time}},function(data){
+						 load();
+					});
+			  }
+			  function clearMail()
+			  {
+					$.post("/mailclear",{},function(data){
+						 load();
+					});			  		
+			  }
+			  function template()
+			  {
+				$("#time").datetimebox("setText",(new Date()).format("yyyy-MM-dd hh:mm:ss") );
+			  	var contents = [];
+			  	var newcontent = {};
+			  	newcontent.pic = "newsletter_legend-cat-h.png"
+			  	newcontent.content = "A heroic cat group is visiting Nebulia! The Musketeers are royal members of the cat kingdom and bonded by the oath of friendship. Invite your Facebook friends to the game and take your own friendship oath. Then the Musketeers will join your tavern for free! All for one, one for all!";
+			  	contents.push(newcontent);
+
+			  	var newcontent2 = {};
+			  	newcontent2.pic = "newsletter_npc_ogre-h.jpg";
+			  	newcontent2.content = "Upgraded Arena Are you tired of fighting same heroes in Arena? That problem is no more! New Arena areas are opened. Now, high-level players can assign multiple teams for their defense. And attackers will have extra chances to challenge them! Test your team-building skills in the new Arena!";
+			  	contents.push(newcontent2);
+
+			  	var newcontent3 = {};
+			  	newcontent3.pic = "newsletter_system_selectHeroes.jpg";
+			  	newcontent3.content = "Remade the battle preparation function: The battle preparation interface is completely restructured. You can directly choose hero skills in this interface now. No need to go back and forth between your Gallery and the battle ground. Besides, we will automatically save your team settings for different modes. Wanna use different teams for Arena and Odyssey? You can do that now!";
+			  	contents.push(newcontent3);
+
+			  	var newcontent4 = {};
+			  	newcontent4.pic = "newsletter_system_discussion.jpg";
+			  	newcontent4.content = "Hero/Quest comments 'Should I level up this Orc Wizard or that Elf Hunter?’ ‘How on earth can I defeat this boss?' You don’t need to solve the puzzles by yourself anymore! With our new message board system, you can check other players' comments on any heroes or quests.";
+			  	contents.push(newcontent4);
+
+			  	var newcontent5 = {};
+			  	newcontent5.pic = "newsletter_npc_king-h.png";
+			  	newcontent5.content = "Redesigned Guild interface Integrated the Guild chatroom and the Guild message board. You can chat with your Guild members in the main interface now.";
+			  	contents.push(newcontent5);
+
+			  	var newcontent6 = {};
+			  	newcontent6.pic = "newsletter_system_deleteHell.jpg";
+			  	newcontent6.content = "Hell mode is gone We noticed that many players are struggling to defeat the Hell mode and unlock Guild Bosses. Hence, we decided to remove Hell mode for good. From now on, you can unlock the Guild Bosses after defeating the same Boss in Normal mode. Previous Hell mode materials is spread into Hard mode levels.";
+			  	contents.push(newcontent6);
+
+			  	var newcontent7 = {};
+			  	newcontent7.pic = "newsletter_system_deleteExplore.jpg";
+			  	newcontent7.content = "Temporarily closed the Dungeon We have received many feedbacks regarding the Dungeon since we added this function last version. Unfortunately, it is not performing as we expected. Instead of being a new fun play mode, the Dungeon has become a irrelevant labor job for most players. We still believe in the idea of having a mini-game challenge in the game. But we need some time to tweak the feature and make it better. Therefore, we decide to temporarily close the Dungeon. Don’t worry, materials you can get every day are still the same as before.";
+			  	contents.push(newcontent7);
+
+			  	var newcontent8 = {};
+			  	newcontent8.pic = "gold_pile4.jpg";
+			  	newcontent8.content = "content:Economic system updates: - Increased the drop rate of high-level materials. - Lowered the requirements of unlocking skills. - Lowered the costs of Legendary summoning. - Unlocked the second & third hero exchange slots for high-level players. - Replaced the Arena battle rewards with winning rewards. You can collect your Arena Coins after winning 6 matches. - New heroes will all wear Cold Iron equipment set. Being naked is not allowed in your tavern anymore! - Equipments will no longer drop in battles. Instead, they will be found in Arena & Odyssey Stores. - More achievements are posted on the message board.";
+			  	contents.push(newcontent8);
+
+			  	$("#contents").val(JSON.stringify(contents));
+			  	drawingContents();  	
+			  }
+			  function addContent()
+			  {
+			  	var contents = $("#contents").val();
+			  	if(!contents||!contents.length)
+				  	contents = "[]";
+			  	contents = eval("(" + contents + ")");
+			  	if(!contents||!contents.length)
+				  	contents = [];
+			  	var newcontent = {};
+			  	newcontent.pic = $("#pic").val();
+			  	newcontent.content = $("#content").val();
+			  	contents.push(newcontent);
+			  	$("#contents").val(JSON.stringify(contents));
+			  	drawingContents();
+			  }
+			  function clearContents()
+			  {
+				$("#contents").val("");
+				$("#content").val("");
+				$("#pic").val("");
+				drawingContents();
+			  }
+			  function addLang()
+				{
+				var langs = $("#langs").val();
+				if(!langs||!langs.length)
+					langs = "[]";
+				langs = eval("("+langs+")");
+				if(!langs||!langs.length)
+					langs = [];
+				var newlang = {};
+				newlang.title = $("#title").val();
+				newlang.language = $("#language").val();
+				newlang.contents = $("#contents").val();
+				langs.push(newlang);
+				$("#langs").val(JSON.stringify(langs));
+			    drawingLangs();
+			  }
+			  function delContent(index){
+			  	var contents = $("#contents").val();
+			  	if(!contents||!contents.length)
+			  		contents = "[]";
+			  	contents = eval("(" + contents + ")");
+			  	var results  = [];
+				for(var i=0;i<contents.length;i++)
+				{
+					if(i==index)
+					{
+						continue;
+					}
+					results.push(contents[i]);
+				}
+				$("#contents").val(JSON.stringify(results));
+				drawingContents();
+				return false;
+			  }
+			  function drawingContents()
+			  {
+			  	var contents = $("#contents").val();
+			  	if(!contents||!contents.length)
+			  		contents = "[]";
+
+			  	contents = eval("(" + contents + ")");
+			  	if(!contents||!contents.length)
+			  		contents = [];
+			  	$("#warp_contents").html("");
+				for(var i=0;i<contents.length;i++)
+				{
+					$("#warp_contents").append($("<a  onclick='delContent("+i+")'>x</a><p>" +
+												"pic:" +
+												contents[i].pic +
+												"<br/>" +
+												"content:" +
+												contents[i].content +
+												"</p>"
+					));
+				}
+			  }
+						function delLang(index){
+						var langs = $("#langs").val();
+						if(!langs || !langs.length)
+						langs = "[]";
+						langs = eval("(" + langs + ")");
+						var results  = [];
+						for(var i=0;i<langs.length;i++)
+						{
+						if(i == index)
+						{	
+						   continue;
+						}
+						results.push(langs[i]);
+						}
+						$("#langs").val(JSON.stringify(results));
+						drawingLangs();
+						return false;
+						}
+						function drawingLangs()
+						{
+						var langs = $("#langs").val();
+						if(!langs||!langs.length)
+						langs = "[]";
+						
+						langs = eval("(" + langs + ")");
+						if(!langs||!langs.length)
+						contents = [];
+						$("#warp_langs").html("");
+						for(var i=0;i<langs.length;i++)
+						{
+						$("#warp_langs").append($("<a  onclick='delLang("+i+")'>x</a><p>" +
+												   "title:" +
+												   langs[i].title +
+												   "<br/>" +
+												   "language:" +
+												   langs[i].language +
+													"<br/>" +
+													"contents:" +
+													langs[i].contents +
+												   "</p>"
+						));
+						}
+						}
+			  function addnewsletter(theType)
+			  {
+					if (!hasAdd) {
+						 hasAdd  = true;
+						 var parm = {};
+						 var msg = "";
+						 parm.title = $("#title").val();
+						 parm.language = $("#language").val();
+						 
+						 parm.content = $("#content").val();
+						 parm.pic = $("#pic").val();
+						 parm.version = $("#version").val();
+						 parm.npc = $("#npc").val();
+						 parm.url = $("#url").val();
+						 parm.time = Date.parse($("#time").datetimebox("getText"));
+						 parm.region = $("#regionObj").val() || 0;
+						 parm.contents = eval("(" +  $("#contents").val()+ ")");
+						 parm.multilang = eval("(" + $("#langs").val()+ ")");
+						 if (isNaN(parm.time))
+							  parm.time=0;
+						 else
+							  parm.time = parseInt(parm.time/1000);
+
+						 $.post("/newsletteredit",{data:parm},function(data){
+							  hasAdd =false;
+							  load();
+						 });
+
+					}else{
+						 if(confirm("请确认该提交不是重复提交？")){
+							  hasAdd = false;
+							  addnewsletter(theType);
+						 }
+					}
+			  }
+
+
+
+	

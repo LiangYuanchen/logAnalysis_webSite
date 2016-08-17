@@ -1,0 +1,4 @@
+#!/bin/sh
+sudo rm ./console.log
+./console.sh 2048 >> console.log &
+#node keystone.js > log.log &

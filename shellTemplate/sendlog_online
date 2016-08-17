@@ -1,0 +1,2 @@
+online=`netstat -anop|grep 5001|grep -v proxy|grep ESTAB|wc -l`
+echo "TH_AN.all.online:$online|g" | nc -u -w0 127.0.0.1 8125

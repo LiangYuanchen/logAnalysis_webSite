@@ -1,0 +1,391 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+	script(type="text/javascript", src="/jquery.min.js")
+block intro
+	.container
+		h1 GMTool - Guild
+
+block content
+	.container: .jumbotron(style="")
+		
+		if hasPermission
+			//- form(method="post",action="/guildedit")
+			label GuildId:
+			input(type="text",name="guildid",value="")
+			label Region:
+			input(type="text",name="region",value="")
+			input(type="button",name="loadPg",value="读取公会")
+			//- 	label point:
+			//- 	input(type="text",name="point",value="")
+			//- 	input(type="submit",name="sub",value=submit)
+
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwarround()">工会战轮循</a>	
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwaronoff('0')">关闭公会战</a>	
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwaronoff('1')">Register</a>		
+		//- <a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwaronoff('2')">Prepare</a>			
+		//- <a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwaronoff('3')">Match</a>			
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwaronoff('4')">Fight</a>			
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwaronoff('5')">Rest</a>			
+		<br>	
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwar('gregister')">开启公会战注册</a>	
+		//- <a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwar('gmatch')">公会战匹配</a>	
+		<a href="javascript:void(0)" title="用户数据" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="guildwar('greward')">公会战奖励</a>	
+		table(id="pg",class="easyui-propertygrid",style="width:auto",data-options="showGroup:true,showHeader:false,scrollbarSize:0,toolbar:toolPg")
+		br
+		table(id="dg",class="easyui-datagrid",title="公会成员",style="width:auto;height:auto",data-options="sortName:'role',sortOrder:'asc',singleSelect:true,collapsible:true,method:'post',onClickRow:onClickRow,onEndEdit:onEndEdit,toolbar:toolDg")
+			thead
+				tr
+					th(data-options="field:'uid',width:120,editor:'numberbox'") uid
+					th(data-options="field:'name',width:120") name
+					th(data-options="field:'role',width:200,editor:'numberbox'") role(0:会长,100:副会长,200:成员)
+					th(data-options="field:'viplv',width:80") viplv
+					th(data-options="field:'tavernlv',width:80") tavernlv
+		br
+		table(id="dgQuest",class="easyui-datagrid",title="副本进度",style="width:auto;height:auto",data-options="sortName:'typeid',sortOrder:'asc',singleSelect:true,collapsible:true,method:'post',onClickRow:onClickRowQuest,onEndEdit:onEndEditQuest,toolbar:toolDgQuest")
+			thead
+				tr
+					th(data-options="field:'typeid',width:120") typeid
+					th(data-options="field:'damage',width:200,editor:'numberbox'") damage
+					th(data-options="field:'finishedonce',width:80,editor:'text'") finishedonce 
+					th(data-options="field:'deadtime',width:80,editor:'datebox',formatter:formatterDate") deadtime					
+					th(data-options="field:'status',width:80,editor:'numberbox'") status 1:打开 2:关闭
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript").
+		function guildwarround()
+		{
+			$.post("/guildwarround",{},function(data){
+				alert("当前状态码："+data);
+			})
+		}
+		function guildwaronoff(cmd)
+		{
+			$.post("/guildwaronoff",{data:cmd},function(result){
+				alert("ok");
+			});
+		}
+		function guildwar(cmd)
+		{
+			$.post("/guildwar",{data:cmd},function(result){
+				alert("ok");
+			});
+		}
+		var toolPg = [
+		    {
+		        text:'刷新',
+		        iconCls:'icon-reload',
+		        handler:load
+		    },
+		    {
+		        text:'保存',
+		        iconCls:'icon-add',
+		        handler:AcceptPgChanges
+		    }
+		]
+		var toolDg = [
+		        {
+		            text:'添加',
+		            iconCls:'icon-add',
+		            handler:append
+		        },
+		        {
+		            text:'保存',
+		            iconCls:'icon-save',
+		            handler:accept
+		        },
+		        //- {
+		        //-     text:'撤销',
+		        //-     iconCls:'icon-undo',
+		        //-     handler:reject
+		        //- },
+		        {
+		            text:'Delete',
+		            iconCls:'icon-remove',
+		            handler:deleteGuild
+		        },
+		        //- {
+		        //-     text:'Changes',
+		        //-     iconCls:'icon-search',
+		        //-     handler:getChanges
+		        //- }
+		    ];
+		var toolDgQuest = [
+		        {
+		            text:'添加',
+		            iconCls:'icon-add',
+		            handler:appendQuest
+		        },
+		        {
+		            text:'保存',
+		            iconCls:'icon-save',
+		            handler:saveQuest
+		        }
+		        //- {
+		        //-     text:'撤销',
+		        //-     iconCls:'icon-undo',
+		        //-     handler:reject
+		        //- },
+		        //- {
+		        //-     text:'Changes',
+		        //-     iconCls:'icon-search',
+		        //-     handler:getChanges
+		        //- }
+		    ];		    
+		 var basedata = {},editIndex = undefined,editIndexQuest = undefined;
+		function load(){
+			var guildid = $("[name=guildid]").val();
+			var region = $("[name=region]").val();
+			//- $("#pg").propertygrid({
+			//- 	url:"/guildselect?guildid="+guildid+"&region="+region+""
+			//- });
+			$.post("/guildselect",{guildid:guildid,region:region},function(data){
+				var result = {total:0,rows:[]};
+				basedata = data;
+				if(!data)
+					{
+						alert("传值为空");
+						return;
+					}
+				data = eval("("+data+")");
+				result.rows = [
+					{"name":"name","value":data.name,"group":"公会基本信息","editor":"text"},
+					{"name":"point","value":data.point,"group":"公会基本信息","editor":"numberbox"},
+					{"name":"level","value":data.level,"group":"公会基本信息"},
+					{"name":"totalpoint","value":data.totalpoint,"group":"公会基本信息","editor":"numberbox"}
+				];
+				result.total = result.rows.length;
+				$("#pg").propertygrid("loadData",result);
+
+				var result2 = {total:0,rows:[]};
+				result2.rows = data.members;
+				result2.total = data.members.length;
+				$("#dg").datagrid("loadData",result2);
+
+				var result3 = {total:0,rows:[]};
+				_.each(data.quests,function(quest){
+					quest.deadtime = quest.deadtime*1000;
+				});
+				result3.rows =data.quests;
+
+				result3.total = data.quests.length;
+				$("#dgQuest").datagrid("loadData",result3);
+			});
+		};
+		$(function(){
+			var guildid = request("guildid");
+			var region = request("region");			
+		
+			$("[name=loadPg]").click(load);
+			if(guildid&&region)
+				{
+					var guildid = $("[name=guildid]").val(guildid);
+					var region = $("[name=region]").val(region);	
+					load();
+				}
+				
+		});
+			function onClickRow(index){
+			if (editIndex != index){
+			    if (endEditingQuest()){
+			        $('#dg').datagrid('selectRow', index)
+			                .datagrid('beginEdit', index);
+			                            editIndex = index;
+			        
+			    } else {
+			        $('#dg').datagrid('selectRow', editIndex);
+			    }
+			}
+			}
+			function endEditing(){
+			if (editIndex == undefined){return true}
+
+			    if ($('#dg').datagrid('validateRow', editIndex)){
+			         $('#dg').datagrid('endEdit', editIndex);
+			        editIndex = undefined;
+			        return true;
+			    } else {
+			        return false;
+			    }
+
+			}			
+			function onEndEdit(index,row,changes){
+			var validated = true;
+			var msg = "";
+
+			}	
+			function request(paras)
+			{ 
+			var url = location.href; 
+			var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+			var paraObj = {} 
+			for (i=0; j=paraString[i]; i++){ 
+			paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+			} 
+			var returnValue = paraObj[paras.toLowerCase()]; 
+			if(typeof(returnValue)=="undefined"){ 
+			return "";
+			}else{ 
+			if(returnValue.indexOf('#')>-1)
+			    returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+			return returnValue;
+			} 
+			}
+			function AcceptPgChanges(){
+			var rows = $("#pg").propertygrid("getRows");
+			var parm = {};
+			for (var i = rows.length - 1; i >= 0; i--) {
+			    if (!isNaN(rows[i].value))
+			        parm[rows[i].name] = rows[i].value;
+			    else if(typeof rows[i].value == "array" || typeof rows[i].value == "object")
+			        parm[rows[i].name] = [];
+			    else
+			        parm[rows[i].name] = rows[i].value;
+			 }
+			
+			var guildid = $("[name=guildid]").val();
+			var region = $("[name=region]").val();
+			parm.edittype=1;
+			parm.guildid = guildid;
+			parm.region = region;
+			// parm.uid = uid;
+			$.post("/guildedit",parm,function(){
+				load();
+				});
+			}
+				function accept(){
+				if (endEditing()){
+				    var rows = $("#dg").datagrid('getChanges');
+				    var validated = true;
+				    var msg = "";
+				    //把rows里的skills技能重置一下
+
+				    if (rows.length>0&&validated) {
+				       // alert(JSON.stringify(rows));
+						var guildid = $("[name=guildid]").val();
+						var region = $("[name=region]").val();				       
+				        $.post("/guildedit",{data:rows,guildid:guildid,region:region,edittype:2},function(){
+				            load();
+				        });
+				        $('#dg').datagrid('acceptChanges');
+				    }else{
+				        //alert(JSON.stringify(rows)+"changes error");
+				    }
+				}
+				}
+				function reject(){
+				$('#dg').datagrid('rejectChanges');
+				editIndex = undefined;
+				}
+				function getChanges(){
+				var rows = $('#dg').datagrid('getChanges');
+				alert("Num:"+rows.length+"\n"+JSON.stringify(rows));
+				} 
+				function append(){
+				// if (endEditing()){
+				//     $('#dg').datagrid('appendRow',{status:'P'});
+				//     editIndex = $('#dg').datagrid('getRows').length-1;
+				//     $('#dg').datagrid('selectRow', editIndex)
+				//             .datagrid('beginEdit', editIndex);
+				// }
+				if(endEditing()){
+				    $("#dg").datagrid('appendRow',{"uid":0});
+				    editIndex = $('#dg').datagrid('getRows').length-1;
+				    $('#dg').datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+				}
+				    // $.post("/addAdventurers",{uid:request("uid")},function(){
+				    //    updatePvPList();
+				    //    });
+				}
+				function deleteGuild(){
+				    var objGuild = $("#dg").datagrid("getSelected");
+				    if (objGuild==null) {
+				            alert("没有选中的冒险者");
+				            return;
+				    };
+				    var indexOfdel = editIndex;
+				    if(endEditing()){
+				        var uid = parseInt(objGuild.uid);
+
+				        if (confirm('删除选中的公会成员？')) {
+							var guildid = $("[name=guildid]").val();
+							var region = $("[name=region]").val();				        	
+				            $.post("/guildedit",{uid:uid,region:region,guildid:guildid,edittype:3},function(){
+				            	$("#dg").datagrid("deleteRow",indexOfdel);
+				                load();
+				            });
+				        };
+				    }
+				}
+				function endEditingQuest(){
+				if (editIndexQuest == undefined){return true}
+
+				    if ($('#dgQuest').datagrid('validateRow', editIndexQuest)){
+				         $('#dgQuest').datagrid('endEdit', editIndexQuest);
+				        editIndexQuest = undefined;
+				        return true;
+				    } else {
+				        return false;
+				    }
+				}
+				function onEndEditQuest(index,row,changes){
+				var validated = true;
+				var msg = "";
+
+				}					
+				function onClickRowQuest(index){
+				if (editIndexQuest != index){
+				    if (endEditingQuest()){
+				        $('#dgQuest').datagrid('selectRow', index)
+				                .datagrid('beginEdit', index);
+				                            editIndexQuest = index;
+				        
+				    } else {
+				        $('#dgQuest').datagrid('selectRow', editIndexQuest);
+				    }
+				}
+				}
+				function formatterDate(val,row)
+				{
+					return (new Date(val)).format();
+				}
+				function appendQuest()
+				{
+						var guildid = $("[name=guildid]").val();
+						var region = $("[name=region]").val();	
+					$.post("/guildedit",{region:region,guildid:guildid,edittype:4},function(data){
+						load();
+					});
+				}
+				function saveQuest()
+				{
+					if (endEditingQuest()){
+					    var rows = $("#dgQuest").datagrid('getChanges');
+					    var validated = true;
+					    var msg = "";
+					    //把rows里的skills技能重置一下
+					    _.each(rows,function(row){
+					    	if(row.finishedonce)
+					    		row.finishedonce = true;
+					    	else
+					    		row.finishedonce = false;
+					    	if(isNaN(row.deadtime))
+					    		row.deadtime = (new Date(row.deadtime))/1000;
+					    	else
+					    		row.deadtime =parseInt(row.deadtime/1000);
+					    	});
+					    if (rows.length>0&&validated) {
+					       // alert(JSON.stringify(rows));
+							var guildid = $("[name=guildid]").val();
+							var region = $("[name=region]").val();				       
+					        $.post("/guildedit",{data:rows,guildid:guildid,region:region,edittype:5},function(){
+					            load();
+					        });
+					        $('#dg').datagrid('acceptChanges');
+					    }else{
+					        //alert(JSON.stringify(rows)+"changes error");
+					    }
+					}
+				}

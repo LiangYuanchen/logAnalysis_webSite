@@ -1,0 +1,16 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Odyssey
+
+block content
+	.container: .jumbotron(style="")
+		if hasPermission
+			form(method="post",action="/odyssey")
+				label 创建机器人数量:
+				input(type="text",name="count",value="")
+				input(type="submit",name="sub",value=submit)

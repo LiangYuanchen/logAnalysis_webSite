@@ -1,0 +1,47 @@
+.pic{
+	width:120px;
+}
+pre{
+	display:inline-block;
+}
+p{
+	padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: #333;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display:inline-block;
+    width:300px;
+}
+.p2{
+    width:120px;
+}
+.del{
+	cursor: pointer;
+}
+.temlateActivity1ByLanguage div{
+	vertical-align: -webkit-baseline-middle;
+	margin:10px;
+}
+.temlateActivity1ByLanguage div span{
+	vertical-align:top;
+}
+.temlateActivity1ByLanguage div a{
+	vertical-align:top;
+}
+.temlateActivity1ByLanguage div input{
+	vertical-align:top;
+}
+.temlateActivity1ByLanguage div textarea{
+	vertical-align:top;
+}
+.language_warp{
+	float: left;
+    margin-left: 200px;
+    margin-top: -100px;
+}

@@ -1,0 +1,1197 @@
+extends ../../layouts/default
+mixin normalActivity2(name)
+	div(id=name)
+		div
+			span 开启
+			input(class="isopen", type="checkbox")
+			div 开始时间
+			input(class="easyui-datetimebox start",style="width:128px,height:32px;")
+			div 结束时间
+			input(class="easyui-datetimebox end",style="width:128px,height:32px;")
+			div weight
+			input(class="easyui-textbox weight",style="width:128px,height:32px;")
+			div(style="clear:both")
+			div(class="language_warp")
+				label 活动语言:
+				&nbsp;
+				input(class="easyui-textbox language",value="")
+				&nbsp;
+				a(class="easyui-linkbutton",iconCls="icon-ok",onclick="addNewLanguageTab(this)") ADD New Tab
+			div(style="clear:both")
+		div(class="easyui-tabs language_tab",style="padding:20px")
+mixin normalActivity(name)
+	input(type="button",onclick="listShow('"+name+"')",value="listShow")
+	div(style="margin:20px 0;position:relative",id=name)
+		div(class="left_warp2",style="float:left;display:none")
+			span 开启
+			input(class="open", type="checkbox")
+			div 开始时间
+			input(class="easyui-datetimebox start",style="width:100%,height:32px")
+			div 关闭时间
+			input(class="easyui-datetimebox end",style="width:100%,height:32px")
+			div 权重
+			input(class="easyui-textbox weight", style="width:100%,height:32px")
+			hr
+			span 活动概述
+			div pic
+			input(class="easyui-textbox pic", style="width:100%,height:32px")
+			div text
+			textarea(class="text", style="width:127px;height:157px;")
+			div language 
+			input(class="easyui-textbox language", style="width:100%,height:32px")
+			div(class="warp_MultiLangNormalAct")
+			hr
+			input(class="MultiLangNormalActs",type="hidden")
+			div(class="header") header
+				//- div language
+				//- input(class="easyui-textbox language", style="width:100%,height:32px")
+				div title
+				textarea(class="title", style="width:127px;height:157px;")
+				div helptext
+				textarea(class="helptext", style="width:127px;height:157px;")
+				div content
+				textarea(class="content", style="width:127px;height:157px;")
+				div(class="warp_MultiLangActivityHeader")
+				input(class="MultiLangActivityHeader",type="hidden")
+			hr
+			div(class="sub") ActivitySub
+				div(class="ActivitySubTemplate",style="display:hidden,position:relative")
+					div typeId
+					input(class="easyui-textbox typeid", style="width:100%,height:32px")
+					div req(逗号相隔)
+					input(class="easyui-textbox req", style="width:100%,height:32px")
+					hr
+					//- div language
+					//- input(class="easyui-textbox language", style="width:100%,height:32px")
+					div content
+					input(class="easyui-textbox content", style="width:100%,height:32px",data-options="multiline:true")
+					input(type="button",onclick="addMultiLangText(this)",value="添加新MultiLangText")
+					div(class="warp_MultiLangText")
+					input(class="MultiLangText",type="hidden")
+					hr
+					div itemId
+					input(class="easyui-textbox itemid", style="width:100%,height:32px")
+					div amount
+					input(class="easyui-textbox amount", style="width:100%,height:32px")
+					input(type="button",onclick="addActivityReward(this)",value="添加新ActivityReward")
+					div(class="warp_ActivityReward")
+					input(class="ActivityReward",type="hidden")
+					hr
+					hr
+
+		div(class="left_warp",style="float:left;")
+			span 开启
+			input(class="open", type="checkbox")
+			div 开始时间
+			input(class="easyui-datetimebox start",style="width:100%,height:32px")
+			div 关闭时间
+			input(class="easyui-datetimebox end",style="width:100%,height:32px")
+			div 权重
+			input(class="easyui-textbox weight", style="width:100%,height:32px")
+			hr
+			span 活动概述
+			div pic
+			input(class="easyui-textbox pic", style="width:100%,height:32px")
+			div text
+			textarea(class="text")
+			div language 
+			input(class="easyui-textbox language", style="width:100%,height:32px")
+			input(type="button",onclick="addMultiLangNormalAct('"+name+"')",value="添加新概述")
+			div(class="warp_MultiLangNormalAct")
+			hr
+			input(class="MultiLangNormalActs",type="hidden")
+			div(class="header") header
+				//- div language
+				//- input(class="easyui-textbox language", style="width:100%,height:32px")
+				div title
+				textarea(class="title")
+				div helptext
+				textarea(class="helptext")
+				div content
+				textarea(class="content")
+				input(type="button",onclick="addMultiLangActivityHeader('"+name+"')",value="添加新header")
+				div(class="warp_MultiLangActivityHeader")
+				input(class="MultiLangActivityHeader",type="hidden")
+			hr
+			div(class="sub") ActivitySub
+				input(type="button",onclick="addActivitySub('"+name+"')",value="添加新ActivitySub")
+		div(style="float:left",class="right_warp")
+			//- table(class="easyui-datagrid warp_list",title="list",style="width:500px;height:auto;",data-options="singleSelect:true,collapsible:true,method:'post',fitColumns:true,view:detailview")
+			//- 	thead
+			//- 		tr
+			//- 			//th(data-options="field:'typeid',width:120 ") typeid
+			//- 			th(data-options="field:'title',width:120 ") title
+			//- 			//- th(data-options="field:'weight',width:120 ") weight
+			//- 			//- th(data-options="field:'helptext',width:120 ") helptext
+			//- 			th(data-options="field:'language',width:120 ") language
+			//- 			//- th(data-options="field:'content',width:120 ") content
+			//- 			//- th(data-options="field:'isopen',width:120 ") isopen
+			//- 			th(data-options="field:'start',width:120 ,formatter:formatDate") start
+			//- 			th(data-options="field:'end',width:120 ,formatter:formatDate ") end
+			//- 			//- th(data-options="field:'pic',width:120") pic
+			//- 			//- th(data-options="field:'text',width:120") text
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Activity
+		div(id="region",style="padding:5px")
+block content
+	span(id="show_message")
+	if hasPermission
+		.container: .jumbotron(style="height:auto")
+			<span>regionId("," 分隔多个):</span>
+			<input type='text' id="regionid" value=""> 
+			<span>regionId排除(","分隔多个):</span>
+			<input type="text" id="excluderegionid" value="">
+			<a href="javascript:void(0)" title="保存" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="edit()">更改</a>
+			<a href="javascript:void(0)" title="清理" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="clearActivity()">清理</a>
+			<a href="javascript:void(0)" title="保存" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="edit(true)">Only Show</a>
+			input(class="easyui-datetimebox",id="todaytime",style="width:100%,height:32px")
+			input(class="easyui-textbox",id="activity",style="width:100%,height:32px")
+			<a href="javascript:void(0)" title="保存" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="editByJson()">edit by json</a>
+			div(style="clear:both")
+			div(style="width:250px;padding:30px 60px;margin:10px,float:left;",title="7日登录",class="easyui-panel")
+				div(style="margin:20px 0;") 
+					span 开启
+					input(id="sevendays_open",type="checkbox")
+			div(style="width:250px;padding:30px 60px;margin:10px,float:left;",title="7日开服活动",class="easyui-panel")
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="sevendaynewact_open",type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox",id="sevendaynewact_start",style="width:100%,height:32px")
+
+			div(style="width:250px;padding:30px 60px",title="绑定Fackbook",class="easyui-panel") 
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="bindfb_open", type="checkbox")
+			div(style="width:250px;padding:30px 60px",title="FollowFacebook",class="easyui-panel") 
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="followfb_open", type="checkbox")
+			div(style="width:250px;padding:30px 60px",title="买宝石送礼品",class="easyui-panel")
+				div(style="margin:20px 0;") 
+					span 开启
+					input(id="accumulatebuygem_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox",id="accumulatebuygem_start",style="width:100%,height:32px")
+					div 结束时间
+					input(class="easyui-datetimebox",id="accumulatebuygem_end",style="width:100%,heigth:32px")
+
+			div(style="width:250px;padding:30px 60px",title="礼品商店",class="easyui-panel")  
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="boxshop_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox",id="boxshop_start",style="width:100%,height:32px")
+					div 关闭时间
+					input(class="easyui-datetimebox",id="boxshop_end",style="width:100%,height:32px")
+					br
+					a(href="store?region=1") 更新商店(购买次数重置)
+			div(style="width:250px;padding:30px 60px",title="关卡活动",class="easyui-panel")   
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="questrw_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox", id="questrw_start",style="width:100%,height:32px")
+					div 关闭时间
+					input(class="easyui-datetimebox", id="questrw_end",style="width:100%,height:32px")
+					br
+					a(href="store?region=1") 更新商店(购买次数重置)
+			div(style="width:250px;padding:30px 60px",title="pvp活动",class="easyui-panel")   
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="pvprw_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox", id="pvprw_start",style="width:100%,height:32px")
+					div 关闭时间
+					input(class="easyui-datetimebox", id="pvprw_end",style="width:100%,height:32px")
+					br
+					a(href="store?region=1") 更新商店(购买次数重置)
+			div(style="width:250px;padding:30px 60px",title="奥德赛活动",class="easyui-panel")   
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="odyessyrw_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox", id="odyessyrw_start",style="width:100%,height:32px")
+					div 关闭时间
+					input(class="easyui-datetimebox", id="odyessyrw_end",style="width:100%,height:32px")
+					br
+					a(href="store?region=1") 更新商店(购买次数重置)
+			div(style="width:250px;padding:30px 60px",title="邮件特殊活动",class="easyui-panel")
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="mailspecial_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox",id="mailspecial_start",style="width:100%,height:32px")
+					div 结束时间
+					input(class="easyui-datetimebox",id="mailspecial_end",style="width:100%,heigth:32px")
+			div(style="clear:both")
+			div(style="width:250px;padding:30px 60px",title="女王闯关",class="easyui-panel")
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="queenquest_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox",id="queenquest_start",style="width:100%,height:32px")
+					div 结束时间
+					input(class="easyui-datetimebox",id="queenquest_end",style="width:100%,heigth:32px")
+			div(style="width:250px;padding:30px 60px",title="女王抽奖",class="easyui-panel")
+				div(style="margin:20px 0;")
+					span 开启
+					input(id="queenlottery_open", type="checkbox")
+					div 开始时间
+					input(class="easyui-datetimebox",id="queenlottery_start",style="width:100%,height:32px")
+					div 结束时间
+					input(class="easyui-datetimebox",id="queenlottery_end",style="width:100%,heigth:32px")
+			div(style="clear:both")
+			dib(id="tt",class="easyui-tabs",style="padding:30px 60px")
+				div(title="折扣商店",style="padding:20px")
+					div(style="width:940px;padding:30px 60px",title="折扣商店",class="easyui-panel")
+						mixin normalActivity("discountshop")
+				div(title="关卡次数活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="关卡次数活动",class="easyui-panel")
+						mixin normalActivity2("questcountrw")
+				div(title="奥德赛次数活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="奥德赛次数活动",class="easyui-panel")
+						mixin normalActivity2("odyesscountrw")
+				div(title="金币花费次数活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="金币花费次数活动",class="easyui-panel")
+						mixin normalActivity2("costcoinrw")
+				div(title="烹饪大赛活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="烹饪大赛活动",class="easyui-panel")
+						mixin normalActivity2("cookracerw")
+				div(title="装备大赛活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="装备大赛活动",class="easyui-panel")
+						mixin normalActivity2("smithracerw")
+				div(title="买金币活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="买金币活动",class="easyui-panel")
+						mixin normalActivity2("buycoinrw")
+				div(title="买体力活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="买体力活动",class="easyui-panel")
+						mixin normalActivity2("buyenergyrw")
+				div(title="花宝石活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="花宝石活动",class="easyui-panel")
+						mixin normalActivity2("costgemrw")
+				div(title="买宝石活动",style="padding:20px;")
+					div(style="width:940px;padding:30px 60px",title="买宝石活动",class="easyui-panel")
+						mixin normalActivity2("buygemrw")
+
+
+
+			div(class="temlateActivity1ByLanguage",style="display:none")
+				div
+					span 活动入口图标:
+					input(class="easyui-textbox pic",style="width:127px")
+					&nbsp;
+					a(class="easyui-linkbutton picadd",onclick="txtadd(this)") >>
+				div
+					span 活动入口文本:
+					input(class="easyui-textbox text",style="width:127px")
+					&nbsp;
+					a(class="easyui-linkbutton textadd",onclick="txtadd(this)") >>
+				hr
+				div
+					span 活动标题:
+					input(class="easyui-textbox title",style="width:127px")
+					&nbsp;
+					a(class="easyui-linkbutton titleadd",onclick="txtadd(this)") >>	
+				div
+					span 活动描述:
+					textarea(class="content", style="width:127px;height:157px;")
+					&nbsp;
+					a(class="easyui-linkbutton contentadd",onclick="txtadd(this)") >>	
+				div
+					span 帮助文本:
+					textarea(class="helptext", style="width:127px;height:157px;")
+					&nbsp;
+					a(class="easyui-linkbutton helptextadd",onclick="txtadd(this)") >>					
+				div
+					span 活动条目:
+					&nbsp;
+					a(class="easyui-linkbutton warpadd",onclick="warpadd(this)") Add New
+
+			div(class="templateActivitySub",style="display:none;position:relative; border: 1px solid #ccc;")
+				a(onclick="txtdel(this)") X
+				div
+					span(class="typeid")
+					textarea(class="content", style="width:127px;height:60px;")
+					label 条件(数量):
+					input(class="easyui-textbox req1",style="width:50px")
+					label 条件(类型):
+					input(class="easyui-textbox req2",style="width:50px")
+					label 物品ID:
+					input(class="easyui-textbox itemid",style="width:50px")
+					label 物品数量:
+					input(class="easyui-textbox amount",style="width:50px")
+				div
+					a(class="easyui-linkbutton contentadd",style="margin-left:55px",onclick="contentadd(this)") ↓↓	
+					a(class="easyui-linkbutton reqadd",style="margin-left:270px",onclick="reqaddAll(this)") ↓↓	
+					a(class="easyui-linkbutton rewardadd",style="margin-left:210px;",onclick="rewardaddAll(this)") ↓↓
+				div
+					div(class="warp_content",style="float:left;width:310px")
+					div(class="warp_req",style="float:left;width:145px")
+					div(class="warp_reward",style="float:left;width:145px")
+				div(style="clear:both;")
+
+
+			div(class="ActivitySubTemplate",style="display:none,position:relative")
+				a(class="delSub",onclick="delActivitySub(this)") 删除ActivitySub
+				div typeId
+				input(class="easyui-textbox typeid", style="width:100%,height:32px")
+				div req(逗号相隔)
+				input(class="easyui-textbox req", style="width:100%,height:32px")
+				hr
+				//- div language
+				//- input(class="easyui-textbox language", style="width:100%,height:32px")
+				//- <textarea style="width:127px;height:157px;" id="text"></textarea>
+
+				div content
+				textarea(class="content")
+				input(type="button",onclick="addMultiLangText(this)",value="添加新MultiLangText")
+				div(class="warp_MultiLangText")
+				input(class="MultiLangText",type="hidden")
+				hr
+				div itemId
+				input(class="easyui-textbox itemid", style="width:100%,height:32px")
+				div amount
+				input(class="easyui-textbox amount", style="width:100%,height:32px")
+				input(type="button",onclick="addActivityReward(this)",value="添加新ActivityReward")
+				div(class="warp_ActivityReward")
+				input(class="ActivityReward",type="hidden")
+				hr
+				hr
+	else 
+		.container: .jumbotron
+			form
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	script(type="text/javascript", src="/js/underscore-min.js")
+	script(type="text/javascript", src="/js/async.min.js")
+	link(rel="stylesheet", type="text/css", href="/css/activity.css")
+	style(type="text/css").
+		.jumbotron p {
+		    margin-bottom: 15px;
+		    font-size: 12px;
+		    font-weight: 200;
+		}
+
+		textarea{
+			width:127px;
+			height:50px;
+		}
+		.warp_MultiLangNormalAct{
+		    position: absolute;
+		    left: 280px;
+		    width:400px;
+		    height:400px;
+		    top: -10px;
+		    overflow:auto;
+		}
+		.warp_MultiLangNormalAct div{
+			float:left;
+		}
+		.warp_MultiLangActivityHeader{
+		    position: absolute;
+		    left: 300px;
+		    width:400px;
+		    top:350px;			
+		    overflow:auto;
+		}
+		.warp_MultiLangActivityHeader div{
+			float:left;
+		}
+
+	script(type="text/javascript").
+		var typeids={
+		"questcountrw":"18",
+		"odyesscountrw":"19",
+		"costcoinrw":"20",
+		"costgemrw":"21",
+		"buyenergyrw":"29",
+		"buycoinrw":"30",
+		"buygemrw":"31",
+		"cookracerw":"33",
+		"smithracerw":"34",
+		"discountshop":"6"
+		};		
+
+		$(".jumbotron").contents(".ActivitySubTemplate").hide();
+		var a = [{typeid:"3434",weight:"32",normalText:[{typeid:"343",weight:"23"},{typeid:"2323",weight:"235"}]},{typeid:"3434",weight:"32",normalText:[{typeid:"343",weight:"23"},{typeid:"2323",weight:"235"}]}];
+
+		$(function(){
+			$(".warp_list").datagrid({
+				 detailFormatter:function(rowIndex,rowData){
+				 	var  results = "<ul>";
+				 	var keys = _.keys(rowData);
+				 	_.each(keys,function(key){
+				 		results += "<li> " + key +":" + rowData[key] + "</li>";
+				 	});
+				 	
+				 	results += "</ul>";
+				 	return results;
+				}
+			});
+			//$("#tt_demo").datagrid("loadData",a);
+		});
+		//- function addnew(strId){
+		//- 	var $base = $("#"+strId+" .left_warp2");
+		//- 	var start = $base.contents(".start").datetimebox("getText"))/1000+"";
+		//- 	var end = $base.contents(".end").datetimebox("getText"))/1000+"";
+		//- 	var weight = $base.contents(".weight").val();
+		//- 	var pic = $base.contents(".pic").val();
+		//- 	var text = $base.contents(".text").val();
+		//- 	var language = $base.contents(".language").val();
+		//- 	var title = $base.contents(".header").contents(".title").val();
+		//- 	var helptext = $base.contents(".header").contents(".helptext").val();
+		//- 	var content = $base.contents(".header").contents(".content").val();
+		//- 	var subcontents_typeid = $base.contents(".sub").contents(".typeid").val();
+		//- 	var subcontents_req = $base.contents(".sub").contents(".req").val();
+		//- 	var subcontents_subtexts =JSON.parse( $base.contents(".sub").contents(".warp_MultiLangText").val());
+		//- 	var subcontents_rewards = JSON.parse($base.contents(".sub").contents(".warp_ActivityReward").val());
+
+		//- 	var $base2 = $("#"+strId+" .left_warp")
+		//- 	$base2.contents(".start").datetimebox("setText",formatDate(start));
+		//- 	$base2.contents(".end").datetimebox("setText",formatDate(end))
+		//- 	$base2.contents(".wight").val(weight);
+		//- 	$base2.contents(".pic").val(pic);
+		//- 	$base2.contents(".text").val(text);
+		//- 	$base2.contents(".language").val(language);
+		//- 	$base2.contents(".header").contents(".title").val(title);
+		//- 	$base2.contents(".header").contents(".helptext").val(helptext);
+		//- 	$base2.contents(".header").contents(".content").val(content);
+		//- 	addMultiLangNormalAct(strId);
+		//- 	addMultiLangActivityHeader(strId);
+
+			
+
+		//- }
+		function delActivitySub(self){
+			$(self).parent().remove();
+		}
+		function listShow(strId){
+			var datas = activity1ToList(strId);
+			datas = {rows:datas,total:datas.length};
+			$("#"+strId+" .right_warp .warp_list").datagrid("loadData",datas);
+		}
+		function activity1ToList(strId){
+			var data_parm = editActivity1(strId);
+			var results=[];
+			if(!data_parm||!data_parm.header)
+			{
+				return results;
+			}
+			_.each(data_parm.header,function(header){
+				var data= {};
+				data.language = header.language;
+				data.title = header.title;
+				data.helptext = header.helptext;
+				data.content = header.content;
+				data.isopen = data_parm.switch.isopen;
+				data.start = data_parm.switch.start;
+				data.end = data_parm.switch.end;
+				if(data_parm.normalactivity)
+				{
+					data.typeid=data_parm.normalactivity.typeid;
+					data.weight = data_parm.normalactivity.weight;
+					if(data_parm.normalactivity.normalacts&&data_parm.normalactivity.normalacts.length>0)
+					{
+						var normalact = _.find(data_parm.normalactivity.normalacts,function(parm){
+							return parm.language = data.language;
+						});
+						if(normalact)
+						{
+							data.pic = normalact.pic;
+							data.text = normalact.text;
+						}
+					}
+				}
+				if(data_parm.subcontents)
+				{
+					data.subcontents = [];
+					_.find(data_parm.subcontents,function(subcontent){
+						var the_subcontent = {};	
+						var subtext = _.find(subcontent.subtext,function(subtext){
+							return subtext.language == data.language;
+						});
+						if(subtext)
+						{
+							the_subcontent.req = subcontent.req;
+							the_subcontent.rewards = subcontent.rewards;
+							the_subcontent.content = subtext.content;
+							data.subcontents.push(the_subcontent);
+						}
+
+					});
+				}
+				results.push(data);
+			});
+			return results;
+		}
+		function loadActivity1(strId,datas)
+		{
+			if(!datas)
+				return;
+			if(datas.normalactivity)
+			{	
+				$("#"+strId+" .left_warp .weight").val(datas.normalactivity.weight);
+				$("#"+strId+" .left_warp .MultiLangNormalActs").val("");
+				if(datas.normalactivity.normalacts)
+				{
+					for(var i=0;i<datas.normalactivity.normalacts.length;i++)
+					{
+						var normalact = datas.normalactivity.normalacts[i];
+						$("#"+strId+" .left_warp .pic").val(normalact.pic);
+						$("#"+strId+" .left_warp").contents(".text").val(normalact.text);
+						$("#"+strId+" .left_warp").contents(".language").val(normalact.language);
+						addMultiLangNormalAct(strId);
+					}				
+				}
+
+				$("#"+strId+" .left_warp .pic").val("");
+				$("#"+strId+" .left_warp").contents(".text").val("");
+				$("#"+strId+" .left_warp").contents(".language").val("");				
+			}
+
+			if(datas.switch)
+			{
+				if(datas.switch.isopen)
+					$("#"+strId+" .left_warp .open").attr("checked","checked");
+				$("#"+strId+" .left_warp .start").datetimebox("setText",formatDate(datas.switch.start));		
+				$("#"+strId+" .left_warp .end").datetimebox("setText",formatDate(datas.switch.end));	
+				$("#"+strId+" .left_warp .header .MultiLangActivityHeader").val("");					
+			}
+				
+
+			if(datas.header)
+			{
+				for(var i=0;i<datas.header.length;i++)
+				{
+					var theHeader = datas.header[i];
+					$("#"+strId+" .left_warp").contents(".language").val(theHeader.language);
+					$("#"+strId+" .left_warp .header").contents(".title").val(theHeader.title);
+					$("#"+strId+" .left_warp .header").contents(".helptext").val(theHeader.helptext);
+					$("#"+strId+" .left_warp .header").contents(".content").val(theHeader.content);
+					addMultiLangActivityHeader(strId);
+				}
+				$("#"+strId+" .left_warp").contents(".language").val("");
+				$("#"+strId+" .left_warp .header").contents(".title").val("");
+				$("#"+strId+" .left_warp .header").contents(".helptext").val("");
+				$("#"+strId+" .left_warp .header").contents(".content").val("");				
+			}
+
+			if(!datas.subcontents)
+			{
+				return;
+			}
+			for(var i=0;i<datas.subcontents.length;i++)
+			{
+				var subcontent = datas.subcontents[i];
+				addActivitySub(strId);
+				$base = $("#"+strId+" .left_warp .sub").contents("div").eq(i);
+				$base.contents(".typeid").val(subcontent.typeid);
+				if(subcontent.subtext)
+				{
+					for(var j=0;j<subcontent.subtext.length;j++)
+					{
+						var subtext = subcontent.subtext[j];
+						
+						$("#"+strId+" .left_warp").contents(".language").val(subtext.language);
+						$base.contents(".content").val(subtext.content);
+						addMultiLangText($base.contents(".typeid").eq(0));
+					}
+					$("#"+strId+" .left_warp").contents(".language").val("");
+					$base.contents(".language").val("");
+					$base.contents(".content").val("");					
+				}
+				if(subcontent.req)
+				{
+					var req = subcontent.req.join(",");
+					$base.contents(".req").val(req);				
+				}
+				if(subcontent.rewards)
+				{
+
+					for(var j=0;j<subcontent.rewards.length;j++)
+					{
+						var reward = subcontent.rewards[j];
+						$base.contents(".itemid").val(reward.itemid);
+						$base.contents(".amount").val(reward.amount);
+						addActivityReward($base.contents(".typeid").eq(0));
+					}
+					$base.contents(".itemid").val("");
+					$base.contents(".amount").val("");				
+				}
+			
+			}
+
+		}
+		function editActivity1(strId)
+		{
+			var normalactivity={};
+			var activityswitch={};
+			var multilanHeader = {};
+			var subcontents = [];
+			var isopen = $("#"+strId + " .left_warp .open:checked").length>0?"true":"false";
+			
+			var start = parseUTC($("#"+strId + " .left_warp .start").datetimebox("getText"))/1000+"";
+			var end = parseUTC($("#"+strId + " .left_warp .end").datetimebox("getText"))/1000+"";
+			var normalActTypeid = typeids[strId];
+			var weight = $("#"+strId + " .left_warp .weight").val();
+
+			normalactivity={switch:{isopen:isopen,start:start,end:end},typeid:normalActTypeid,weight:weight};
+			normalactivity.normalacts=[];
+
+			var normalacts = $("#"+strId + " .left_warp .MultiLangNormalActs").val();
+			if(!normalacts)
+				normalacts=[];
+			else
+				normalacts = JSON.parse(normalacts);
+			normalactivity.normalacts = normalacts;
+
+
+			activityswitch.isopen = isopen;
+			activityswitch.start = start;
+			activityswitch.end = end;
+			multilanHeader =$("#"+strId + " .left_warp .header .MultiLangActivityHeader").val();
+
+			if(!multilanHeader)
+				multilanHeader = [];
+			else
+				multilanHeader = JSON.parse(multilanHeader);
+
+
+			var iLength = $("#"+strId+" .left_warp .sub").contents("div").length;
+			for(var i=0;i<iLength;i++)
+			{
+				var $div= $("#"+strId+" .left_warp .sub").contents("div").eq(i);
+				var subcontent = {};
+				subcontent.typeid = $div.contents(".typeid").val();
+				subcontent.req = [];
+				var arrReq = $div.contents(".req").val().split(",");
+				_.each(arrReq,function(req){
+					if(!isNaN(req))
+						subcontent.req.push(parseInt(req));
+				});
+				var multilantexts = $div.contents(".MultiLangText").val();
+				if(!multilantexts)
+					multilantexts = [];
+				else
+					multilantexts = JSON.parse(multilantexts);
+				subcontent.subtext = multilantexts;
+				var activityreward = $div.contents(".ActivityReward").val();
+				if(!activityreward)
+					activityreward = [];
+				else
+					activityreward = JSON.parse(activityreward);
+				subcontent.rewards = activityreward;
+				subcontents.push(subcontent);
+			}
+			var activity1 = {};
+			if(isopen=="true")
+				activity1.normalactivity = normalactivity;
+			activity1.header = multilanHeader;
+			activity1.switch = activityswitch;
+			activity1.subcontents = subcontents;
+			return activity1;
+		}
+		function delActivityReward(self)
+		{
+			var $base = $(self).parent().parent().parent();
+			var activityreward ={};
+			var strActivityReward = $(self).next("p").attr("value").split("$&");
+			activityreward.itemid = strActivityReward[0];
+			activityreward.amount = strActivityReward[1];
+			var activityrewards = $base.contents(".ActivityReward").val();
+			if(!activityrewards)
+				activityrewards = [];
+			else
+				activityrewards=JSON.parse(activityrewards);
+			var results =[];
+			var hastrue =false;
+			_.each(activityrewards,function(item){
+				if(item.itemid == activityreward.itemid&&item.amount== activityreward.amount&&!hastrue)
+					{
+						hastrue = true;
+						return;
+					}
+				results.push(item);
+			});	
+			$base.contents(".ActivityReward").val(JSON.stringify(results));
+			//- $(self).next("p").remove();
+			//- $(self).remove();
+			$(self).parent().remove();
+		}
+		function addActivityReward(self)
+		{
+			 var $base =$(self).parent();
+			 var itemid = $base.contents(".itemid").val();
+			 var amount = $base.contents(".amount").val();
+			 var activityreward = {itemid:itemid,amount:amount};
+			 $base.contents(".warp_ActivityReward").append($("<div><a  onclick='delActivityReward(this)'>x</a><p value=\""+
+													itemid+"$&"+amount +
+													"\" >" +
+												   "itemid     :" +
+												   itemid+
+												   "<br/>" +
+												   "amount:" +
+												   amount +
+												   "</p></div>"
+			));
+			var activityrewards = $base.contents(".ActivityReward").val();
+			if(!activityrewards)
+				activityrewards = [];
+			else
+				activityrewards=JSON.parse(activityrewards);
+			activityrewards.push(activityreward);
+			$base.contents(".ActivityReward").val(JSON.stringify(activityrewards));
+		}		
+		function delMultiLangText(self)
+		{
+			var $base = $(self).parent().parent().parent();
+			var multilantext ={};
+			var strMultilantext = $(self).next("p").attr("value").split("$&");
+			multilantext.language = strMultilantext[0];
+			multilantext.content = strMultilantext[1];
+			var multilantexts = $base.contents(".MultiLangText").val();
+			if(!multilantexts)
+				multilantexts = [];
+			else
+				multilantexts=JSON.parse(multilantexts);
+			var results =[];
+			var hastrue = false;
+			_.each(multilantexts,function(lantext){
+				if(lantext.language == multilantext.language&&lantext.content== multilantext.content&&!hastrue)
+					{
+						hastrue = true;
+						return;
+					}
+				results.push(lantext);
+			});	
+			$base.contents(".MultiLangText").val(JSON.stringify(results));
+			//- $(self).next("p").remove();
+			//- $(self).remove();
+			$(self).parent().remove();
+		}
+		function addMultiLangText(self)
+		{
+			 var $base =$(self).parent();
+			 //var language = $base.contents(".language").val();
+			 var language = $base.parent().parent().contents(".language").val();
+			 var content = $base.contents(".content").val().replace(/"/g,"");
+			 var multilantext = {language:language,content:content};
+			 $base.contents(".warp_MultiLangText").append($("<div><a  onclick='delMultiLangText(this)'>x</a><p value=\""+
+													language+"$&"+content +
+													"\" >" +
+												   "language     :" +
+												   language+
+												   "<br/>" +
+												   "content:" +
+												   content +
+												   "</p></div>"
+			));
+			var multilantexts = $base.contents(".MultiLangText").val();
+			if(!multilantexts)
+				multilantexts = [];
+			else
+				multilantexts=JSON.parse(multilantexts);
+			multilantexts.push(multilantext);
+			$base.contents(".MultiLangText").val(JSON.stringify(multilantexts));
+		}
+		function addActivitySub(strId)
+		{
+			var $activitySub = $(".jumbotron").contents(".ActivitySubTemplate");
+			
+			$activitySub = $activitySub.clone(true);
+			$activitySub.css("display","block");
+			$("#"+strId+" .left_warp .sub").append($activitySub);
+		}
+		function addMultiLangActivityHeader(strId)
+		{
+			var title = $("#"+strId+" .left_warp .header .title").val();
+			//var language = $("#"+strId+" .left_warp .header .language").val();
+			var language = $("#"+strId+" .left_warp .language").val();
+			var helptext = $("#"+strId+" .left_warp .header .helptext").val().replace(/"/g,"");
+			var content =$("#"+strId+" .left_warp .header .content").val().replace(/"/g,"");
+			var actHeader = {title:title,language:language,helptext:helptext,content:content};
+			$("#"+strId+" .left_warp .header .warp_MultiLangActivityHeader").append("<div><a  onclick='delHeader(\""+strId+"\",this)'>x</a><p value=\""+title+"$&"+language+"$&"+helptext+"$&"+ content +
+													"\" >" +
+												   "title     :" +
+												   title+
+												   "<br/>" +
+												   "language:" +
+												   language +
+													"<br/>" +
+													"helptext   :" +
+													helptext +
+													"<br/>"+
+													"content:"+
+													content+
+												   "</p></div>"
+			);
+			var MultiLangActivityHeader = $("#"+strId+" .left_warp .header .MultiLangActivityHeader").val();
+			if(!MultiLangActivityHeader)
+				MultiLangActivityHeader = [];
+			else
+				MultiLangActivityHeader = JSON.parse(MultiLangActivityHeader);
+			MultiLangActivityHeader.push(actHeader);
+			$("#"+strId+" .left_warp .header .MultiLangActivityHeader").val(JSON.stringify(MultiLangActivityHeader));
+		}
+		function delHeader(strId,self)
+		{
+			var StrHeaderAct = $(self).next("p").attr("value").split("$&");
+			var headerAct={title:StrHeaderAct[0],language:StrHeaderAct[1],helptext:StrHeaderAct[2],content:StrHeaderAct[3]};
+			var MultiLangActivityHeader =  $("#"+strId+" .left_warp .header .MultiLangActivityHeader").val();
+			if(!MultiLangActivityHeader)
+				MultiLangActivityHeader = [];
+			else
+				MultiLangActivityHeader = JSON.parse(MultiLangActivityHeader);
+
+			var results = [];
+			var hastrue = false;
+			_.each(MultiLangActivityHeader,function(act){
+				if(act.title==headerAct.title&&act.language==headerAct.language&&act.helptext==headerAct.helptext&&act.content==headerAct.content&&!hastrue)
+					{
+						hastrue = true;
+						return;
+					}
+				results.push(act);
+			})
+			$("#"+strId+" .left_warp .header .MultiLangActivityHeader").val(JSON.stringify(results));
+			$(self).parent().remove();
+			//- $(self).next("p").remove();
+			//- $(self).remove();
+		}
+		function addMultiLangNormalAct(strId)
+		{
+			var text = $("#"+strId+" .left_warp .text").val().replace(/"/g,"");
+			var pic = $("#"+strId+" .left_warp .pic").val().replace(/"/g,"");
+			var language = $("#"+strId+" .left_warp .language").val().replace(/"/g,"");
+			var normalAct = {text:text,pic:pic,language:language};
+			$("#"+strId + " .left_warp .warp_MultiLangNormalAct").append($("<div><a   onclick='delLang(\""+strId+"\",this)'>x</a><p  value=\""+
+													text+"$&"+pic+"$&"+language +
+													"\" >" +
+												   "pic     :" +
+												   pic+
+												   "<br/>" +
+												   "language:" +
+												   language +
+													"<br/>" +
+													"text   :" +
+													text +
+												   "</p></div>"
+			));
+			
+			var MultiLangNormalActs =  $("#"+strId+" .left_warp .MultiLangNormalActs").val();
+			if(!MultiLangNormalActs)
+				MultiLangNormalActs = [];
+			else
+				MultiLangNormalActs = JSON.parse(MultiLangNormalActs);
+			MultiLangNormalActs.push(normalAct);
+			$("#"+strId+" .left_warp .MultiLangNormalActs").val(JSON.stringify(MultiLangNormalActs));
+		}
+		$(function(){
+			$(".panel").css("float","left").css("margin","10px");
+			$(".language_tab").tabs({
+				onBeforeClose:function(title,index){
+					if(!confirm("确认删除？"))
+					{
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+
+				}
+			});
+
+
+		});
+		function delLang(strId,self){
+			var StrNormalAct = $(self).next("p").attr("value").split("$&");
+			var normalAct={text:StrNormalAct[0],pic:StrNormalAct[1],language:StrNormalAct[2]};
+			var MultiLangNormalActs =  $("#"+strId+" .left_warp .MultiLangNormalActs").val();
+			if(!MultiLangNormalActs)
+				MultiLangNormalActs = [];
+			else
+				MultiLangNormalActs = JSON.parse(MultiLangNormalActs);
+
+			var results = [];
+			var hastrue = false;
+			_.each(MultiLangNormalActs,function(act){
+				if(act.text==normalAct.text&&act.pic==normalAct.pic&&act.language==normalAct.language&&!hastrue)
+					{
+						hastrue = true;
+						return;
+					}
+				results.push(act);
+			})
+			$("#"+strId+" .left_warp .MultiLangNormalActs").val(JSON.stringify(results));
+			//- $(self).next("p").remove();
+			//- $(self).remove();
+			$(self).parent().remove();
+		}
+
+
+
+	if hasPermission
+		script(type="text/javascript").
+			var firstRegionId=0;
+			var lastRegionId=0;
+			$.post("/getregion",null,function(data){
+				var arrStr = data.split(":");
+				if(!arrStr||arrStr.length<2)
+					return;
+				firstRegionId =parseInt( arrStr[0]);
+				lastRegionId =parseInt( arrStr[1]);
+				var divRegion=$("#region");
+				for(var i=firstRegionId;i<lastRegionId+1;i++)
+					{
+						var aregion =$( "<a class='easyui-linkbutton' data-options=\"iconCls:'icon-reload',plain:true\" href='?region="+i+"' >分区"+i+"</a>");
+						divRegion.append(aregion);
+					}
+				});			
+			function request(paras,region)
+			{ 
+			if(!isNaN(region))
+				{
+				return region;
+				}
+			var url = location.href; 
+			var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+			var paraObj = {} 
+			for (i=0; j=paraString[i]; i++){ 
+			paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+			} 
+			var returnValue = paraObj[paras.toLowerCase()]; 
+			if(typeof(returnValue)=="undefined"){ 
+			return "";
+			}else{ 
+			if(returnValue.indexOf('#')>-1)
+			returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+			return returnValue;
+			}
+			}
+			var baseData={};
+			var load = function()
+			{
+				baseData = {};
+				$.post("/commonsettinglist",{region:request("region")},function(data){
+					if(data==""||!data)
+					{
+						alert("分区无活动数据！");
+					}
+					baseData = eval("("+data+")");
+					loadActivityTab("questcountrw",baseData["questcountrw"]);
+					loadActivityTab("odyesscountrw",baseData["odyesscountrw"]);
+					loadActivityTab("costcoinrw",baseData["costcoinrw"]);
+					loadActivityTab("cookracerw",baseData["cookracerw"]);
+					loadActivityTab("smithracerw",baseData["smithracerw"]);
+					loadActivityTab("buycoinrw",baseData["buycoinrw"]);
+					loadActivityTab("buyenergyrw",baseData["buyenergyrw"]);
+					loadActivityTab("costgemrw",baseData["costgemrw"]);
+					loadActivityTab("buygemrw",baseData["buygemrw"]);
+					loadActivity1("discountshop",baseData["discountshop"]);
+					if(baseData["todaytime"])
+						$("#todaytime").datetimebox("setText",formatDate(baseData["todaytime"]));
+					if(baseData["sevendays"]["open"])
+						$("#sevendays_open").attr("checked","checked");
+					if(baseData["sevendaynewact"]&&baseData["sevendaynewact"]["open"])
+						$("#sevendaynewact_open").attr("checked","checked");
+					$("#sevendaynewact_start").datetimebox("setText",formatDate(baseData["sevendaynewact"]["start"]));
+					if(baseData["accumulatebuygem"]["open"])
+						$("#accumulatebuygem_open").attr("checked","checked");
+					$("#accumulatebuygem_start").datetimebox("setText",formatDate(baseData["accumulatebuygem"]["start"]));
+					$("#accumulatebuygem_end").datetimebox("setText",formatDate(baseData["accumulatebuygem"]["end"]));
+					if(baseData["boxshop"]["open"])
+						$("#boxshop_open").attr("checked","checked");
+					$("#boxshop_start").datetimebox("setText",formatDate(baseData["boxshop"]["start"]));
+					$("#boxshop_end").datetimebox("setText",formatDate(baseData["boxshop"]["end"]));
+
+					if(baseData["queenquest"]["open"])
+						$("#queenquest_open").attr("checked","checked");
+					$("#queenquest_start").datetimebox("setText",formatDate(baseData["queenquest"]["start"]));
+					$("#queenquest_end").datetimebox("setText",formatDate(baseData["queenquest"]["end"]));
+
+					if(baseData["queenlottery"]["open"])
+						$("#queenlottery_open").attr("checked","checked");
+					$("#queenlottery_start").datetimebox("setText",formatDate(baseData["queenlottery"]["start"]));
+					$("#queenlottery_end").datetimebox("setText",formatDate(baseData["queenlottery"]["end"]));
+
+					if(baseData["bindfb"]["open"])
+						$("#bindfb_open").attr("checked","checked");
+					if(baseData["followfb"]["open"])
+						$("#followfb_open").attr("checked","checked");
+
+					if(baseData["questrw"]["open"])
+						$("#questrw_open").attr("checked","checked");
+					$("#questrw_start").datetimebox("setText", formatDate(baseData["questrw"]["start"]));
+					$("#questrw_end").datetimebox("setText", formatDate(baseData["questrw"]["end"]));
+
+					if(baseData["pvprw"]["open"])
+						$("#pvprw_open").attr("checked","checked");
+					$("#pvprw_start").datetimebox("setText", formatDate(baseData["pvprw"]["start"]));
+					$("#pvprw_end").datetimebox("setText", formatDate(baseData["pvprw"]["end"]));
+
+					if(baseData["odyessyrw"]["open"])
+						$("#odyessyrw_open").attr("checked","checked");
+					$("#odyessyrw_start").datetimebox("setText", formatDate(baseData["odyessyrw"]["start"]));
+					$("#odyessyrw_end").datetimebox("setText", formatDate(baseData["odyessyrw"]["end"]));
+
+					if (baseData["mailspecial"])
+					{
+						$("#mailspecial_start").datetimebox("setText", formatDate(baseData["mailspecial"]["start"]));
+						$("#mailspecial_end").datetimebox("setText", formatDate(baseData["mailspecial"]["end"]));					
+						if(baseData["mailspecial"]["open"])
+							$("#mailspecial_open").attr("checked", "checked");
+					}
+				});
+			}
+			load();
+			var editByJson = function(){
+				var json = $("#activity").val();
+				$.post("/commonsettingedit",{data:JSON.parse(json)},function(){
+					alert("修改结束");
+					//load();
+				});						
+			}
+			var getRegion = function(){
+				var result = [];
+				var regionid = $("#regionid").val();
+				if(regionid==="0")
+					return "0";
+				var excluderegionid = $("#excluderegionid").val();
+				var arrRegionid = regionid.split(",");
+				var arrexcluderegionid = excluderegionid.split(",");
+
+				if(regionid.length>0)
+				{
+					for(var i=firstRegionId;i<lastRegionId+1;i++)
+					{
+						if(_.contains(arrRegionid,i+"")&&!_.contains(arrexcluderegionid,i+""))
+							result.push(i);
+					}
+				}
+				else{
+					for(var i=firstRegionId;i<lastRegionId+1;i++)
+					{
+						if(!_.contains(arrexcluderegionid,i+""))
+							result.push(i);
+					}
+				}
+				return result.join(",");
+			}
+			var edit = function(onlyShow)
+			{
+				var theData={};
+				theData["sevendays"]={};
+				theData["sevendaynewact"]={};
+				theData["accumulatebuygem"] = {};
+				theData["boxshop"] = {};
+				theData["discountshop"] = editActivity1("discountshop");
+				theData["bindfb"] = {};
+				theData["followfb"] = {};
+				theData["questrw"] ={};
+				theData["pvprw"] = {};
+				theData["odyessyrw"] = {};
+				theData["queenlottery"] = {};
+				theData["queenquest"] = {};
+				theData["questcountrw"] = editActivityTab("questcountrw");
+				theData["odyesscountrw"] = editActivityTab("odyesscountrw");
+				theData["costcoinrw"] = editActivityTab("costcoinrw");
+				theData["cookracerw"] = editActivityTab("cookracerw");
+				theData["smithracerw"] = editActivityTab("smithracerw");
+				theData["buycoinrw"] = editActivityTab("buycoinrw");
+				theData["buyenergyrw"] = editActivityTab("buyenergyrw");
+				theData["costgemrw"] = editActivityTab("costgemrw");
+				theData["buygemrw"] = editActivityTab("buygemrw");
+				theData["mailspecial"] = {};
+				var regionid = getRegion();
+				if(regionid.length>0)
+					theData["regionid"] = regionid.replace(/,/g,':');
+				else
+					theData["regionid"] = request("region") || 0;
+				if(theData["regionid"]==0)
+				{
+					if(!confirm("确定要更新所有分区的活动么?"))
+					{
+						return;
+					}
+				}
+				else
+				{
+					if(!confirm("确定要更新/查看 分区\n"+theData["regionid"]))
+					{
+						return;
+					}
+				}
+
+				var todaytime = $("#todaytime").datetimebox("getText");
+				if(todaytime.length>0)
+					theData["todaytime"] = parseInt( parseUTC(todaytime))/1000 + "";
+				theData["sevendays"].open = ($("#sevendays_open:checked").length>0?true:false + "").toString();
+				theData["sevendaynewact"].open = ($("#sevendaynewact_open:checked").length>0?true:false + "").toString();
+				theData["sevendaynewact"].start =  parseInt( parseUTC($("#sevendaynewact_start").datetimebox("getText")))/1000 + "";
+
+				theData["accumulatebuygem"].open = ($("#accumulatebuygem_open:checked").length>0?true:false + "").toString();
+				theData["accumulatebuygem"].start =  parseInt( parseUTC($("#accumulatebuygem_start").datetimebox("getText")))/1000 + "";
+				theData["accumulatebuygem"].end = parseInt( parseUTC($("#accumulatebuygem_end").datetimebox("getText")))/1000 + "";
+
+				theData["boxshop"].open = ($("#boxshop_open:checked").length>0?true:false + "").toString();
+				theData["boxshop"].start = parseInt(parseUTC( $("#boxshop_start").datetimebox("getText")))/1000 + "";
+				theData["boxshop"].end = parseInt(parseUTC( $("#boxshop_end").datetimebox("getText")))/1000 + "";
+
+				theData["queenquest"].open = ($("#queenquest_open:checked").length>0?true:false + "").toString();
+				theData["queenquest"].start = parseInt(parseUTC( $("#queenquest_start").datetimebox("getText")))/1000 + "";
+				theData["queenquest"].end = parseInt(parseUTC( $("#queenquest_end").datetimebox("getText")))/1000 + "";
+
+				theData["queenlottery"].open = ($("#queenlottery_open:checked").length>0?true:false + "").toString();
+				theData["queenlottery"].start = parseInt(parseUTC( $("#queenlottery_start").datetimebox("getText")))/1000 + "";
+				theData["queenlottery"].end = parseInt(parseUTC( $("#queenlottery_end").datetimebox("getText")))/1000 + "";				
+
+
+				theData["bindfb"].open = ($("#bindfb_open:checked").length>0?true:false + "").toString();
+				theData["followfb"].open = ($("#followfb_open:checked").length>0?true:false + "").toString();
+
+				theData["questrw"].open = ($("#questrw_open:checked").length>0?true:false + "").toString();
+				theData["questrw"].start = parseInt(parseUTC($("#questrw_start").datetimebox("getText")))/1000 + "";
+				theData["questrw"].end = parseInt(parseUTC($("#questrw_end").datetimebox("getText")))/1000 + "";
+
+				theData["pvprw"].open = ($("#pvprw_open:checked").length>0?true:false + "").toString();	
+				theData["pvprw"].start = parseInt(parseUTC($("#pvprw_start").datetimebox("getText")))/1000 + "";
+				theData["pvprw"].end = parseInt(parseUTC($("#pvprw_end").datetimebox("getText")))/1000 + "";				
+				theData["odyessyrw"].open = ($("#odyessyrw_open:checked").length>0?true:false + "").toString();
+				theData["odyessyrw"].start = parseInt(parseUTC($("#odyessyrw_start").datetimebox("getText")))/1000 + "";
+				theData["odyessyrw"].end = parseInt(parseUTC($("#odyessyrw_end").datetimebox("getText")))/1000 + "";
+
+				theData["mailspecial"].open = ($("#mailspecial_open:checked").length > 0 ? true : false + "").toString();
+				theData["mailspecial"].start = parseInt(parseUTC($("#mailspecial_start").datetimebox("getText"))) / 1000 + "";
+				theData["mailspecial"].end = parseInt(parseUTC($("#mailspecial_end").datetimebox("getText"))) / 1000 + "";
+				
+				if(onlyShow)
+				{
+					$("#show_message").text(JSON.stringify(theData));
+				}
+				else
+				{
+					$.post("/commonsettingedit",{data:theData},function(){
+						alert("修改结束");
+						//load();
+					});			
+				}
+			}
+			var clearActivity = function()
+			{
+				$.post("/commonsettingclear",{},function(){
+					load();
+				})
+			}
+	else 
+		script(type="text/javascript").
+	script(type="text/javascript", src="/js/activity.js")
+
+

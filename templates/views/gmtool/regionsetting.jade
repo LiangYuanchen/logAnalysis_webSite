@@ -1,0 +1,54 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - RegionSetting
+
+block content
+	.container: .jumbotron(style="")
+		if hasPermission
+			<a href="javascript:void(0)" title="保存" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="edit()">更改</a>		
+			div(style="width:250px;padding:30px 60px;margin:10px,float:left;",class="easyui-panel",title="LastRegion")
+				input(id="lastregion",name="lastregion",class="easyui-numberbox",style="width:100%,height:32px")
+			br
+			div(style="width:250px;padding:30px 60px;margin:10px,float:left;",class="easyui-panel",title="NewRegions")
+				input(id="newregions",name="newregions",class="easyui-textbox",style="width:100%,height:32px")
+			br
+			div(style="width:250px;padding:30px 60px;margin:10px,float:left;",class="easyui-panel",title="HotRegions")
+				input(id="hotregions",name="hotregions",class="easyui-textbox",style="width:100%,height:32px")
+			br
+			div(style="width:250px;padding:30px 60px;margin:10px,float:left;",class="easyui-panel",title="CloseRegions")
+				input(id="closeregions",name="closeregions",class="easyui-textbox",style="width:100%,height:32px")
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript").
+		function load(){
+			$.post("/regionsettinglist",{},function(data){
+				if(!data)
+					return;
+				if(typeof data == "string"&&data)
+					data = eval("(" + data + ")");
+				$("#lastregion").val(data.lastregion);
+				$("#newregions").val(data.newregions);
+				$("#hotregions").val(data.hotregions);
+				$("#closeregions").val(data.closeregions);
+			});
+		}
+		function edit(onlyShow)
+		{
+			var data = {};
+			data.lastregion = $("#lastregion").val();
+			data.newregions = $("#newregions").val();
+			data.hotregions = $("#hotregions").val();
+			data.closeregions = $("#closeregions").val();
+			
+			$.post("/regionsettingedit",{data:data},function(data){
+				load();
+			});
+		}
+		$(function(){
+			load();
+		});

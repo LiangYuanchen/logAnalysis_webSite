@@ -1,0 +1,153 @@
+extends ../../layouts/default
+
+block intro
+	.container
+		h1 GMTool
+		
+block content
+	if hasPermission
+		.container: .jumbotron.
+			<form method=post action="/login">
+				<h2>User Edit</h2>
+				<input type="text" name=username value="" >
+				<select name=isfacebook onchange="changeAction(this)">
+					<option value="0">Device</option>
+					<option value="1">Facebook</option>
+					<option value="2">UID</option>
+				</select>
+				<span id="wrap_region">分区：<input type="reg" name=reg value="1"/></span>
+				<input type=submit name=sub value=submit>
+			</form>
+			<!-- <a target="_half" href="/contractPvPRecode.html" >PVP评分对比</a> - -->
+			<a target="_half" href="/gmtool/pvprank">pvp联赛表单(仅用于重置，导出)</a> -
+			<a target="_half" href="/gmtool/store?region=1">商店相关</a> -
+			<a target="_half" href="/gmtool/mail">邮件相关</a> -
+			<a target="_half" href="/gmtool/odyssey">奥德赛相关</a> -
+			<a target="_half" href="/gmtool/dailyreward?region=1">日常奖励</a> -
+			<a target="_half" href="/gmtool/datetime">时间时区相关</a> -
+			<a target="_half" href="/gmtool/chat">聊天相关</a> -
+			<a target="_half" href="/gmtool/guild">公会</a> -
+			<a target="_half" href="/gmtool/activity">活动</a> - 
+			<a target="_half" href="/gmtool/newsletter">公告</a> - 
+			<a target="_half" href="/gmtool/leavemsg">评价</a> - 
+			<a target="_half" href="/gmtool/regionsetting">Region</a> -
+			<a target="_half" href="/gmtool/summonlegend">传奇招募设置</a>
+			<br/>
+			<a target="_blank" href="http://101.200.171.121:3000/">Dev服务器InnSite连接</a> <br/>
+			<a target="_blank" href="http://121.42.29.122:3000/">QA服务器InnSite连接</a>  <br/>
+			<a target="_blank" href="http://52.91.25.144:3000/">PreLive服务器InnSite连接</a> <br/>
+			<a target="_blank" href="http://52.76.120.167:3000/">东南亚服务器InnSite连接</a> <br/>
+			<a target="_blank" href="http://52.58.42.85:3000/">欧洲服务器InnSite连接</a>
+			<h3>Version control <span style="color:red;font:12px" title=",1表示client version ,2表示data version" id="version_show_warp"></span></h3>
+			<form method=post action="/upclientversion" onsubmit="return submitIt('client version:' +$(this).children('[name=version]').val())" >
+				<span>current client version:</span>&nbsp;<span id="cv"></span>
+				<br/>
+				<input type="text" name=version value="" >
+				<input type="hidden" name="version_type" value="1">
+				<input type=submit name=sub value=submit>
+			</form>
+			<form method=post action="/upclientversion" onsubmit="return submitIt('data version:'+$(this).children('[name=version]').val())" >
+				<span>current data version:</span>&nbsp;<span id="dv"></span>
+				<br/>
+				<input type="text" name=version value="">
+				<input type="hidden" name="version_type" value="2"> 
+				<input type=submit name=sub value=submit>
+			</form>
+			<form method=post action="/upclientversion" onsubmit="return submitIt('ios_check_version:'+$(this).children('[name=version]').val())">
+				<span>current ios_check_version:</span>&nbsp;<span id="iv"></span>
+				<br/>
+				<input type="text" name=version value="">
+				<input type="hidden" name="version_type" value="3"> 
+				<input type=submit name=sub value=submit>
+			</form>
+			<div>
+				<span>google play version:</span><br/><span id="cv2"></span>
+			</div>	
+			<!--<a href="javascript:void(0)" title="ClearFaceBookBind" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="unlockBindFaceBook()">ClearBindFaceBook</a>-->
+			<a href="javascript:void(0)" title="ReloadConfig" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="reloadConfig()">ReloadConfig</a>			
+			<script type="text/javascript" src="jquery.min.js"></script>
+			<script>
+			function submitIt(msg){
+				if(confirm("确定操作?"+"\n"+msg))
+				{
+						return true;
+				}
+				else
+					return false;
+			}
+			$.post("/getclientversion",{},function(data){
+			 	var arrData = data.split(",");
+			 	var cv = arrData[0].replace(/:/g,",") || "null";
+			 	var dv = arrData[1].replace(/:/g,",")|| "null";
+			 	var iv = arrData[2].replace(/:/g,",")|| "null";
+			 	$("#cv").text(cv);
+			 	$("#dv").text(dv);
+			 	$("#iv").text(iv);
+			});
+			// $.post("/client_version",{},function(data){
+			//  	$("#cv2").text(data);
+			// });
+			$.post("/timenow",{});
+			</script>
+	else
+		.container: .jumbotron.
+			<form method=post action="/login">
+				<h2>User Edit</h2>
+				<input type="text" name=username value="" >
+				<select name=isfacebook onchange="changeAction(this)">
+					<option value="0">Device</option>
+					<option value="1">Facebook</option>
+					<option value="2">UID</option>
+				</select>
+				<span id="wrap_region">分区：<input type="reg" name=reg value="1"/></span>
+				<input type=submit name=sub value=submit>
+			</form>
+			<!-- <a target="_half" href="/contractPvPRecode.html" >PVP评分对比</a> - -->
+			<a target="_half" href="/gmtool/mail">邮件相关</a> -
+			<a target="_half" href="/gmtool/chat">聊天</a> -
+			<a target="_half" href="/gmtool/guild">公会</a> -
+			<a target="_half" href="/gmtool/activity">活动</a> - 
+			<a target="_half" href="/gmtool/newsletter">公告</a> - 
+			<a target="_half" href="/gmtool/leavemsg">评价</a> - 
+			<a target="_half" href="/gmtool/regionsetting">Region</a>
+			
+			
+
+
+block js
+	script(type="text/javascript").
+		var parm_type =!{JSON.stringify(parm_type)};
+		var parm_name =!{JSON.stringify(parm_name)};
+		var version_show_warp_text = "";
+		if(parm_name&&parm_type)
+			version_show_warp_text = "("+parm_type + " " + parm_name+")";
+		$("#version_show_warp").text(version_show_warp_text);
+		function unlockBindFaceBook(){
+			$.post("/clearfb",{},function(data){
+				alert("finish");
+			});
+		}
+		function reloadConfig(){
+			if(confirm("重置GameConfig,继续?"))
+			{
+				$.post("/reloadconfig",{},function(data){
+					alert("finish");
+				});			
+			}
+		}
+		function changeAction(self){
+			if(self.value=="2")
+			{
+				$("#wrap_region").hide();
+				$(document.forms).attr("action","/gmtool/index");
+				$(document.forms).attr("method","get");
+				$("[type='text']").eq(0).attr("name","uid");
+			}
+			else
+			{
+				$("#wrap_region").show();
+				$(document.forms).attr("action","/login");
+				$(document.forms).attr("method","post");
+				$("[type='text']").eq(0).attr("name","username");
+			}
+		}

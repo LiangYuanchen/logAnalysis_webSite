@@ -1,0 +1,281 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - DailyReward
+	include ../../layouts/warp_region
+block content
+	if hasPermission
+		.container: .jumbotron(style="").
+					<div style="float:left;width:250px;margin-right:20px" >
+						  <div class="easyui-panel" title="修改" style="width:250px;padding:30px 60px" >
+						  <form method="post" action="/mailadd" >
+								<div style="margin:20px 0;" >
+									 <div>ItemID:</div>
+									 <input class="easyui-numberbox" id="itemid" data-options="" style="width:100%,height:32px"/>
+								</div>
+								<div style="margin:20px 0;" >
+									 <div>Amount:</div>
+									 <input class="easyui-numberbox" id="amount" data-options="" style="width:100%,height:32px"/>
+								</div>
+								<div style="margin:20px 0;" >
+									 <div>Month:</div>
+									 <input class="easyui-numberbox" id="month" data-options="" style="width:100%,height:32px"/>
+								</div>
+								<div style="margin:20px 0;" >
+									 <div>day:</div>
+									 <input class="easyui-numberbox" id="day" data-options="" style="width:100%,height:32px"/>
+								</div>
+								<div style="margin:20px 0;" >
+									 <a href="#" onclick="edit()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Edit</a>
+								</div>
+								<div style="margin:20px 0;" >
+									 <a href="#" onclick="del()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Delete</a>
+								</div>
+								<div style="margin:20px 0;" >
+									 <a href="#" onclick="clr()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">ClearAll</a>
+								</div>
+						  </form>
+						  </div>
+					 </div>
+					 <div class="easyui-calendar" id="cal" style="width:750px;height:650px;float:left;" data-options="formatter:formatDay,onSelect:selectedDate"></div>
+					 <div style="clear:both" ></div>
+	else
+		.container: .jumbotron(style="")
+			div(class="easyui-calendar",id="cal",style="width:750px;height:650px;float:left;",data-options="formatter:formatDay,onSelect:selectedDate")
+			div(style="clear:both")
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+
+	if hasPermission
+		script(type="text/javascript").
+			  var currentData = [];
+			  var baseData = [];
+				function request(paras)
+				{ 
+					var url = location.href; 
+					var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+					var paraObj = {} 
+					for (i=0; j=paraString[i]; i++){ 
+					paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+					} 
+					var returnValue = paraObj[paras.toLowerCase()]; 
+					if(typeof(returnValue)=="undefined"){ 
+					return "";
+					}else{ 
+					if(returnValue.indexOf('#')>-1)
+					returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+					return returnValue;
+					} 
+				}				  
+			  function refresh()
+			  {
+				  $.ajax({
+					type:"post",
+					url:"/dailyrwlist",
+					dataType:"json",
+					data:{region:request("region")},					
+					async:false,
+					success:function(data){
+						 currentData = data;			
+					 }
+
+					});			
+				 
+			  }
+			  function baserefresh(){
+				  $.ajax({
+					type:"post",
+					url:"/dailyrwbaselist",
+					dataType:"json",
+					async:false,
+					success:function(data){
+						 baseData = data;			
+					 }
+
+					});					  
+			  }
+			  refresh();
+			  baserefresh();
+			  function getDataByDate(date)
+			  {
+					for(var i=0;i<currentData.total;i++){
+						 var parm = currentData.rows[i];
+						 if(parm.day == date.getDate()&& parm.month == date.getMonth()+1){
+							  return parm;
+						 }
+					}
+					for(var i=0;i<baseData.length;i++){
+						var parm = baseData[i];
+						if(parm.day == date.getDate()&& parm.month == date.getMonth()+1){
+							return parm;
+						}
+					}
+					//return {itemid:34343,amount:34343};
+					return null;
+			  }
+			  function edit(){
+					var parm={};
+					parm.itemid=$("#itemid").val();
+					parm.amount=$("#amount").val();
+					parm.day=$("#day").val();
+					parm.month=$("#month").val();
+					parm.region = request("region");
+					$.post("/dailyrwedit",parm,function(data){
+						 refresh();
+						 $("#cal").calendar();
+					});
+			  }
+			  function del(){
+					var parm={};
+					parm.day=$("#day").val();
+					parm.month=$("#month").val();
+					parm.region = request("region");
+					$.post("/dailyrwdelete",parm,function(data){
+						 alert("删除成功");
+						 refresh();
+						 $("#cal").calendar();
+					});			 
+			  }
+			  function clr(){
+					if(confirm("将要清空全部DailyReward,是否继续"))
+					{
+						var parm = {};
+						parm.region = request("region");
+					  $.post("/dailyrwclear",parm,function(data){
+						 alert("Clear成功");
+						 refresh();
+						 $("#cal").calendar();
+					});					 
+					}
+			  }
+			 function selectedDate(date){
+					//alert("month:"+(date.getMonth()+1)+",day:"+date.getDate());
+					$("#month").val(date.getMonth()+1);
+					$("#day").val(date.getDate());
+					var parm = getDataByDate(date);
+					if(parm)
+					{
+						 $("#itemid").val(parm.itemid);
+						 $("#amount").val(parm.amount);
+					}
+					else{
+						 $("#itemid").val("");
+						 $("#amount").val("");					
+					}
+			  }
+			  function formatDay(date){
+					var m = date.getMonth()+1;
+					var d = date.getDate();
+					var data = getDataByDate(date);
+
+
+
+					var opts = $(this).calendar('options');
+					if(data==null)
+						 return d;
+					else 
+						  return '<div class="icon-search md">' + d + 
+					 '</div>'+'<div class="bd" >'+data.itemid +"<br/>"+data.amount+'</div>';
+			  }
+	else
+		script(type="text/javascript").
+			  var currentData = [];
+			  var baseData = [];
+				function request(paras)
+				{ 
+				var url = location.href; 
+				var paraString = url.substring(url.indexOf("?")+1,url.length).split("&"); 
+				var paraObj = {} 
+				for (i=0; j=paraString[i]; i++){ 
+				paraObj[j.substring(0,j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=")+1,j.length); 
+				} 
+				var returnValue = paraObj[paras.toLowerCase()]; 
+				if(typeof(returnValue)=="undefined"){ 
+				return "";
+				}else{ 
+				if(returnValue.indexOf('#')>-1)
+				returnValue = returnValue.substring(0,returnValue.indexOf('#'));
+				return returnValue;
+				} 
+				}				  
+			  function refresh()
+			  {
+				  $.ajax({
+					type:"post",
+					url:"/dailyrwlist",
+					dataType:"json",
+					data:{region:request("region")},
+					async:false,
+					success:function(data){
+						 currentData = data;			
+					 }
+
+					});			
+				 
+			  }
+			  function baserefresh(){
+				  $.ajax({
+					type:"post",
+					url:"/dailyrwbaselist",
+					dataType:"json",
+					async:false,
+					success:function(data){
+						 baseData = data;			
+					 }
+
+					});					  
+			  }
+			  refresh();
+			  baserefresh();
+			  function getDataByDate(date)
+			  {
+					for(var i=0;i<currentData.total;i++){
+						 var parm = currentData.rows[i];
+						 if(parm.day == date.getDate()&& parm.month == date.getMonth()+1){
+							  return parm;
+						 }
+					}
+					for(var i=0;i<baseData.length;i++){
+						var parm = baseData[i];
+						if(parm.day == date.getDate()&& parm.month == date.getMonth()+1){
+							return parm;
+						}
+					}
+					//return {itemid:34343,amount:34343};
+					return null;
+			  }
+
+			 function selectedDate(date){
+					//alert("month:"+(date.getMonth()+1)+",day:"+date.getDate());
+					$("#month").val(date.getMonth()+1);
+					$("#day").val(date.getDate());
+					var parm = getDataByDate(date);
+					if(parm)
+					{
+						 $("#itemid").val(parm.itemid);
+						 $("#amount").val(parm.amount);
+					}
+					else{
+						 $("#itemid").val("");
+						 $("#amount").val("");					
+					}
+			  }
+			  function formatDay(date){
+					var m = date.getMonth()+1;
+					var d = date.getDate();
+					var data = getDataByDate(date);
+
+
+
+					var opts = $(this).calendar('options');
+					if(data==null)
+						 return d;
+					else 
+						  return '<div class="icon-search md">' + d + 
+					 '</div>'+'<div class="bd" >'+data.itemid +"<br/>"+data.amount+'</div>';
+			  }

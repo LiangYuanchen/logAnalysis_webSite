@@ -1,0 +1,16 @@
+extends /layouts/default
+
+block body-contents
+	h1 Hi~ *|first_name|*
+	p.text-larger 无尽酒馆 #{brand}:
+		p.text-larger 总用户
+				| <strong style="color:#{data.proportion.users.text}" > #{data.daily.users}</strong> (#{data.yestD.users})
+		p.text-larger 活跃用户 
+				| <strong style="color:#{data.proportion.activeUsers.text}">#{data.daily.activeUsers}</strong> (#{data.yestD.activeUsers})
+		p.text-larger 新用户 
+				| <strong style="color:#{data.proportion.newUsers.text}">#{data.daily.newUsers}</strong> (#{data.yestD.newUsers})
+		p.text-larger 一日留存
+				| <strong style="color:#{data.proportion.daysLeft.text}">#{data.daily.daysLeft} </strong> (#{data.yestD.daysLeft})
+	p.text-muted Sent #{data.daily.date}
+	p &nbsp;
+	+button({ url: '#{data.daily.url}' , label: 'Open innSite' })

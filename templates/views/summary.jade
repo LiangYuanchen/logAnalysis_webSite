@@ -1,0 +1,83 @@
+extends ../layouts/default
+
+block head
+	link(rel="stylesheet", type="text/css", href="easyui/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="easyui/themes/icon.css")
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+block content
+	.container: .jumbotron
+		if onSummaryRetention
+			span(style="color:red") #{new Date(onSummaryRetention*1000).toDateString()} 数据整理中……
+		form(method='get')
+			include ../layouts/country
+			include ../layouts/region
+			input(type="submit",value="Search",name="sub")
+			label(id="lastlogdate")
+		table(style="min-width:700px",id="dg",title="Summary",data-options="rownumbers:true,singleSelect:true,pagination:true,pageSize:50,toolbar:toolbar")
+			thead
+				tr
+					th(data-options="field:'firstDate',width:120,sortable:true,order:'desc',formatter:formatterDate") 日期
+					th(data-options="field:'Revenue',width:100,sortable:true,order:'desc',formatter:formatterDigital") Revenue
+					//- th(data-options="field:'userRegTime',width:100") 注册时间
+					th(data-options="field:'DAU',width:80,sortable:true,order:'desc',formatter:formatterDigital") DAU
+					th(data-options="field:'DNU',width:80,sortable:true,order:'desc',formatter:formatterDigital") DNU
+					th(data-options="field:'EDAU',width:80,sortable:true,order:'desc',formatter:formatterDigital") EDAU
+					th(data-options="field:'ARPU',width:80,sortable:true,order:'desc',formatter:formatterDigital") ARPU
+					th(data-options="field:'ARPPU',width:150,sortable:true,order:'desc',formatter:formatterDigital") ARPPU
+					th(data-options="field:'PaidMan',width:60,sortable:true,order:'desc',formatter:formatterDigital") 付费人数
+					th(data-options="field:'PaidPercentage',width:60,sortable:true,order:'desc',formatter:formatterPercent") 付费率
+					th(data-options="field:'LTV7',width:60,sortable:true,order:'desc',formatter:formatterDigital") 7日LTV
+					th(data-options="field:'LTV15',width:120,sortable:true,order:'desc',formatter:formatterDigital") 15日LTV
+					th(data-options="field:'LTV30',width:120,sortable:true,order:'desc',formatter:formatterDigital") 30日LTV
+					th(data-options="field:'LTV60',width:120,sortable:true,order:'desc',formatter:formatterDigital") 60日LTV
+					th(data-options="field:'LTV90',width:120,sortable:true,order:'desc',formatter:formatterDigital") 90日LTV
+block js
+		script(type="text/javascript", src="/js/highcharts.js")
+		script(type="text/javascript", src="/js/exporting.js")
+		script(type='text/javascript').
+			var isload = false;	
+
+			function formatterDate(val,row){
+				var date ;
+				if(!isNaN(val)){
+					 date = (new Date(val*1000));
+					 return date.format("yyyy-MM-dd");
+				}
+				else 
+					 return "";
+			}
+				var toolbar = [
+					{
+				            text:'Refresh',
+				            iconCls:'icon-reload',
+				            handler:loadNewData
+				    }
+			    ];
+				function loadNewData(){
+					//- $.post("/handle",{actions:"getSummary"},function(data){
+					//- 	$('#dg').datagrid().datagrid('reload');
+					//- 	});
+				}
+			function formatterPercent(val,row){
+				var result = parseFloat(val)*100;
+				if((result-parseInt(result))>0)
+					result = result.toFixed(2);
+				return result+"%";
+			}
+			function formatterDigital(val,row){
+				var result = parseFloat(val);
+				if((result-parseInt(result))>0)
+					result = result.toFixed(2);
+				return result;
+			}
+			$(function(){
+				var region = $('#region').combo('getValue');
+				$("#dg").datagrid({queryParams:{country:$("#country").val(),region:region},
+						url:'/summary'
+				});
+				//var pager = $('#dg').datagrid().datagrid('getPager');
+				$.post("/handle",{actions:"lastlogdateSummary"},function(data){
+					$("#lastlogdate").text(data);
+				});
+			});
+

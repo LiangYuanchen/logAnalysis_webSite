@@ -1,0 +1,130 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Date
+
+block content
+	if hasPermission
+		.container: .jumbotron(style="").
+			 <h2>服务器时间:<span id="servertime" >XXX</span></h2>
+				  <div class="easyui-panel" title="客户端时间修改" style="width:250px;padding:30px 60px" >
+				  <form method="post" action="/clientdate" >
+						<div style="margin:20px 0;" >
+							 <div>客户端时间:</div>
+							 <div id="clienttime" >xxx</div>
+						</div>
+					  
+						<div style="margin:20px 0;" >
+							 <div>UID:</div>
+							 <input class="easyui-numberbox" id="uid" data-options="" style="width:100%,height:32px"/>
+						</div>
+						<div style="margin:20px 0;" >
+							 <div>Date:</div>
+							 <input class="easyui-textbox" id="dateClient" data-options="" style="width:100%,height:32px"/>
+						</div>
+						<div style="margin:20px 0;" >
+							 <a href="#" onclick="editClient()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Edit</a>
+							 +1D(加一天)<br/>+1h（加一小时）<br/>+1m（加一分钟）<br/>-1D(减一天)
+						</div>
+						 <div style="margin:20px 0;" >
+							 <a href="#" onclick="getclienttime()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">GetDate</a>
+						</div>			
+						 <div style="margin:20px 0;" >
+							 <a href="#" onclick="clearDate()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Clear</a>
+						</div>	  
+				  </form>
+				  </div>
+				  <div class="easyui-panel" title="服务器时间修改" style="width:250px;padding:30px 60px" >
+				  <form method="post" action="/serverdate" >
+						<div style="margin:20px 0;" >
+							 <div>Date:</div>
+							 <input class="easyui-textbox" id="dateServer" data-options="" style="width:100%,height:32px"/>
+						</div>
+						<div style="margin:20px 0;" >
+							 <a href="#" onclick="editServer()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Edit</a>
+						 </div>
+
+				  </form>
+				  </div>
+	else 
+		.container: .jumbotron(style="").
+			 <h2>服务器时间:<span id="servertime" >XXX</span></h2>
+				  <div class="easyui-panel" title="客户端时间" style="width:250px;padding:30px 60px" >
+				  <form method="post" action="/clientdate" >
+						<div style="margin:20px 0;" >
+							 <div>客户端时间:</div>
+							 <div id="clienttime" >xxx</div>
+						</div>
+					  
+						<div style="margin:20px 0;" >
+							 <div>UID:</div>
+							 <input class="easyui-numberbox" id="uid" data-options="" style="width:100%,height:32px"/>
+						</div>
+						 <div style="margin:20px 0;" >
+							 <a href="#" onclick="getclienttime()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">GetDate</a>
+						</div>			
+				  </form>
+				  </div>
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	if hasPermission
+		script(type="text/javascript").
+			 function getservertime(){
+				  $.post("/timenow",{},function(data){
+					  $("#servertime").text(data);
+				 });		 
+				 }
+				 $(function(){
+					  getservertime();
+				 });
+				 function editClient(){
+					  $.post("/clientdate",{uid:$("#uid").val(),date:$("#dateClient").val()},function(data){
+							getclienttime();
+					  });
+				 }
+				 function editServer(){
+					  $.post("/serverdate",{date:$("#dateServer").val()},function(data){
+							getservertime();
+					  });
+				 }
+				 function getclienttime(){
+					  var uid = $("#uid").val();
+					  if(uid){
+							$.post("/getclienttime",{uid:uid},function(data){
+								 $("#clienttime").text(data);
+							})
+					  }
+				 }
+				 function clearDate(){
+					  var uid = $("#uid").val();
+					  if(uid){
+							$.post("clientdate",{uid:uid,date:"=0Y"},function(data){
+									  getclienttime();
+							});
+					  }
+				 }
+	else 
+		script(type="text/javascript").
+				function getservertime(){
+				  $.post("/timenow",{},function(data){
+					  $("#servertime").text(data);
+				 });		 
+				 }
+				 $(function(){
+					  getservertime();
+				 });
+
+				 function getclienttime(){
+					  var uid = $("#uid").val();
+					  if(uid){
+							$.post("/getclienttime",{uid:uid},function(data){
+								 $("#clienttime").text(data);
+							})
+					  }
+				 }
+

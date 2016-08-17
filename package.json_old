@@ -1,0 +1,40 @@
+// 最早的package.json配置
+// {
+//   "name": "innsite",
+//   "version": "0.0.0",
+//   "private": true,
+//   "dependencies": {
+//     "keystone": "0.2.27",
+//     "async": "~0.9.0",
+//     "underscore": "~1.7.0",
+//     "dotenv": "0.4.0",
+//     "node-schedule":">=0.1.13",
+//     "hexy":">=0.2.6",
+//     "node-uuid":"1.4.3",
+//     "cron":"1.0.9",
+//     "time":"0.11.1",
+//     "sleep":"latest",
+//     "panic":"0.2.1",
+//     "protobufjs":"3.8.2",
+//     "whois-ux":"0.0.2",
+//     "winston":"1.0.0",
+//     "should":"6.0.3",
+//     "csvtojson":"0.4.0",
+//     "memcached":"2.1.0",
+//     "express": "~3.3.8"
+//   },
+//   "devDependencies": {
+//     "gulp": "~3.6.2",
+//     "gulp-jshint": "~1.6.1",
+//     "jshint-stylish": "~0.1.3",
+//     "gulp-watch": "~0.6.5"
+//   },
+//   "engines": {
+//     "node": ">=0.12.02",
+//     "npm": ">=1.3.14"
+//   },
+//   "scripts": {
+//     "start": "node keystone.js"
+//   },
+//   "main": "keystone.js"
+// }

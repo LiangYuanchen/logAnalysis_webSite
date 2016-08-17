@@ -1,0 +1,154 @@
+div(style="display:none",class="region_select") 分区:
+	select(id="region",name="region",style="width:100px")
+	div(id="warp_region")
+		input(type="radio",name="type",value="0")
+		span 全部
+		br
+		input(type="radio",name="type",value="1")
+		span world 001
+		br
+		input(type="radio",name="type",value="2")
+		span world 002
+		br
+		input(type="radio",name="type",value="3")
+		span world 003
+		br
+		input(type="radio",name="type",value="4")
+		span world 004
+		br
+		input(type="radio",name="type",value="5")
+		span world 005
+		br
+		input(type="radio",name="type",value="6")
+		span world 006
+		br
+		input(type="radio",name="type",value="7")
+		span world 007
+		br
+		input(type="radio",name="type",value="8")
+		span world 008
+		br
+		input(type="radio",name="type",value="9")
+		span world 009
+		br
+		input(type="radio",name="type",value="10")
+		span world 010
+		br			
+		input(type="radio",name="type",value="99")
+		span world 099
+		br
+		input(type="radio",name="type",value="100")
+		span world 100
+		br
+script(type="text/javascript").
+	var region = "!{filters["region"]}";
+	$(function(){
+		$(".region_select").css("display","inline-block");
+		$('#region').combo({
+			 required:true,
+			 editable:false,
+			 multiple:true
+		});
+		$('#warp_region').appendTo($('#region').combo('panel'));
+		initWrap_region();
+		$('#warp_region input').click(function(){
+			regioncheck(this);
+			});
+
+	});
+	function regioncheck(self)
+	{
+		
+		var value = $('#warp_region input[name="type"]:checked ').val();
+		$('#region').combo('setText', getTextByRegion(value));
+		$('#region').combo('setValue',value);	
+	}
+	function getTextByRegion(region)
+	{
+		switch(region)
+			{
+				case "0":
+					return "全部";
+					break;
+				case "1":
+					return "world 001";
+					break;
+				case "2":
+					return "world 002";
+					break;
+				case "3":
+					return "world 003";
+					break;
+				case "4":
+					return "world 004";		
+				case "5":
+					return "world 005";	
+				case "6":
+					return "world 006";	
+				case "7":
+					return "world 007";
+				case "8":
+					return "world 008";
+				case "9":
+					return "world 009";
+				case "10":
+					return "world 010";
+				case "99":
+					return "world 099";
+				case "100":
+					return "world 100";
+					break;
+			};
+	}
+	function initWrap_region()
+	{
+		var arrRegion = (region+"").split(",");
+		var result = "0";
+		var regionText,regionValue;
+		if(!arrRegion)
+			return result;
+		if(_.contains(arrRegion,"0"))
+		{
+			$('#region').combo('setText', "全部");
+			$('#region').combo('setValue',"0");
+		}
+		else
+		{
+			result="";
+			resultText="";
+
+			_.each(arrRegion,function(parm){
+				result+=","+parm;
+				resultText+=","+getTextByRegion(parm);
+			});
+			if(result.length==0)
+				{
+				regionText="全部";
+				regionValue="0";
+				}
+			else
+				{
+					regionText = resultText.substring(1);
+					regionValue= result.substring(1);
+				}
+			$('#region').combo('setText', regionText);
+			$('#region').combo('setValue',regionValue);			
+		}
+
+		if(_.contains(arrRegion,"0"))
+			{
+				$("#warp_region input[value='0']")[0].checked=true;
+			}
+		else
+			{
+				_.each($("#warp_region input"),function(self){
+					if(_.contains(arrRegion,self.value))
+					{
+						self.checked = true;
+					}
+				});			
+			}
+
+
+
+	}

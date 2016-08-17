@@ -1,0 +1,23 @@
+#!/bin/sh
+exec 3>/dev/tcp/127.0.0.1/4545
+while read line
+do
+   # echo $line
+length=`echo -n "$line" | wc -c`
+let "var=($length&255)"
+let "var1=($length>>8)&255"
+let "var2=($length>>16)&255"
+let "var3=($length>>24)&255"
+
+
+#printf "\x$(printf "%x" $var)\x$(printf "%x" $var1)\x$(printf "%x" $var2)\x$(printf "%x" $var3)$line" >&3;
+#printf "\"%x\" $var"printf "\"%x\" $var1"printf "\"%x\" $var2"printf "\"%x\" $var3"$line >&3;sleep 5
+#echo -n `printf "\x$(printf "%x" $var)\x$(printf "%x" $var1)\x$(printf "%x" $var2)\x$(printf "%x" $var3)"`$line >&3;sleep 5
+        #echo -n $line >&3;
+printf "0: %.8x" $length | sed -E 's/0: (..)(..)(..)(..)/0: \4\3\2\1/' | xxd -r -g0  >&3;
+echo -n "$line" >&3;
+done < ../baseData/log.log
+# date=`date +%Y-%m-%d`
+# num=`cat ./log/inn1_$date.log |wc -l`
+# exec 3>/dev/tcp/127.0.0.1/4547
+# echo -e "game2:$date:5000" >&3

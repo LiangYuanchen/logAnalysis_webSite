@@ -1,0 +1,741 @@
+extends ../../layouts/default
+block head
+	link(rel="stylesheet", type="text/css", href="/css/themes/default/easyui.css")
+	link(rel="stylesheet", type="text/css", href="/css/themes/icon.css")
+	link(rel="stylesheet", type="text/css", href="/css/demo.css")
+block intro
+	.container
+		h1 GMTool - Mail
+
+block content
+	if hasPermission
+		.container: .jumbotron(style="").
+			<h2>Mail</h2>
+			<div style="float:left;width:250px;" >
+				<div class="easyui-panel" title="添加" style="width:250px;padding:30px 60px" >
+				<form method="post" action="/mailadd" >
+					<div style="margin:20px 0;" >
+						<input class="easyui-linkbutton" id="template1" value="模板1" onclick="templateForm1()" />
+					</div>
+					<div style="margin:20px 0;" >
+						<input class="easyui-linkbutton" id="template3" value="模板2" onclick="templateForm3()" />
+					</div>						
+					<div style="margin:20px 0;" >
+						<input class="easyui-linkbutton" id="template2" value="模板3" onclick="templateForm2()" />
+					</div>					
+					<div style="margin:20px 0;" >
+						<div>Title:</div>
+						<input class="easyui-textbox" id="title" data-options="" style="width:100%,height:32px"/>
+					</div>
+					<div style="margin:20px 0;" >
+						<div>Text:</div>
+						<textarea style="width:127px;height:157px;" id="text"></textarea>
+					</div>
+					<div style="margin:20px 0;" >
+						<div>Language:</div>
+						<input class="easyui-textbox" id="language" data-options="" style="width:100%,height:32px"/>
+					</div>
+					<div style="margin:20px 0;" >
+						<a href="#" onclick="addContents()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Add</a>
+					</div>
+					<div style="margin:20px 0;" >
+						<div>mailContents:</div>
+						<input id="contents" name="contents"  type="hidden" />
+						<div id="warp_contents">
+
+						</div>
+					</div>
+					<hr />
+					<div style="margin:20px 0;" >
+					<div>TypeID:</div>
+						<input class="easyui-textbox" id="typeid"  data-options="" style="width:100%,height:32px"/> 逗号(,)相隔
+					</div>
+					<div style="margin:20px 0;" >
+						<div>Amount:</div>
+						<input class="easyui-textbox" id="amount"  data-options="" style="width:100%,height:32px"/> 逗号(,)相隔
+					</div>
+					<div style="margin:20px 0;" class="qunfa"  >
+						<div>Uid:</div>
+						<input class="easyui-textbox"  id="uid" data-options="" style="width:100%,height:32px"/> 逗号(,)相隔
+					</div>
+					<div style="margin:20px 0;" class="qunfa"  >
+						<div>VIPLevel:</div>
+						<input class="easyui-textbox"  id="VIPLevel" data-options="" style="width:100%,height:32px"/> 必须,相隔
+					</div>
+					<div style="margin:20px 0;" class="qunfa"  >
+						<div>BindFB:</div>
+						<input type="checkbox"  id="BindFB" data-options="" style="width:100%,height:32px"/> 
+					</div>
+					<div style="margin:20px 0;" class="qunfa"  >
+						<div>RegisterTimeBegin:</div>
+						<input class="easyui-datetimebox"  id="RegisterTimeBegin" data-options="" style="width:100%,height:32px"/> 
+					</div>
+					<div style="margin:20px 0;" class="qunfa"  >
+						<div>RegisterTimeEnd:</div>
+						<input class="easyui-datetimebox"  id="RegisterTimeEnd" data-options="" style="width:100%,height:32px"/> 
+					</div>
+					<div style="margin:20px 0;" class="qunfa"  >
+					<div>Platform:</div>
+						<input class="easyui-numberbox"  id="platform" data-options="" style="width:100%,height:32px"/>
+					</div>
+					<div style="margin:20px 0;" class="qunfa" >
+					<div>tavernlv:</div>
+						<input class="easyui-numberbox"  id="tavernlv" data-options="" style="width:100%,height:32px"/>
+					</div>	
+					<div style="margin:20px 0;" >
+					<div>url:</div>
+						<input class="easyui-textbox"  id="url" data-options="" style="width:100%,height:32px"/>
+					</div>		
+					<div style="margin:20px 0;" >
+					<div>region:</div>
+						<input class="easyui-textbox"  id="region" data-options="" style="width:100%,height:32px"/>
+					</div>	
+					<div style="margin:20px 0;" class="qunfa" >
+						<div>SendType:</div>
+						<select id="sendtype" style="width:150px"></select>
+						<div id="sp">
+							<input type="checkbox" name="type" value="0" ><span>ALL</span><br/>
+							<input type="checkbox" name="type" value="2" ><span>Platform</span><br/>
+							<input type="checkbox" name="type" value="4" ><span>TavernLvEqual</span><br/>
+							<input type="checkbox" name="type" value="8" ><span>TavernLvLess</span><br/>
+							<input type="checkbox" name="type" value="16" ><span>TavernLvGreat</span><br/>
+							<input type="checkbox" name="type" value="32" ><span>Specify</span><br/>
+							<input type="checkbox" name="type" value="64" ><span>PvPRank</span><br/>
+							<input type="checkbox" name="type" value="128" ><span>OnlyOldPlayer</span><br/>
+							<input type="checkbox" name="type" value="256" ><span>VIPLevel</span><br/>
+							<input type="checkbox" name="type" value="512" ><span>BindFB</span><br/>
+							<input type="checkbox" name="type" value="1024" ><span>RegisterTime</span><br/>
+						</div>
+					</div>
+					<div style="margin:20px 0;" >
+						<div>SendTime:</div>
+						<input class="easyui-datetimebox" id="sendtime"  style="width:100%,height:32px"/>
+					</div>
+					<div style="margin:20px 0;" >
+						<div>ExpireTime:</div>
+						<input class="easyui-datetimebox" id="expiretime"  style="width:100%,height:32px"/>
+					</div>
+					<div style="margin:20px 0;" >
+						<a href="#" onclick="addMail()" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">Add</a>
+					</div>
+					<div style="margin:20px 0;" >
+						<span>额外的发送选项</span>
+						<input type="checkbox"  name="checkQunfa" value="" />
+					</div>
+					<div style="margin:20px 0;display:none" class="qunfa" >
+					<div>country(大简写例如：CN AU US):</div>
+						<input class="easyui-textbox"  id="country" data-options="" style="width:100%,height:32px"/>
+						<hr/>
+					<div>not in country(大简写例如：CN AU US):</div>
+						<input class="easyui-textbox"  id="ne_country" data-options="" style="width:100%,height:32px"/>
+						<a href="#" onclick="addMail('all')" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">facebook绑定登录奖励</a>
+						<hr/>
+						<a href="#" onclick="addMail('country')" class="easyui-linkbutton" iconCls="icon-ok" style="width:100%;height:32px">国别发送</a>						
+					</div>
+				</form>
+				</div>
+			</div>
+			<div style="float:left;width:700px;margin-left:20px;" >
+				<table id="tt" class="easyui-datagrid" title="MailList" style="width:auto;height:auto;" data-options="
+						singleSelect:true,collapsible:true,method:'post',toolbar:tooldg,
+						rownumbers:true,
+						fitColumns:true,
+						view:detailview
+						" >
+						<thead>
+							<tr> 
+								 <th data-options="field:'index',width:30" >Index</th>
+								<!--<th data-options="field:'title',width:60" >title</th>-->
+								<th data-options="field:'sendtime',width:80,formatter:formatDate" >SendTime</th>
+								<th data-options="field:'sendtype',width:80,formatter:formatSendType" >SendType</th>
+								<th data-options="field:'expiretime',width:80,formatter:formatDate" >ExpireTime</th>
+								<th data-options="field:'platform'" >Platform</th>
+								<th data-options="field:'tavernlv'" >TavernLv</th>
+								<th data-options="field:'region'" >region</th>
+						</thead>
+				</table>
+			</div>
+			<div style="clear:both"></div>
+	else
+		.container: .jumbotron(style="").
+			<h2>Mail</h2>
+			<div style="float:left;width:700px;margin-left:20px;" >
+				<table id="tt" class="easyui-datagrid" title="MailList" style="width:auto;height:auto;" data-options="
+						singleSelect:true,collapsible:true,method:'post',toolbar:[],
+						rownumbers:true,
+						fitColumns:true,
+						view:detailview
+						" >
+						<thead>
+							<tr> 
+								 <th data-options="field:'index',width:30" >Index</th>
+								<!--<th data-options="field:'title',width:60" >title</th>-->
+								<th data-options="field:'sendtime',width:80,formatter:formatDate" >SendTime</th>
+								<th data-options="field:'sendtype',width:80,formatter:formatSendType" >SendType</th>
+								<th data-options="field:'expiretime',width:80,formatter:formatDate" >ExpireTime</th>
+								<th data-options="field:'platform'" >Platform</th>
+								<th data-options="field:'tavernlv'" >TavernLv</th>
+								<th data-options="field:'region'" >region</th>
+						</thead>
+				</table>
+			</div>
+			<div style="clear:both"></div>	
+block js
+	script(type="text/javascript", src="/jquery.easyui.min.js")
+	script(type="text/javascript", src="/datagrid-scrollview.js")
+	script(type="text/javascript", src="/js/underscore-min.js")
+	script(type="text/javascript", src="/js/async.min.js")
+	if hasPermission
+		script(type="text/javascript").
+			  //var str = '1234567890';
+			  //str = str.replace(/(?=(?:\d{3})+(?!\d))/g,',');
+			 // alert(str);
+
+			  function checkQunfa(){
+			  	if(this.checked)
+			  		$(".qunfa").css("display","block");
+			  	else
+			  		$(".qunfa").css("display","none");
+			  }
+			  $(function(){
+			  	  $("[name=checkQunfa]").click(checkQunfa);
+				  $("#tt").datagrid({
+						 detailFormatter:function(rowIndex,rowData){
+						 	  var returns ="";
+							  returns+= '<table><tr>' +
+											  '<td style="border:0;padding-right:10px">' +
+											  '<p>TypeId: ' + JSON.stringify(rowData.typeid) + '</p>' +
+											  '<p>Amount: ' + JSON.stringify(rowData.amount) + '</p>' +
+											  '<p>Uid: ' + JSON.stringify(rowData.uid) + '</p>' +
+											  '<p>VIPLevel: ' + JSON.stringify(rowData.viplevel) + '</p>' +
+											  '<p>BindFB: ' + JSON.stringify(rowData.bindfb) + '</p>' +
+											  '<p>RegisterTime: ' + JSON.stringify(rowData.registertime) + '</p>' +
+											  //'<p>Text: ' + JSON.stringify(rowData.text) + '</p>' +
+											  '<p>UserNames: ' + JSON.stringify(rowData.usernames) + '</p>' +
+											  '</td>' +
+											  '</tr></table>';
+							   var cdata = rowData.contents;
+							   if(cdata && cdata.length > 0)
+							   {
+								   for(var i=0;i<cdata.length;i++)
+								   {
+									   var data = cdata[i];
+									   returns+="<p>" +
+												 "<blockquote>" +
+												 "title:" + data.title +
+												 "<br/>" +
+												 "text:" + data.text +
+												 "<br/>" +
+												 "language:" + data.language +
+												 "</blockquote>" +
+												 "</p>";
+								   }
+							   }
+							   return returns;
+						 }
+					});
+				  load();
+			  });
+			  function load(){
+					$.post("/maillist",{},function(data){
+				  		var i =0;
+						async.whilst(
+							function(){
+								return i<data.rows.length;
+							},
+							function(callback)
+							{
+								 getGameUserNameByIds(data.rows[i].uid,function(err,usernames){
+								 	data.rows[i].usernames = usernames;
+								 	i++;
+								 	callback();
+								 });								
+							},
+							function()
+							{
+								$("#tt").datagrid("loadData",data);
+							}
+						)
+					});
+			  }
+
+			  var tooldg = [
+					{
+					text:'删除',
+					iconCls:'icon-remove',
+					handler:delMail
+					},
+					{
+					text:"Clear",
+					iconCls:'icon-remove',
+					handler:clearMail
+					}
+			  ];
+
+			  var hasAdd = false;
+			  function formatSendType(val,row){
+					var result = "";
+					val = parseInt(val);
+					if ((val&2)==2) {
+						 result+="PLATFORM ";
+					};
+					if ((val&4)==4) {
+						 result+="TAVERNLVEQUAL ";
+					};
+					if ((val&8)==8) {
+						 result+="TAVERNLVLESS ";
+					};
+					if ((val&16)==16) {
+						 result+="TAVERNLVGREAT ";
+					};
+					if ((val&32)==32) {
+						 result+="SPECIFY ";
+					};
+					if((val&64)==64){
+						result+="PvPRank ";
+					}
+					if((val&128)==128){
+						result+="OnlyOldPlayer";
+					}
+					if((val&256)==256){
+						result+="VIPLEVEL";
+					}
+					if((val&512)==512){
+						result+="BINDFB";
+					}
+					if((val&1024)==1024){
+						result+="REGISTERTIME";
+					}
+
+					if (val==0) {
+						 result="ALL";
+					};
+					return result;
+			  }
+			  function delMail()
+			  {
+					var cmd = $("#tt").datagrid("getSelected").index;
+					if (isNaN(cmd)) {
+						 alert("没有选中行！！！");
+						 return;
+					};
+					$.post("/maildel",{data:cmd},function(data){
+						 load();
+					});
+			  }
+			  function clearMail()
+			  {
+					$.post("/mailclear",{},function(data){
+						 load();
+					});			  		
+			  }
+			  var getGameUserNameByIds = function(strUids,next){
+			  	var arrUids = "";
+			  	if(!strUids)
+			  	{
+			  		next(null,"");
+			  		return;
+			  	}
+			  	if(typeof strUids == "string")
+			  		 arrUids = strUids.split(",");
+			  	else 
+			  		 arrUids = strUids;
+			  	var i = 0;
+			  	var arrUsername = [];
+			  	async.whilst(
+			  	function(){
+			  	return i<arrUids.length;
+			  	},
+			  	function(callback){
+			  		var uid = arrUids[i];
+					$.post('/getUserName',{uid:uid},function(data){
+						if(data&&data.length>0)
+					    	arrUsername.push(data);
+					    i++;
+					    callback();
+					});
+			  	},
+			  	function(){
+			  		next(null,arrUsername.join(","));
+			  	}
+			  	);
+			  }
+				  function validateMail(data,next)
+				  {
+				  	var msg="";
+				  	var errorMsg = "";
+
+			  		var arrTypeId = data.typeid.split(",");
+			  		var arrAmount = data.amount.split(",");
+			  		if(arrTypeId.length!=data.amount.split(",").length)
+			  			{
+			  				errorMsg+="typeID和amount数量不对";
+			  			}
+			  		if(data.typeid.indexOf("4000")>=0)
+			  			{
+			  				for(var i=0;i<arrTypeId.length;i++)
+			  					{
+			  						if(arrTypeId[i]=="4000")
+			  							{
+			  								msg+="宝石数量:"+arrAmount[i].replace(/(?=(?:\d{3})+(?!\d))/g,',')  +"\n";
+			  								if(isNaN(arrAmount[i])||parseInt(arrAmount[i])>=1000)
+			  									errorMsg+="宝石数量("+arrAmount[i]+")异常"+"\n";
+			  							}
+			  						if(arrTypeId[i]=="3000")
+			  							{
+			  								msg+="金币数量:"+arrAmount[i].replace(/(?=(?:\d{3})+(?!\d))/g,',') +"\n";
+			  								if(isNaN(arrAmount[i])||parseInt(arrAmount[i])>5000)
+			  									errorMsg+="金币数("+arrAmount[i]+")异常"+"\n";
+			  							}
+			  					}
+			  			}
+				  	for(var parm in data)
+			  		{
+			  			var keyName = parm;
+			  			var theValue = data[parm];
+			  			if(parm=="title")
+			  				keyName = "标题";
+			  			if(parm=="text")
+			  				keyName = "内容";
+			  			if(parm=="sendtime"||parm=="expiretime")
+			  				theValue = new Date(parseInt(theValue)*1000).format("yyyy-MM-dd hh:mm:ss");
+			  			if(parm=="sendtype")
+			  				{
+			  					if(isNaN(theValue))
+			  						errorMsg+="sendType类型错误";
+			  					theValue=formatSendType(data[parm]);
+			  						
+			  				}
+			 			if(data[parm])
+			  				msg+=keyName+":"+theValue+"\n";
+			  		}
+			  		getGameUserNameByIds(data.uid,function(err,usernames){
+			  			if(usernames&&usernames.length>0)
+			  				msg+="username:" + usernames+"\n";
+					  	if(confirm(msg+errorMsg))
+				  		{
+				  			next(true);
+				  		}
+				  		else
+			  			{
+			  				next(false);
+			  			}
+
+			  		});
+				  }
+			  function templateForm1()
+			  {
+			  		$("#title").val("New Update Coming Soon!");
+			  		$("#text").val(" A new update will come out in the next 12 hours.Please update the game later on Google Play and you will receive awesome gifts including 200 Gems! ");
+			  		//$("#sendtype").combo("setValue","0");
+			  		var twohourslater = Date.now()+60*1000*60*12;
+			  		$("#sendtime").datetimebox("setText",(new Date()).format("yyyy-MM-dd hh:mm:ss") );
+			  		$("#expiretime").datetimebox("setText",(new Date(twohourslater)).format("yyyy-MM-dd hh:mm:ss") );
+			  		$("#typeid").val("");
+			  		$("#amount").val("");
+			  		$("#uid").val("");
+			  		$("#platform").val("");
+			  		$("#tavernlv").val("");
+			  		$("#url").val("https://www.facebook.com/tavernheroes");
+			  		$("#region").val("0");
+			  		$('#sp input').each(function(index,element){
+						 var v = $(this).val();
+						 var s = $(this).next('span').text();			
+						 $(this).removeAttr("checked");								 					 	
+						 
+			  		});
+			  		
+	
+			  		$("#sp input[value='0']").attr("checked","true");
+			  		
+			  		 spCheck($("#sp input[value='0']")[0]);
+			  		 
+			  }
+			  function templateForm3()
+			  {
+			  		$("#title").val("New Update Coming Soon!");
+			  		$("#text").val(" A new update will come out in the next 2 hours.Please update the game later on Google Play and you will receive awesome gifts including 200 Gems! ");
+			  		//$("#sendtype").combo("setValue","0");
+			  		var twohourslater = Date.now()+60*1000*60*2;
+			  		$("#sendtime").datetimebox("setText",(new Date()).format("yyyy-MM-dd hh:mm:ss") );
+			  		$("#expiretime").datetimebox("setText",(new Date(twohourslater)).format("yyyy-MM-dd hh:mm:ss") );
+			  		$("#typeid").val("");
+			  		$("#amount").val("");
+			  		$("#uid").val("");
+			  		$("#platform").val("");
+			  		$("#tavernlv").val("");
+			  		$("#url").val("https://www.facebook.com/tavernheroes");
+			  		$("#region").val("0");
+			  		$('#sp input').each(function(index,element){
+						 var v = $(this).val();
+						 var s = $(this).next('span').text();
+						 $(this).removeAttr("checked");
+						 
+			  		});
+			  		$("#sp input[value='0']").attr("checked","true");
+			  		
+			  		spCheck($("#sp input[value='0']")[0]);
+			  		 
+			  		
+			  }				  
+			  function templateForm2()
+			  {
+			  		$("#title").val("Maintenance Compensation");
+			  		$("#text").val("Thanks for your patience and congratulations for updating the new version! ");
+			  		//$("#sendtype").combo("setValue","2");
+			  		var twohourslater = Date.now()+60*1000*60*24*2;
+			  		$("#sendtime").datetimebox("setText",(new Date()).format("yyyy-MM-dd hh:mm:ss") );
+			  		$("#expiretime").datetimebox("setText",(new Date(twohourslater)).format("yyyy-MM-dd hh:mm:ss") );
+			  		$("#typeid").val("4000");
+			  		$("#amount").val("200");
+			  		$("#uid").val("");
+			  		$("#platform").val("");
+			  		$("#tavernlv").val("");
+			  		$("#url").val("");
+			  		$("#region").val("0");
+			  		$('#sp input').each(function(index,element){
+						 var v = $(this).val();
+						 var s = $(this).next('span').text();			
+						 $(this).removeAttr("checked");								 					 	
+						 
+			  			});
+			  		
+			  		$("#sp input[value='2']").attr("checked","checked");
+			  		$("#sp input[value='128']").attr("checked","checked");
+			  		 spCheck($("#sp input[value='2']")[0]);	
+			  		 spCheck($("#sp input[value='128']")[0]);	
+			  		
+			  }
+			 function addContents()
+			 {
+					 var contents = $("#contents").val();
+					 if(!contents || !contents.length)
+					 contents = "[]";
+					 contents = eval("(" + contents + ")");
+					 if(!contents || !contents.length)
+					 contents = [];
+					 var newcontent = {};
+					 newcontent.title = $("#title").val();
+					 newcontent.text = $("#text").val();
+			 		 newcontent.language = $("#language").val();
+					 contents.push(newcontent);
+					 $("#contents").val(JSON.stringify(contents));
+					 drawingContents();
+			 }
+
+			 function drawingContents()
+			 {
+				 var contents = $("#contents").val();
+				 if(!contents || !contents.length)
+				 contents = "[]";
+				 contents = eval("(" + contents + ")");
+				 if(!contents || !contents.length)
+				 contents = [];
+				 $("#warp_contents").html("");
+				 for(var i=0;i<contents.length;i++)
+				 {
+				 	$("#warp_contents").append($("<a  onclick='delContent("+i+")'>x</a><p>" +
+												"title:" +
+												contents[i].title +
+												"<br/>" +
+												"text:" +
+												contents[i].text +
+												"<br/>" +
+												"language:" +
+												contents[i].language +
+												"</p>"
+												));
+				 }
+			}
+
+			  function addMail(theType)
+			  {
+					if (!hasAdd) {
+						 hasAdd  = true;
+						 var parm = {};
+						 var msg = "";
+						 parm.title = $("#title").val();
+						 
+						 parm.text = $("#text").val();
+						 parm.typeid = $("#typeid").val();
+						 parm.amount = $("#amount").val();
+						 parm.uid = $("#uid").val();
+						 parm.platform = $("#platform").val();
+						 parm.tavernlv = $("#tavernlv").val();
+						 parm.region = $("#region").val();
+						 parm.sendtype = $("#sendtype").combo("getValue");
+						 parm.sendtime = parseInt(parseUTC($("#sendtime").datetimebox("getText"))); 
+						 parm.expiretime = parseInt(parseUTC($("#expiretime").datetimebox("getText"))); 
+						 parm.country = $("#country").val();
+						 parm.ne_country = $("#ne_country").val();
+						 parm.url = $("#url").val();
+						 parm.viplevel = $("#VIPLevel").val();
+						 parm.bindfb = $("#BindFB:checked").length>0?"1":"0";
+						 parm.registertimebegin = parseUTC( $("#RegisterTimeBegin").datetimebox("getText"));
+						 parm.registertimeend = parseUTC( $("#RegisterTimeEnd").datetimebox("getText"));
+						 parm.contents = eval("(" +  $("#contents").val()+ ")");
+						 if (isNaN(parm.sendtime)) 
+							  parm.sendtime=0;
+						 else
+							  parm.sendtime =parseInt(parm.sendtime/1000);
+						 if(isNaN(parm.expiretime))
+							  parm.expiretime = 0;
+						 else
+							  parm.expiretime = parseInt(parm.expiretime/1000);
+						 if(isNaN(parm.registertimebegin))
+							  parm.registertimebegin = 0;
+						 else
+							  parm.registertimebegin = parseInt(parm.registertimebegin/1000);
+						 if(isNaN(parm.registertimeend))
+							  parm.registertimeend = 0;
+						 else
+							  parm.registertimeend = parseInt(parm.registertimeend/1000);
+						var url = "/mailadd";
+						if(theType=="all"){
+							url="/mailsendall";
+						}
+						else if(theType=="country")
+							url="/mailsendcountry";
+						validateMail(parm,function(boolResult){
+							if(boolResult)
+							{
+								$.post(url,{data:parm},function(data){
+								  hasAdd =false;
+								  load();
+								});
+							}
+							else
+							{
+
+							}
+						});							
+
+					}else{
+						 if(confirm("请确认该提交不是重复提交？")){
+							  hasAdd = false;
+							  addMail(theType);
+						 }
+					}
+			  }
+			  var spCheck = function(self){
+						 var vB = $("#sendtype").combo("getValue") || 0;
+						 var sB = $("#sendtype").combo("getText") || "";
+						 var v = $(self).val();
+						 var s = $(self).next('span').text();
+						
+						 if(self.checked)
+						 {
+							  v = parseInt(v) + parseInt(vB);
+							  s = s + " " + sB; 
+						 }
+						 else
+						 {
+							  v = parseInt(vB) - parseInt(v);
+							  if(v<0)
+							  	v = 0;
+							  var arrS = sB.split(' ');
+							  var result=[];
+							  for(var i=0;i<arrS.length;i++)
+							  {
+									if (arrS[i]!=s) {
+										 result.push(arrS[i]);
+									};
+							  }
+							  s = result.join(" ");
+						 }
+						 $('#sendtype').combo('setText', s);
+						 $('#sendtype').combo('setValue',v);
+					};
+			 $(function(){
+					$('#sendtype').combo({
+						 required:true,
+						 editable:false,
+						 multiple:true
+					});
+					$('#sp').appendTo($('#sendtype').combo('panel'));
+					$('#sp input').click(function(){
+						spCheck(this);
+						});
+			  });
+	else 
+		script(type="text/javascript").
+			  $(function(){
+				  $("#tt").datagrid({
+						 detailFormatter:function(rowIndex,rowData){
+							 var returns ="";
+							 returns += '<table><tr>' +
+											  '<td style="border:0;padding-right:10px">' +
+											  '<p>TypeId: ' + JSON.stringify(rowData.typeid) + '</p>' +
+											  '<p>Amount: ' + JSON.stringify(rowData.amount) + '</p>' +
+											  '<p>Uid: ' + JSON.stringify(rowData.uid) + '</p>' +
+											  '<p>Text: ' + JSON.stringify(rowData.text) + '</p>' +
+											  '</td>' +
+											  '</tr></table>';
+
+							 var cdata = rowData.contents;
+							 if (cdata && cdata.length > 0) {
+								 for (var i = 0; i < cdata.length; i++) {
+									 var data = cdata[i];
+									 returns += "<p>" +
+											 "<blockquote>" +
+											 "title:" + data.title +
+											 "<br/>" +
+											 "text:" + data.text +
+											 "<br/>" +
+											 "language:" + data.language +
+											 "</blockquote>" +
+											 "</p>";
+								 }
+							 }
+							 return returns;
+						 }
+					});
+				  load();
+			  });
+
+			  function load(){
+					$.post("/maillist",{},function(data){
+						 $("#tt").datagrid("loadData",data);
+					});
+			  }
+
+			  var tooldg = [
+					{
+					text:'删除',
+					iconCls:'icon-remove',
+					handler:delMail
+					}
+			  ];
+
+			  var hasAdd = false;
+
+			  function formatDate(val,row){
+					var date = new Date(val*1000);
+					return date.format("yyyy-MM-dd hh:mm:ss");
+			  }
+			  function formatSendType(val,row){
+					var result = "";
+					val = parseInt(val);
+					if ((val&2)==2) {
+						 result+="PLATFORM ";
+					};
+					if ((val&4)==4) {
+						 result+="TAVERNLVEQUAL ";
+					};
+					if ((val&8)==8) {
+						 result+="TAVERNLVLESS ";
+					};
+					if ((val&16)==16) {
+						 result+="TAVERNLVGREAT ";
+					};
+					if ((val&32)==32) {
+						 result+="SPECIFY";
+					};
+					if (val==0) {
+						 result="ALL";
+					};
+					return result;
+			  }
+
+
+	
